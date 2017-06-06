@@ -16,9 +16,11 @@
     "PATENTS"
   ],
   "dependencies": {
-    "eslint": "3",
-    "graphql": "^0.10.1",
+    "graphql": "^0.10.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
     "mocha": "^3.4.2",
-    "prettier": "^1.4.1"
+    "prettier": "^1.4.2"
   }
 }
