@@ -89,13 +89,16 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
       ],
     },
     {
-      code: 'graphql`fragment User { id }`;',
+      filename: '/path/to/test.js',
+      code: 'graphql`fragment F on User {\n  id()\n}`;',
       errors: [
         {
-          message: `Syntax Error GraphQL request (1:15) Expected "on", found {
+          message: `Syntax Error test.js (2:6) Expected Name, found )
 
-1: fragment User { id }
-                 ^
+1: fragment F on User {
+2:   id()
+        ^
+3: }
 `,
         },
       ],
@@ -104,7 +107,11 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
 });
 
 ruleTester.run('graphql-naming', rules['graphql-naming'], {
-  valid: valid,
+  valid: [
+    ...valid,
+    // syntax error, covered by `graphql-syntax`
+    {code: 'graphql`query {{{`'},
+  ],
   invalid: [
     {
       filename: 'path/to/Example.react.js',

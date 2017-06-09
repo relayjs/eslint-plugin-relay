@@ -9,7 +9,8 @@
 
 'use strict';
 
-const graphql = require('graphql');
+const {parse, Source} = require('graphql');
+const path = require('path');
 
 function getGraphQLTagName(tag) {
   if (tag.type === 'Identifier' && tag.name === 'graphql') {
@@ -37,7 +38,7 @@ function getGraphQLAST(taggedTemplateExpression) {
   }
   const quasi = taggedTemplateExpression.quasi.quasis[0];
   try {
-    return graphql.parse(quasi.value.cooked);
+    return parse(quasi.value.cooked);
   } catch (error) {
     // Invalid syntax, covered by graphql-syntax rule
     return null;
@@ -172,7 +173,8 @@ module.exports.rules = {
             return;
           }
           try {
-            const ast = graphql.parse(quasi.value.cooked);
+            const filename = path.basename(context.getFilename());
+            const ast = parse(new Source(quasi.value.cooked, filename));
             ast.definitions.forEach(definition => {
               if (!definition.name) {
                 context.report({
