@@ -9,7 +9,7 @@
 
 'use strict';
 
-const {parse, Source} = require('graphql');
+const {parse, visit, Source} = require('graphql');
 const path = require('path');
 
 function getGraphQLTagName(tag) {
@@ -131,7 +131,8 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
           context.report({
             loc: getLoc(context, taggedTemplateExpression, def.name),
             message:
-              'Container fragment names must be `<ModuleName>_<propName>`. Got `{{actual}}`, expected `{{expected}}`.',
+              'Container fragment names must be `<ModuleName>_<propName>`. ' +
+                'Got `{{actual}}`, expected `{{expected}}`.',
             data: {
               actual: definitionName,
               expected: expectedName,
@@ -194,6 +195,62 @@ module.exports.rules = {
       };
     },
   },
+  'compat-uses-vars': {
+    meta: {
+      docs: {
+        description:
+          'Relay Compat transforms fragment spreads from ' +
+            "`...Container_foo` to `Container.getFragment('foo')`. This " +
+            'makes ESLint aware of this.',
+      },
+    },
+    create(context) {
+      return {
+        TaggedTemplateExpression(taggedTemplateExpression) {
+          const ast = getGraphQLAST(taggedTemplateExpression);
+          if (!ast) {
+            return;
+          }
+          visit(ast, {
+            FragmentSpread(spreadNode) {
+              const m =
+                spreadNode.name &&
+                spreadNode.name.value.match(/^([a-z0-9]+)_[a-z0-9]+$/i);
+              if (!m) {
+                return;
+              }
+              const componentName = m[1];
+              if (
+                context
+                  .getScope(taggedTemplateExpression)
+                  .isUsedName(componentName)
+              ) {
+                // if this variable is defined, mark it as used
+                context.markVariableAsUsed(componentName);
+              } else {
+                // otherwise, yell about this needed to be defined
+                context.report({
+                  message:
+                    'In compat mode, Relay expects the component that has ' +
+                      'the `{{fragmentName}}` fragment to be imported with ' +
+                      'the variable name `{{varName}}`.',
+                  data: {
+                    fragmentName: spreadNode.name.value,
+                    varName: componentName,
+                  },
+                  loc: getLoc(
+                    context,
+                    taggedTemplateExpression,
+                    spreadNode.name
+                  ),
+                });
+              }
+            },
+          });
+        },
+      };
+    },
+  },
   'graphql-naming': {
     meta: {
       fixable: 'code',
@@ -222,7 +279,8 @@ module.exports.rules = {
                 if (operationName.indexOf(moduleName) !== 0) {
                   context.report({
                     message:
-                      'Operations should start with the module name. Expected prefix `{{expected}}`, got `{{actual}}`.',
+                      'Operations should start with the module name. ' +
+                        'Expected prefix `{{expected}}`, got `{{actual}}`.',
                     data: {
                       expected: moduleName,
                       actual: operationName,
@@ -254,7 +312,8 @@ module.exports.rules = {
                   context.report({
                     node: property.value.tag,
                     message:
-                      '`{{callee}}` expects GraphQL to be tagged with graphql`...` or graphql.experimental`...`.',
+                      '`{{callee}}` expects GraphQL to be tagged with ' +
+                        'graphql`...` or graphql.experimental`...`.',
                     data: {
                       callee: calleeToString(node.callee),
                     },
@@ -266,7 +325,8 @@ module.exports.rules = {
                 context.report({
                   node: property,
                   message:
-                    '`{{callee}}` expects fragment definitions to be `key: graphql`.',
+                    '`{{callee}}` expects fragment definitions to be ' +
+                      '`key: graphql`.',
                   data: {
                     callee: calleeToString(node.callee),
                   },

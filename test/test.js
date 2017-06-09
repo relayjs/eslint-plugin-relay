@@ -23,9 +23,9 @@ const valid = [
   {
     filename: 'path/to/Example.react.js',
     code: `
-createFragmentContainer(Component, {
-  user: graphql\`fragment Example_user on User {id}\`,
-});
+      createFragmentContainer(Component, {
+        user: graphql\`fragment Example_user on User {id}\`,
+      });
     `,
   },
   {
@@ -119,7 +119,8 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
       errors: [
         {
           message:
-            'Operations should start with the module name. Expected prefix `Example`, got `RandomName`.',
+            'Operations should start with the module name. Expected prefix ' +
+              '`Example`, got `RandomName`.',
           line: 1,
           column: 28,
           endLine: 1,
@@ -130,46 +131,49 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
     {
       filename: 'path/to/Example.react.js',
       code: `
-createFragmentContainer(Component, {
-  user: junk\`fragment Random_user on User {id}\`,
-});
-`,
+        createFragmentContainer(Component, {
+          user: junk\`fragment Random_user on User {id}\`,
+        });
+      `,
       errors: [
         {
           message:
-            '`createFragmentContainer` expects GraphQL to be tagged with graphql`...` or graphql.experimental`...`.',
+            '`createFragmentContainer` expects GraphQL to be tagged with ' +
+              'graphql`...` or graphql.experimental`...`.',
         },
       ],
     },
     {
       filename: 'MyComponent.jsx',
       code: `
-createFragmentContainer(Component, {
-  user: graphql\`fragment Random on User {id}\`,
-});
-`,
+        createFragmentContainer(Component, {
+          user: graphql\`fragment Random on User {id}\`,
+        });
+      `,
       output: `
-createFragmentContainer(Component, {
-  user: graphql\`fragment MyComponent_user on User {id}\`,
-});
-`,
+        createFragmentContainer(Component, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
       errors: [
         {
           message:
-            'Container fragment names must be `<ModuleName>_<propName>`. Got `Random`, expected `MyComponent_user`.',
+            'Container fragment names must be `<ModuleName>_<propName>`. Got ' +
+              '`Random`, expected `MyComponent_user`.',
         },
       ],
     },
     {
       code: `
-createFragmentContainer(Component, {
-  [user]: graphql\`fragment Random on User {id}\`,
-});
-`,
+        createFragmentContainer(Component, {
+          [user]: graphql\`fragment Random on User {id}\`,
+        });
+      `,
       errors: [
         {
           message:
-            '`createFragmentContainer` expects fragment definitions to be `key: graphql`.',
+            '`createFragmentContainer` expects fragment definitions to be ' +
+              '`key: graphql`.',
         },
       ],
     },
