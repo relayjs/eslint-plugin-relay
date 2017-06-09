@@ -12,6 +12,10 @@
 const {parse, visit, Source} = require('graphql');
 const path = require('path');
 
+function shouldLint(context) {
+  return /graphql|relay/i.test(context.getSourceCode().text);
+}
+
 function getGraphQLTagName(tag) {
   if (tag.type === 'Identifier' && tag.name === 'graphql') {
     return 'graphql';
@@ -159,6 +163,9 @@ module.exports.rules = {
       },
     },
     create(context) {
+      if (!shouldLint(context)) {
+        return {};
+      }
       return {
         TaggedTemplateExpression(node) {
           if (!getGraphQLTagName(node.tag)) {
@@ -205,6 +212,9 @@ module.exports.rules = {
       },
     },
     create(context) {
+      if (!shouldLint(context)) {
+        return {};
+      }
       return {
         TaggedTemplateExpression(taggedTemplateExpression) {
           const ast = getGraphQLAST(taggedTemplateExpression);
@@ -259,6 +269,9 @@ module.exports.rules = {
       },
     },
     create(context) {
+      if (!shouldLint(context)) {
+        return {};
+      }
       return {
         TaggedTemplateExpression(node) {
           const ast = getGraphQLAST(node);

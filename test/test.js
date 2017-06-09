@@ -131,8 +131,10 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
     {
       filename: 'path/to/Example.react.js',
       code: `
+        const createFragmentContainer = require('relay-runtime');
+        var UserFragment;
         createFragmentContainer(Component, {
-          user: junk\`fragment Random_user on User {id}\`,
+          user: junk\`fragment Example_user on User { id }\`,
         });
       `,
       errors: [
@@ -140,6 +142,23 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
           message:
             '`createFragmentContainer` expects GraphQL to be tagged with ' +
               'graphql`...` or graphql.experimental`...`.',
+        },
+      ],
+    },
+    {
+      filename: 'path/to/Example.react.js',
+      code: `
+        const createFragmentContainer = require('relay-runtime');
+        var UserFragment;
+        createFragmentContainer(Component, {
+          user: UserFragment,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`createFragmentContainer` expects fragment definitions to be ' +
+              '`key: graphql`.',
         },
       ],
     },
