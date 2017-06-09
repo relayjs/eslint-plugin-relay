@@ -83,7 +83,7 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
         const {graphql} = require('RelayCompat');
         graphql\`
           query Example {
-            ...ExampleComponent_prop
+            ...ExampleComponent_foo_bar
           }
         \`
       `,
@@ -91,12 +91,12 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
         {
           message:
             'In compat mode, Relay expects the component that has the ' +
-              '`ExampleComponent_prop` fragment to be imported with the ' +
+              '`ExampleComponent_foo_bar` fragment to be imported with the ' +
               'variable name `ExampleComponent`.',
           line: 6,
           column: 16,
           endLine: 6,
-          endColumn: 37,
+          endColumn: 40,
         },
       ],
     },

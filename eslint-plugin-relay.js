@@ -225,7 +225,7 @@ module.exports.rules = {
             FragmentSpread(spreadNode) {
               const m =
                 spreadNode.name &&
-                spreadNode.name.value.match(/^([a-z0-9]+)_[a-z0-9]+$/i);
+                spreadNode.name.value.match(/^([a-z0-9]+)_/i);
               if (!m) {
                 return;
               }
