@@ -23,6 +23,8 @@ const ruleTester = new RuleTester({
   parserOptions: {ecmaVersion: 6, sourceType: 'module'},
 });
 
+const esLintVersion = require('eslint/package.json').version;
+
 ruleTester.defineRule('relay/compat-uses-vars', rules['compat-uses-vars']);
 
 ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
@@ -54,7 +56,11 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
           }
         \`
       `,
-      errors: ["'OtherComponent' is assigned a value but never used."],
+      errors: [
+        esLintVersion === '3.5.0'
+          ? "'OtherComponent' is defined but never used."
+          : "'OtherComponent' is assigned a value but never used.",
+      ],
     },
   ],
 });
