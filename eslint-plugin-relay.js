@@ -231,6 +231,10 @@ module.exports.rules = {
       if (!shouldLint(context)) {
         return {};
       }
+      if (!/react-relay\/compat|RelayCompat/.test(context.getSourceCode().text)) {
+        // Only run in for compat mode files
+        return {};
+      }
       return {
         TaggedTemplateExpression(taggedTemplateExpression) {
           const ast = getGraphQLAST(taggedTemplateExpression);

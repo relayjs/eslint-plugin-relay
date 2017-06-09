@@ -42,12 +42,26 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
         \`
       `,
     },
+    {
+      // OK, since this is Relay Modern
+      code: `
+        /* eslint relay/compat-uses-vars: 1 */
+        var require;
+        const {graphql} = require('react-relay');
+        graphql\`
+          query Example {
+            ...ExampleComponent_prop
+          }
+        \`
+      `,
+    },
   ],
   invalid: [
     {
       filename: 'path/to/Example.react.js',
       code: `
         /* eslint relay/compat-uses-vars: 1 */
+        const {graphql} = require('RelayCompat');
         const OtherComponent = require('other-component');
         const ExampleComponent = require('example-component');
         graphql\`
