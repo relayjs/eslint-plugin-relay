@@ -49,13 +49,25 @@ function getGraphQLAST(taggedTemplateExpression) {
   }
 }
 
-const MODULE_NAME_REGEX = /(?:\/|^)(\w+)(?:\.[\w\.]+|\/index\.\w+)$/;
-function getModuleName(context) {
-  const match = context.getFilename().match(MODULE_NAME_REGEX);
-  if (match) {
-    return match[1];
-  }
-  return null;
+// Copied directly from Relay
+function getModuleName(filePath) {
+  const filename = path.basename(filePath, path.extname(filePath));
+  // /path/to/button/index.js -> button
+  let moduleName = filename === 'index'
+    ? path.basename(path.dirname(filePath))
+    : filename;
+
+  // Example.ios -> Example
+  // Example.product.android -> Example
+  moduleName = moduleName.replace(/(?:\.\w+)+/, '');
+
+  // foo-bar -> fooBar
+  // Relay compatibility mode splits on _, so we can't use that here.
+  moduleName = moduleName.replace(/[^a-zA-Z0-9]+(\w?)/g, (match, next) =>
+    next.toUpperCase(),
+  );
+
+  return moduleName;
 }
 
 // TODO remove after we no longer have to support ESLint 3.5.0
@@ -137,7 +149,7 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
   if (!ast) {
     return;
   }
-  const moduleName = getModuleName(context);
+  const moduleName = getModuleName(context.getFilename());
   ast.definitions.forEach(def => {
     if (!def.name) {
       // no name, covered by graphql-naming/TaggedTemplateExpression
@@ -327,7 +339,7 @@ module.exports.rules = {
           ast.definitions.forEach(definition => {
             switch (definition.kind) {
               case 'OperationDefinition':
-                const moduleName = getModuleName(context);
+                const moduleName = getModuleName(context.getFilename());
                 const name = definition.name;
                 if (!name) {
                   return;
