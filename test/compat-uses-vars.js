@@ -55,6 +55,29 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
         \`
       `,
     },
+    {
+      code: `
+        /* eslint relay/compat-uses-vars: 1 */
+
+        const OtherComponent = require('OtherComponent');
+        const React = require('React');
+
+        const {graphql} = require('RelayCompat');
+
+        class ThisComponent extends React.Component {
+          render() {
+            graphql\`
+              query ThisComponentQuery {
+                viewer {
+                  ...OtherComponent_viewer
+                }
+              }
+            \`;
+          }
+        }
+        module.exports = ThisComponent;
+      `,
+    },
   ],
   invalid: [
     {

@@ -231,10 +231,39 @@ module.exports.rules = {
       if (!shouldLint(context)) {
         return {};
       }
-      if (!/react-relay\/compat|RelayCompat/.test(context.getSourceCode().text)) {
+      if (
+        !/react-relay\/compat|RelayCompat/.test(context.getSourceCode().text)
+      ) {
         // Only run in for compat mode files
         return {};
       }
+      function isInScope(name) {
+        var scope = context.getScope();
+        var sourceCode = context.getSourceCode();
+        var variables = scope.variables;
+
+        while (scope.type !== 'global') {
+          scope = scope.upper;
+          variables = scope.variables.concat(variables);
+        }
+        if (scope.childScopes.length) {
+          variables = scope.childScopes[0].variables.concat(variables);
+          // Temporary fix for babel-eslint
+          if (scope.childScopes[0].childScopes.length) {
+            variables = scope.childScopes[0].childScopes[0].variables.concat(
+              variables
+            );
+          }
+        }
+
+        for (var i = 0, len = variables.length; i < len; i++) {
+          if (variables[i].name === name) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       return {
         TaggedTemplateExpression(taggedTemplateExpression) {
           const ast = getGraphQLAST(taggedTemplateExpression);
@@ -250,11 +279,7 @@ module.exports.rules = {
                 return;
               }
               const componentName = m[1];
-              if (
-                context
-                  .getScope(taggedTemplateExpression)
-                  .isUsedName(componentName)
-              ) {
+              if (isInScope(componentName)) {
                 // if this variable is defined, mark it as used
                 context.markVariableAsUsed(componentName);
               } else {
