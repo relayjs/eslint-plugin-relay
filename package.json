@@ -8,7 +8,7 @@
   "scripts": {
     "test": "mocha",
     "test-watch": "mocha --watch",
-    "prettier": "find . -name node_modules -prune -or -name '*.js' -exec prettier --write --single-quote --trailing-comma es5 --no-bracket-spacing --jsx-bracket-same-line --parser flow {} +"
+    "prettier": "find . -name node_modules -prune -or -name '*.js' -exec prettier --write --single-quote --trailing-comma none --no-bracket-spacing --jsx-bracket-same-line --parser flow {} +"
   },
   "files": [
     "eslint-plugin-relay.js",

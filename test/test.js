@@ -26,22 +26,22 @@ const valid = [
       createFragmentContainer(Component, {
         user: graphql\`fragment Example_user on User {id}\`,
       });
-    `,
+    `
   },
   {
     filename: 'path/to/MyComponent.react.js',
-    code: 'graphql`query MyComponent { me { name }}`;',
+    code: 'graphql`query MyComponent { me { name }}`;'
   },
   {
     filename: 'path/to/MyComponent.react.js',
-    code: 'graphql`query MyComponentBla { me { name }}`;',
+    code: 'graphql`query MyComponentBla { me { name }}`;'
   },
   {
     filename: 'path/to/MyComponent.jsx',
     code: `createFragmentContainer(Component, {
       user: graphql\`fragment MyComponent_user on User {id}\`,
-    });`,
-  },
+    });`
+  }
 ];
 
 ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
@@ -54,39 +54,39 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
         'graphql`query{test}`;',
         'graphql`{test}`;',
         'graphql`subscription {test}`;',
-        'graphql`mutation {test}`;',
+        'graphql`mutation {test}`;'
       ].join('\n'),
       errors: [
         {
           message: 'Operations in graphql tags require a name.',
           line: 1,
-          column: 9,
+          column: 9
         },
         {
           message: 'Operations in graphql tags require a name.',
           line: 2,
-          column: 9,
+          column: 9
         },
         {
           message: 'Operations in graphql tags require a name.',
           line: 3,
-          column: 9,
+          column: 9
         },
         {
           message: 'Operations in graphql tags require a name.',
           line: 4,
-          column: 9,
-        },
-      ],
+          column: 9
+        }
+      ]
     },
     {
       code: 'test;\ngraphql`fragment Test on User { ${x} }`;',
       errors: [
         {
           message:
-            'graphql tagged templates do not support ${...} substitutions.',
-        },
-      ],
+            'graphql tagged templates do not support ${...} substitutions.'
+        }
+      ]
     },
     {
       filename: '/path/to/test.js',
@@ -99,18 +99,18 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
 2:   id()
         ^
 3: }
-`,
-        },
-      ],
-    },
-  ],
+`
+        }
+      ]
+    }
+  ]
 });
 
 ruleTester.run('graphql-naming', rules['graphql-naming'], {
   valid: [
     ...valid,
     // syntax error, covered by `graphql-syntax`
-    {code: 'graphql`query {{{`'},
+    {code: 'graphql`query {{{`'}
   ],
   invalid: [
     {
@@ -124,9 +124,9 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
           line: 1,
           column: 28,
           endLine: 1,
-          endColumn: 38,
-        },
-      ],
+          endColumn: 38
+        }
+      ]
     },
     {
       filename: 'path/to/Example.react.js',
@@ -141,9 +141,9 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects GraphQL to be tagged with ' +
-              'graphql`...` or graphql.experimental`...`.',
-        },
-      ],
+              'graphql`...` or graphql.experimental`...`.'
+        }
+      ]
     },
     {
       filename: 'path/to/Example.react.js',
@@ -158,9 +158,9 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects fragment definitions to be ' +
-              '`key: graphql`.',
-        },
-      ],
+              '`key: graphql`.'
+        }
+      ]
     },
     {
       filename: 'MyComponent.jsx',
@@ -178,9 +178,9 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             'Container fragment names must be `<ModuleName>_<propName>`. Got ' +
-              '`Random`, expected `MyComponent_user`.',
-        },
-      ],
+              '`Random`, expected `MyComponent_user`.'
+        }
+      ]
     },
     {
       code: `
@@ -192,9 +192,9 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects fragment definitions to be ' +
-              '`key: graphql`.',
-        },
-      ],
-    },
-  ],
+              '`key: graphql`.'
+        }
+      ]
+    }
+  ]
 });

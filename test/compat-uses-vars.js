@@ -20,7 +20,7 @@ const rules = require('..').rules;
 const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
-  parserOptions: {ecmaVersion: 6, sourceType: 'module'},
+  parserOptions: {ecmaVersion: 6, sourceType: 'module'}
 });
 
 const esLintVersion = require('eslint/package.json').version;
@@ -40,7 +40,7 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
             ...ExampleComponent_prop
           }
         \`
-      `,
+      `
     },
     {
       // OK, since this is Relay Modern
@@ -53,7 +53,7 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
             ...ExampleComponent_prop
           }
         \`
-      `,
+      `
     },
     {
       code: `
@@ -76,8 +76,8 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
           }
         }
         module.exports = ThisComponent;
-      `,
-    },
+      `
+    }
   ],
   invalid: [
     {
@@ -96,10 +96,10 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
       errors: [
         esLintVersion === '3.5.0'
           ? "'OtherComponent' is defined but never used."
-          : "'OtherComponent' is assigned a value but never used.",
-      ],
-    },
-  ],
+          : "'OtherComponent' is assigned a value but never used."
+      ]
+    }
+  ]
 });
 
 ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
@@ -114,8 +114,8 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
             ...ExampleComponent_prop
           }
         \`
-      `,
-    },
+      `
+    }
   ],
   invalid: [
     // missing name on query
@@ -139,9 +139,9 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
           line: 6,
           column: 16,
           endLine: 6,
-          endColumn: 40,
-        },
-      ],
-    },
-  ],
+          endColumn: 40
+        }
+      ]
+    }
+  ]
 });

@@ -64,7 +64,7 @@ function getModuleName(filePath) {
   // foo-bar -> fooBar
   // Relay compatibility mode splits on _, so we can't use that here.
   moduleName = moduleName.replace(/[^a-zA-Z0-9]+(\w?)/g, (match, next) =>
-    next.toUpperCase(),
+    next.toUpperCase()
   );
 
   return moduleName;
@@ -93,7 +93,7 @@ function getLoc(context, templateNode, graphQLNode) {
   const [start, end] = getRange(context, templateNode, graphQLNode);
   return {
     start: getLocFromIndex(context.getSourceCode(), start),
-    end: getLocFromIndex(context.getSourceCode(), end),
+    end: getLocFromIndex(context.getSourceCode(), end)
   };
 }
 
@@ -104,14 +104,14 @@ function getRange(context, templateNode, graphQLNode) {
   const graphQLStart = templateNode.quasi.quasis[0].start;
   return [
     graphQLStart + graphQLNode.loc.start,
-    graphQLStart + graphQLNode.loc.end,
+    graphQLStart + graphQLNode.loc.end
   ];
 }
 
 const CREATE_CONTAINER_FUNCTIONS = new Set([
   'createFragmentContainer',
   'createPaginationContainer',
-  'createRefetchContainer',
+  'createRefetchContainer'
 ]);
 
 function isCreateContainerCall(node) {
@@ -167,13 +167,13 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
                 'Got `{{actual}}`, expected `{{expected}}`.',
             data: {
               actual: definitionName,
-              expected: expectedName,
+              expected: expectedName
             },
             fix: fixer =>
               fixer.replaceTextRange(
                 getRange(context, taggedTemplateExpression, def.name),
                 expectedName
-              ),
+              )
           });
         }
       }
@@ -187,8 +187,8 @@ module.exports.rules = {
       docs: {
         description:
           'Validates the syntax of all graphql`...` and ' +
-            'graphql.experimental`...` templates.',
-      },
+            'graphql.experimental`...` templates.'
+      }
     },
     create(context) {
       if (!shouldLint(context)) {
@@ -204,7 +204,7 @@ module.exports.rules = {
             context.report({
               node: node,
               message:
-                'graphql tagged templates do not support ${...} substitutions.',
+                'graphql tagged templates do not support ${...} substitutions.'
             });
             return;
           }
@@ -215,7 +215,7 @@ module.exports.rules = {
               if (!definition.name) {
                 context.report({
                   message: 'Operations in graphql tags require a name.',
-                  loc: getLoc(context, node, definition),
+                  loc: getLoc(context, node, definition)
                 });
               }
             });
@@ -223,12 +223,12 @@ module.exports.rules = {
             context.report({
               node: node,
               message: '{{message}}',
-              data: {message: error.message},
+              data: {message: error.message}
             });
           }
-        },
+        }
       };
-    },
+    }
   },
   'compat-uses-vars': {
     meta: {
@@ -236,8 +236,8 @@ module.exports.rules = {
         description:
           'Relay Compat transforms fragment spreads from ' +
             "`...Container_foo` to `Container.getFragment('foo')`. This " +
-            'makes ESLint aware of this.',
-      },
+            'makes ESLint aware of this.'
+      }
     },
     create(context) {
       if (!shouldLint(context)) {
@@ -303,27 +303,27 @@ module.exports.rules = {
                       'the variable name `{{varName}}`.',
                   data: {
                     fragmentName: spreadNode.name.value,
-                    varName: componentName,
+                    varName: componentName
                   },
                   loc: getLoc(
                     context,
                     taggedTemplateExpression,
                     spreadNode.name
-                  ),
+                  )
                 });
               }
-            },
+            }
           });
-        },
+        }
       };
-    },
+    }
   },
   'graphql-naming': {
     meta: {
       fixable: 'code',
       docs: {
-        description: 'Validates naming conventions of graphql tags',
-      },
+        description: 'Validates naming conventions of graphql tags'
+      }
     },
     create(context) {
       if (!shouldLint(context)) {
@@ -353,9 +353,9 @@ module.exports.rules = {
                         'Expected prefix `{{expected}}`, got `{{actual}}`.',
                     data: {
                       expected: moduleName,
-                      actual: operationName,
+                      actual: operationName
                     },
-                    loc: getLoc(context, node, name),
+                    loc: getLoc(context, node, name)
                   });
                 }
                 break;
@@ -385,8 +385,8 @@ module.exports.rules = {
                       '`{{callee}}` expects GraphQL to be tagged with ' +
                         'graphql`...` or graphql.experimental`...`.',
                     data: {
-                      callee: calleeToString(node.callee),
-                    },
+                      callee: calleeToString(node.callee)
+                    }
                   });
                   return;
                 }
@@ -398,14 +398,14 @@ module.exports.rules = {
                     '`{{callee}}` expects fragment definitions to be ' +
                       '`key: graphql`.',
                   data: {
-                    callee: calleeToString(node.callee),
-                  },
+                    callee: calleeToString(node.callee)
+                  }
                 });
               }
             });
           }
-        },
+        }
       };
-    },
-  },
+    }
+  }
 };
