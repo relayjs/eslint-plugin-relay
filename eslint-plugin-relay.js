@@ -419,7 +419,26 @@ module.exports.rules = {
       if (!shouldLint(context)) {
         return {};
       }
-      return {};
+      return {
+        TaggedTemplateExpression(node) {
+          const ast = getGraphQLAST(node);
+          if (!ast) {
+            return;
+          }
+
+          const moduleName = getModuleName(context.getFilename());
+          ast.definitions.forEach(def => {
+            if (!def.name) {
+              // no name, covered by graphql-naming/TaggedTemplateExpression
+              return;
+            }
+            const definitionName = def.name.value;
+            if (def.kind === 'FragmentDefinition') {
+              console.log(def.name.value);
+            }
+          });
+        }
+      };
     }
   }
 };
