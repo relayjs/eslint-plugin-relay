@@ -407,5 +407,19 @@ module.exports.rules = {
         }
       };
     }
+  },
+  'generated-flow-types': {
+    meta: {
+      fixable: 'code',
+      docs: {
+        description: 'Validates usage of RelayModern generated flow types'
+      }
+    },
+    create(context) {
+      if (!shouldLint(context)) {
+        return {};
+      }
+      return {};
+    }
   }
 };

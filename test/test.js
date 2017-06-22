@@ -15,7 +15,7 @@ const path = require('path');
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
-const ruleTester = new RuleTester({parserOptions: {ecmaVersion: 6}});
+const ruleTester = new RuleTester({parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}});
 
 const valid = [
   {code: 'hello();'},
@@ -196,5 +196,53 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         }
       ]
     }
+  ]
+});
+
+ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
+  valid: [
+    ...valid,
+    // syntax error, covered by `graphql-syntax`
+    {code: 'graphql`query {{{`'}
+  ],
+  invalid: [
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: `
+        type Props = {
+          user: MyComponent_user,
+        }
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'React components with fragments must use the ' +
+              'generated `<ModuleName>_<propName>` flow type.'
+        }
+      ]
+    },
   ]
 });
