@@ -15,7 +15,10 @@ const path = require('path');
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
-const ruleTester = new RuleTester({parser: 'babel-eslint', parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}});
+const ruleTester = new RuleTester({
+  parser: 'babel-eslint',
+  parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
+});
 
 const valid = [
   {code: 'hello();'},
@@ -579,6 +582,6 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
               '`MyComponent_user` flow type.'
         }
       ]
-    },
+    }
   ]
 });

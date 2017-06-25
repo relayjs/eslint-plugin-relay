@@ -188,15 +188,15 @@ function validateObjectTypeAnnotation(
   propName,
   propType
 ) {
-  const propTypeProperty =
-    propType.properties.filter(property =>
+  const propTypeProperty = propType.properties.filter(
+    property =>
       // HACK: https://github.com/babel/babel-eslint/issues/307
-        context.getSourceCode().getFirstToken(property).value === propName
-    )[0];
+      context.getSourceCode().getFirstToken(property).value === propName
+  )[0];
 
   let atleastOnePropertyExists = !!propType.properties[0];
 
-  if(!propTypeProperty) {
+  if (!propTypeProperty) {
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
@@ -205,15 +205,16 @@ function validateObjectTypeAnnotation(
         prop: propName,
         type
       },
-      fix: fixer => atleastOnePropertyExists
-        ? fixer.insertTextBefore(
-            propType.properties[0],
-            `${propName}: ${type}, `
-          )
-        : fixer.replaceText(propType, `{${propName}: ${type}}`),
+      fix: fixer =>
+        atleastOnePropertyExists
+          ? fixer.insertTextBefore(
+              propType.properties[0],
+              `${propName}: ${type}, `
+            )
+          : fixer.replaceText(propType, `{${propName}: ${type}}`),
       loc: Component
     });
-  } else if(
+  } else if (
     propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
     propTypeProperty.value.id.name !== type
   ) {
@@ -479,15 +480,18 @@ module.exports.rules = {
         ClassDeclaration(node) {
           const componentName = node.id.name;
           componentMap[componentName] = {
-            Component: node.id,
+            Component: node.id
           };
-          node.body.body.filter(child =>
-            child.type === 'ClassProperty' &&
-            child.key.name === 'props' &&
-            child.typeAnnotation
-          ).forEach(child => {
-            componentMap[componentName].propType = child.typeAnnotation;
-          })
+          node.body.body
+            .filter(
+              child =>
+                child.type === 'ClassProperty' &&
+                child.key.name === 'props' &&
+                child.typeAnnotation
+            )
+            .forEach(child => {
+              componentMap[componentName].propType = child.typeAnnotation;
+            });
         },
         TaggedTemplateExpression(node) {
           const ast = getGraphQLAST(node);
@@ -510,15 +514,15 @@ module.exports.rules = {
           expectedTypes.forEach(type => {
             const componentName = type.split('_')[0];
             const propName = type.split('_')[1];
-            if(!componentName || ! propName || !componentMap[componentName]) {
+            if (!componentName || !propName || !componentMap[componentName]) {
               // incorrect name, covered by graphql-naming/CallExpression
               return;
             }
             const {Component, propType} = componentMap[componentName];
-            if(propType) {
+            if (propType) {
               // There exists a prop typeAnnotation. Let's look at how it's
               // structured
-              switch(propType.typeAnnotation.type) {
+              switch (propType.typeAnnotation.type) {
                 case 'ObjectTypeAnnotation':
                   validateObjectTypeAnnotation(
                     context,
@@ -546,7 +550,6 @@ module.exports.rules = {
                     typeAliasMap[alias]
                   );
                   break;
-
               }
             } else {
               context.report({
@@ -559,20 +562,22 @@ module.exports.rules = {
                 },
                 fix: fixer => {
                   const classBodyStart = Component.parent.body.body[0];
-                  if(!classBodyStart) {
+                  if (!classBodyStart) {
                     // HACK: There's nothing in the body. Let's not do anything
                     // When something is added to the body, we'll have a fix
                     return;
                   }
-                  const aliasWhitespace =
-                    ' '.repeat(Component.parent.loc.start.column);
-                  const propsWhitespace =
-                    ' '.repeat(classBodyStart.loc.start.column);
+                  const aliasWhitespace = ' '.repeat(
+                    Component.parent.loc.start.column
+                  );
+                  const propsWhitespace = ' '.repeat(
+                    classBodyStart.loc.start.column
+                  );
                   return [
                     fixer.insertTextBefore(
                       Component.parent,
                       `type Props = {${propName}: ` +
-                      `${type}};\n\n${aliasWhitespace}`
+                        `${type}};\n\n${aliasWhitespace}`
                     ),
                     fixer.insertTextBefore(
                       classBodyStart,
