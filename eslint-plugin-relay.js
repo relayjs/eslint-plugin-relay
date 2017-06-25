@@ -433,8 +433,22 @@ module.exports.rules = {
               return;
             }
             const definitionName = def.name.value;
+            const propName = definitionName.split('_')[1];
+            if(!propName) {
+              return;
+              // invalid fragment name, covered by graphql-naming/CallExpression
+            }
             if (def.kind === 'FragmentDefinition') {
-              console.log(def.name.value);
+              context.report({
+                message:
+                  'Component property `{{prop}}` expects to use the generated ' +
+                    '`{{type}}` flow type.',
+                data: {
+                  prop: propName,
+                  type: definitionName
+                },
+                loc: getLoc(context, node, def.name)
+              });
             }
           });
         }

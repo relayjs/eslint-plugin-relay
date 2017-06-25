@@ -258,8 +258,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'React components with fragments must use the ' +
-              'generated `<ModuleName>_<propName>` flow type.'
+            'Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type.'
         }
       ]
     },
