@@ -181,6 +181,49 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
   });
 }
 
+function validateObjectTypeAnnotation(context, Component, type, propName, propType) {
+  const propTypeProperty =
+    propType.typeAnnotation.properties.filter(property =>
+      // HACK: https://github.com/babel/babel-eslint/issues/307
+        context.getSourceCode().getFirstToken(property).value === propName
+    )[0];
+
+  let atleastOnePropertyExists = !!propType.typeAnnotation.properties[0];
+
+  if(!propTypeProperty) {
+    // TODO: No typeAnnotation exists within props
+    // typeAnnotation. For the fix, we must add the key itself
+    context.report({
+      message:
+        'Component property `{{prop}}` expects to use the generated ' +
+          '`{{type}}` flow type.',
+      data: {
+        prop: propName,
+        type
+      },
+      fix: fixer => atleastOnePropertyExists
+        ? fixer.insertTextBefore(propType.typeAnnotation.properties[0], `${propName}: ${type}, `)
+        : fixer.replaceText(propType.typeAnnotation, `{${propName}: ${type}}`),
+      loc: Component
+    });
+  } else if(
+    propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
+    propTypeProperty.value.id.name !== type
+  ) {
+    context.report({
+      message:
+        'Component property `{{prop}}` expects to use the generated ' +
+          '`{{type}}` flow type.',
+      data: {
+        prop: propName,
+        type
+      },
+      fix: fixer => fixer.replaceText(propTypeProperty.value, type),
+      loc: Component
+    });
+  }
+}
+
 module.exports.rules = {
   'graphql-syntax': {
     meta: {
@@ -419,7 +462,22 @@ module.exports.rules = {
       if (!shouldLint(context)) {
         return {};
       }
+      let componentMap = {};
+      let expectedTypes = [];
       return {
+        ClassDeclaration(node) {
+          const componentName = node.id.name;
+          componentMap[componentName] = {
+            Component: node.id,
+          };
+          node.body.body.filter(child =>
+            child.type === 'ClassProperty' &&
+            child.key.name === 'props' &&
+            child.typeAnnotation
+          ).forEach(child => {
+            componentMap[componentName].propType = child.typeAnnotation;
+          })
+        },
         TaggedTemplateExpression(node) {
           const ast = getGraphQLAST(node);
           if (!ast) {
@@ -432,22 +490,50 @@ module.exports.rules = {
               // no name, covered by graphql-naming/TaggedTemplateExpression
               return;
             }
-            const definitionName = def.name.value;
-            const propName = definitionName.split('_')[1];
-            if(!propName) {
-              return;
-              // invalid fragment name, covered by graphql-naming/CallExpression
-            }
             if (def.kind === 'FragmentDefinition') {
+              expectedTypes.push(def.name.value);
+            }
+          });
+        },
+        'Program:exit': function(node) {
+          expectedTypes.forEach(type => {
+            const componentName = type.split('_')[0];
+            const propName = type.split('_')[1];
+            if(!componentName || ! propName || !componentMap[componentName]) {
+              // incorrect name, covered by graphql-naming/CallExpression
+              return;
+            }
+            const {Component, propType} = componentMap[componentName];
+            if(propType) {
+              // There exists a prop typeAnnotation. Let's look at how it's
+              // structured
+              switch(propType.typeAnnotation.type) {
+                case 'ObjectTypeAnnotation':
+                  validateObjectTypeAnnotation(
+                    context,
+                    Component,
+                    type,
+                    propName,
+                    propType
+                  );
+                  break;
+                case 'GenericTypeAnnotation':
+                  // TODO: It references an Alias. Let's figure check that alias
+                  break;
+
+              }
+            } else {
+              // TODO: No props typeAnnotation exists. For the fix, we must add
+              // the typeAnnotation for props
               context.report({
                 message:
                   'Component property `{{prop}}` expects to use the generated ' +
                     '`{{type}}` flow type.',
                 data: {
                   prop: propName,
-                  type: definitionName
+                  type
                 },
-                loc: getLoc(context, node, def.name)
+                loc: Component
               });
             }
           });
