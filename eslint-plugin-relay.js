@@ -197,8 +197,6 @@ function validateObjectTypeAnnotation(
   let atleastOnePropertyExists = !!propType.properties[0];
 
   if(!propTypeProperty) {
-    // TODO: No typeAnnotation exists within props
-    // typeAnnotation. For the fix, we must add the key itself
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
@@ -532,7 +530,6 @@ module.exports.rules = {
                   break;
                 case 'GenericTypeAnnotation':
                   const alias = propType.typeAnnotation.id.name;
-                  // TODO: type alias is not an object
                   if (
                     !typeAliasMap[alias] ||
                     typeAliasMap[alias].type !== 'ObjectTypeAnnotation'
@@ -552,8 +549,6 @@ module.exports.rules = {
 
               }
             } else {
-              // TODO: No props typeAnnotation exists. For the fix, we must add
-              // the typeAnnotation for props
               context.report({
                 message:
                   'Component property `{{prop}}` expects to use the ' +
@@ -561,6 +556,29 @@ module.exports.rules = {
                 data: {
                   prop: propName,
                   type
+                },
+                fix: fixer => {
+                  const classBodyStart = Component.parent.body.body[0];
+                  if(!classBodyStart) {
+                    // HACK: There's nothing in the body. Let's not do anything
+                    // When something is added to the body, we'll have a fix
+                    return;
+                  }
+                  const aliasWhitespace =
+                    ' '.repeat(Component.parent.loc.start.column);
+                  const propsWhitespace =
+                    ' '.repeat(classBodyStart.loc.start.column);
+                  return [
+                    fixer.insertTextBefore(
+                      Component.parent,
+                      `type Props = {${propName}: ` +
+                      `${type}};\n\n${aliasWhitespace}`
+                    ),
+                    fixer.insertTextBefore(
+                      classBodyStart,
+                      `props: Props;\n\n${propsWhitespace}`
+                    )
+                  ];
                 },
                 loc: Component
               });
