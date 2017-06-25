@@ -181,7 +181,13 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
   });
 }
 
-function validateObjectTypeAnnotation(context, Component, type, propName, propType) {
+function validateObjectTypeAnnotation(
+  context,
+  Component,
+  type,
+  propName,
+  propType
+) {
   const propTypeProperty =
     propType.typeAnnotation.properties.filter(property =>
       // HACK: https://github.com/babel/babel-eslint/issues/307
@@ -202,7 +208,10 @@ function validateObjectTypeAnnotation(context, Component, type, propName, propTy
         type
       },
       fix: fixer => atleastOnePropertyExists
-        ? fixer.insertTextBefore(propType.typeAnnotation.properties[0], `${propName}: ${type}, `)
+        ? fixer.insertTextBefore(
+            propType.typeAnnotation.properties[0],
+            `${propName}: ${type}, `
+          )
         : fixer.replaceText(propType.typeAnnotation, `{${propName}: ${type}}`),
       loc: Component
     });
@@ -527,8 +536,8 @@ module.exports.rules = {
               // the typeAnnotation for props
               context.report({
                 message:
-                  'Component property `{{prop}}` expects to use the generated ' +
-                    '`{{type}}` flow type.',
+                  'Component property `{{prop}}` expects to use the ' +
+                    'generated `{{type}}` flow type.',
                 data: {
                   prop: propName,
                   type
