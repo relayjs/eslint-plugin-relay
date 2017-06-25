@@ -189,12 +189,12 @@ function validateObjectTypeAnnotation(
   propType
 ) {
   const propTypeProperty =
-    propType.typeAnnotation.properties.filter(property =>
+    propType.properties.filter(property =>
       // HACK: https://github.com/babel/babel-eslint/issues/307
         context.getSourceCode().getFirstToken(property).value === propName
     )[0];
 
-  let atleastOnePropertyExists = !!propType.typeAnnotation.properties[0];
+  let atleastOnePropertyExists = !!propType.properties[0];
 
   if(!propTypeProperty) {
     // TODO: No typeAnnotation exists within props
@@ -209,10 +209,10 @@ function validateObjectTypeAnnotation(
       },
       fix: fixer => atleastOnePropertyExists
         ? fixer.insertTextBefore(
-            propType.typeAnnotation.properties[0],
+            propType.properties[0],
             `${propName}: ${type}, `
           )
-        : fixer.replaceText(propType.typeAnnotation, `{${propName}: ${type}}`),
+        : fixer.replaceText(propType, `{${propName}: ${type}}`),
       loc: Component
     });
   } else if(
@@ -473,7 +473,11 @@ module.exports.rules = {
       }
       let componentMap = {};
       let expectedTypes = [];
+      let typeAliasMap = {};
       return {
+        TypeAlias(node) {
+          typeAliasMap[node.id.name] = node.right;
+        },
         ClassDeclaration(node) {
           const componentName = node.id.name;
           componentMap[componentName] = {
@@ -523,11 +527,27 @@ module.exports.rules = {
                     Component,
                     type,
                     propName,
-                    propType
+                    propType.typeAnnotation
                   );
                   break;
                 case 'GenericTypeAnnotation':
-                  // TODO: It references an Alias. Let's figure check that alias
+                  const alias = propType.typeAnnotation.id.name;
+                  // TODO: type alias is not an object
+                  if (
+                    !typeAliasMap[alias] ||
+                    typeAliasMap[alias].type !== 'ObjectTypeAnnotation'
+                  ) {
+                    // The type Alias doesn't exist, is invalid, or is being
+                    // imported. Can't do anything.
+                    break;
+                  }
+                  validateObjectTypeAnnotation(
+                    context,
+                    Component,
+                    type,
+                    propName,
+                    typeAliasMap[alias]
+                  );
                   break;
 
               }
