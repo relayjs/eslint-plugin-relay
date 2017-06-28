@@ -724,9 +724,9 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
 
-prettier@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.5.1.tgz#3d6e60e5e7078ec218fe32867a3a66e946c01938"
+prettier@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.5.2.tgz#7ea0751da27b93bfb6cecfcec509994f52d83bb3"
 
 process-nextick-args@~1.0.6:
   version "1.0.7"
