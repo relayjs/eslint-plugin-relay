@@ -134,8 +134,8 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
         {
           message:
             'In compat mode, Relay expects the component that has the ' +
-              '`ExampleComponent_foo_bar` fragment to be imported with the ' +
-              'variable name `ExampleComponent`.',
+            '`ExampleComponent_foo_bar` fragment to be imported with the ' +
+            'variable name `ExampleComponent`.',
           line: 6,
           column: 16,
           endLine: 6,

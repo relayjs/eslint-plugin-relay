@@ -120,7 +120,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             'Operations should start with the module name. Expected prefix ' +
-              '`Example`, got `RandomName`.',
+            '`Example`, got `RandomName`.',
           line: 1,
           column: 28,
           endLine: 1,
@@ -141,7 +141,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects GraphQL to be tagged with ' +
-              'graphql`...` or graphql.experimental`...`.'
+            'graphql`...` or graphql.experimental`...`.'
         }
       ]
     },
@@ -158,7 +158,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects fragment definitions to be ' +
-              '`key: graphql`.'
+            '`key: graphql`.'
         }
       ]
     },
@@ -178,7 +178,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             'Container fragment names must be `<ModuleName>_<propName>`. Got ' +
-              '`Random`, expected `MyComponent_user`.'
+            '`Random`, expected `MyComponent_user`.'
         }
       ]
     },
@@ -192,7 +192,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects fragment definitions to be ' +
-              '`key: graphql`.'
+            '`key: graphql`.'
         }
       ]
     }

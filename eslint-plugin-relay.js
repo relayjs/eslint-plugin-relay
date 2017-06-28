@@ -53,9 +53,8 @@ function getGraphQLAST(taggedTemplateExpression) {
 function getModuleName(filePath) {
   const filename = path.basename(filePath, path.extname(filePath));
   // /path/to/button/index.js -> button
-  let moduleName = filename === 'index'
-    ? path.basename(path.dirname(filePath))
-    : filename;
+  let moduleName =
+    filename === 'index' ? path.basename(path.dirname(filePath)) : filename;
 
   // Example.ios -> Example
   // Example.product.android -> Example
@@ -164,7 +163,7 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
             loc: getLoc(context, taggedTemplateExpression, def.name),
             message:
               'Container fragment names must be `<ModuleName>_<propName>`. ' +
-                'Got `{{actual}}`, expected `{{expected}}`.',
+              'Got `{{actual}}`, expected `{{expected}}`.',
             data: {
               actual: definitionName,
               expected: expectedName
@@ -187,7 +186,7 @@ module.exports.rules = {
       docs: {
         description:
           'Validates the syntax of all graphql`...` and ' +
-            'graphql.experimental`...` templates.'
+          'graphql.experimental`...` templates.'
       }
     },
     create(context) {
@@ -235,8 +234,8 @@ module.exports.rules = {
       docs: {
         description:
           'Relay Compat transforms fragment spreads from ' +
-            "`...Container_foo` to `Container.getFragment('foo')`. This " +
-            'makes ESLint aware of this.'
+          "`...Container_foo` to `Container.getFragment('foo')`. This " +
+          'makes ESLint aware of this.'
       }
     },
     create(context) {
@@ -299,8 +298,8 @@ module.exports.rules = {
                 context.report({
                   message:
                     'In compat mode, Relay expects the component that has ' +
-                      'the `{{fragmentName}}` fragment to be imported with ' +
-                      'the variable name `{{varName}}`.',
+                    'the `{{fragmentName}}` fragment to be imported with ' +
+                    'the variable name `{{varName}}`.',
                   data: {
                     fragmentName: spreadNode.name.value,
                     varName: componentName
@@ -350,7 +349,7 @@ module.exports.rules = {
                   context.report({
                     message:
                       'Operations should start with the module name. ' +
-                        'Expected prefix `{{expected}}`, got `{{actual}}`.',
+                      'Expected prefix `{{expected}}`, got `{{actual}}`.',
                     data: {
                       expected: moduleName,
                       actual: operationName
@@ -383,7 +382,7 @@ module.exports.rules = {
                     node: property.value.tag,
                     message:
                       '`{{callee}}` expects GraphQL to be tagged with ' +
-                        'graphql`...` or graphql.experimental`...`.',
+                      'graphql`...` or graphql.experimental`...`.',
                     data: {
                       callee: calleeToString(node.callee)
                     }
@@ -396,7 +395,7 @@ module.exports.rules = {
                   node: property,
                   message:
                     '`{{callee}}` expects fragment definitions to be ' +
-                      '`key: graphql`.',
+                    '`key: graphql`.',
                   data: {
                     callee: calleeToString(node.callee)
                   }
