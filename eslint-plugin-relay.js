@@ -108,6 +108,53 @@ function getRange(context, templateNode, graphQLNode) {
   ];
 }
 
+const DEFAULT_FLOW_TYPES_OPTIONS = {
+  haste: false
+};
+
+function getOptions(optionValue) {
+  if (optionValue) {
+    return {
+      haste: optionValue.haste || DEFAULT_FLOW_TYPES_OPTIONS.haste
+    };
+  }
+
+  return DEFAULT_FLOW_TYPES_OPTIONS;
+}
+
+function genImportFixRange(type, imports, requires) {
+  const alreadyHasImport = imports
+    .filter(node => node.importKind === 'type')
+    .some(node =>
+      node.specifiers.some(specifier => specifier.imported.name === type)
+    );
+
+  if (alreadyHasImport) {
+    return null;
+  }
+
+  // if(imports) {
+  //
+  // }
+
+  // start of file
+  return [0, 0];
+}
+
+function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
+  if (haste) {
+    return fixer.insertTextAfterRange(
+      importFixRange,
+      `${whitespace}import type {${type}} from './${type}.graphql'`
+    );
+  } else {
+    return fixer.insertTextAfterRange(
+      importFixRange,
+      `\n${whitespace}import type {${type}} from './__generated__/${type}.graphql'`
+    );
+  }
+}
+
 const CREATE_CONTAINER_FUNCTIONS = new Set([
   'createFragmentContainer',
   'createPaginationContainer',
@@ -186,8 +233,10 @@ function validateObjectTypeAnnotation(
   Component,
   type,
   propName,
-  propType
+  propType,
+  importFixRange
 ) {
+  const options = getOptions(context.options[0]);
   const propTypeProperty = propType.properties.filter(
     property =>
       // HACK: https://github.com/babel/babel-eslint/issues/307
@@ -205,13 +254,23 @@ function validateObjectTypeAnnotation(
         prop: propName,
         type
       },
-      fix: fixer =>
-        atleastOnePropertyExists
-          ? fixer.insertTextBefore(
+      fix: fixer => {
+        const whitespace = ' '.repeat(Component.parent.loc.start.column);
+        let fixes = [
+          genImportFixer(fixer, importFixRange, type, options.haste, whitespace)
+        ];
+        if (atleastOnePropertyExists) {
+          fixes.push(
+            fixer.insertTextBefore(
               propType.properties[0],
               `${propName}: ${type}, `
             )
-          : fixer.replaceText(propType, `{${propName}: ${type}}`),
+          );
+        } else {
+          fixes.push(fixer.replaceText(propType, `{${propName}: ${type}}`));
+        }
+        return fixes;
+      },
       loc: Component
     });
   } else if (
@@ -226,7 +285,19 @@ function validateObjectTypeAnnotation(
         prop: propName,
         type
       },
-      fix: fixer => fixer.replaceText(propTypeProperty.value, type),
+      fix: fixer => {
+        const whitespace = ' '.repeat(Component.parent.loc.start.column);
+        return [
+          genImportFixer(
+            fixer,
+            importFixRange,
+            type,
+            options.haste,
+            whitespace
+          ),
+          fixer.replaceText(propTypeProperty.value, type)
+        ];
+      },
       loc: Component
     });
   }
@@ -464,16 +535,42 @@ module.exports.rules = {
       fixable: 'code',
       docs: {
         description: 'Validates usage of RelayModern generated flow types'
-      }
+      },
+      schema: [
+        {
+          type: 'object',
+          properties: {
+            haste: {
+              type: 'boolean'
+            }
+          },
+          additionalProperties: false
+        }
+      ]
     },
     create(context) {
       if (!shouldLint(context)) {
         return {};
       }
+      const options = getOptions(context.options[0]);
       let componentMap = {};
       let expectedTypes = [];
+      let imports = [];
+      let requires = [];
       let typeAliasMap = {};
       return {
+        ImportDeclaration(node) {
+          imports.push(node);
+        },
+        VariableDeclarator(node) {
+          if (
+            node.init &&
+            node.init.type === 'CallExpression' &&
+            node.init.callee.name === 'require'
+          ) {
+            requires.push(node);
+          }
+        },
         TypeAlias(node) {
           typeAliasMap[node.id.name] = node.right;
         },
@@ -519,6 +616,9 @@ module.exports.rules = {
               return;
             }
             const {Component, propType} = componentMap[componentName];
+
+            const importFixRange = genImportFixRange(type, imports, requires);
+
             if (propType) {
               // There exists a prop typeAnnotation. Let's look at how it's
               // structured
@@ -529,7 +629,8 @@ module.exports.rules = {
                     Component,
                     type,
                     propName,
-                    propType.typeAnnotation
+                    propType.typeAnnotation,
+                    importFixRange
                   );
                   break;
                 case 'GenericTypeAnnotation':
@@ -547,7 +648,8 @@ module.exports.rules = {
                     Component,
                     type,
                     propName,
-                    typeAliasMap[alias]
+                    typeAliasMap[alias],
+                    importFixRange
                   );
                   break;
               }
@@ -574,6 +676,13 @@ module.exports.rules = {
                     classBodyStart.loc.start.column
                   );
                   return [
+                    genImportFixer(
+                      fixer,
+                      importFixRange,
+                      type,
+                      options.haste,
+                      aliasWhitespace
+                    ),
                     fixer.insertTextBefore(
                       Component.parent,
                       `type Props = {${propName}: ` +

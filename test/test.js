@@ -209,6 +209,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {code: 'graphql`query {{{`'},
     {
       code: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
 
@@ -224,6 +225,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     },
     {
       code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {
           user: MyComponent_user,
         }
@@ -259,6 +261,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
 
@@ -295,6 +298,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user, somethingElse: number};
 
@@ -331,6 +335,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
 
@@ -367,6 +372,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
 
@@ -405,6 +411,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
         class MyComponent extends React.Component {
@@ -445,6 +452,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
         class MyComponent extends React.Component {
@@ -485,6 +493,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
         class MyComponent extends React.Component {
@@ -525,6 +534,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
         class MyComponent extends React.Component {
@@ -561,6 +571,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
         class MyComponent extends React.Component {
