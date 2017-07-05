@@ -275,7 +275,7 @@ function validateObjectTypeAnnotation(
   if (!propTypeProperty) {
     context.report({
       message:
-        'Component property `{{prop}}` expects to use the generated ' +
+        'ADVICE: Component property `{{prop}}` expects to use the generated ' +
           '`{{type}}` flow type.',
       data: {
         prop: propName,
@@ -314,7 +314,7 @@ function validateObjectTypeAnnotation(
   ) {
     context.report({
       message:
-        'Component property `{{prop}}` expects to use the generated ' +
+        'ADVICE: Component property `{{prop}}` expects to use the generated ' +
           '`{{type}}` flow type.',
       data: {
         prop: propName,
@@ -696,7 +696,7 @@ module.exports.rules = {
             } else {
               context.report({
                 message:
-                  'Component property `{{prop}}` expects to use the ' +
+                  'ADVICE: Component property `{{prop}}` expects to use the ' +
                     'generated `{{type}}` flow type.',
                 data: {
                   prop: propName,

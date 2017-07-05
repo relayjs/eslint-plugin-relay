@@ -281,7 +281,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -320,7 +320,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -359,7 +359,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -398,7 +398,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -441,7 +441,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -484,7 +484,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -527,7 +527,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -570,7 +570,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -609,7 +609,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -649,7 +649,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -691,7 +691,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -736,7 +736,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -781,7 +781,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -826,7 +826,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -871,7 +871,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -924,7 +924,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
@@ -969,7 +969,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'Component property `user` expects to use the generated ' +
+            'ADVICE: Component property `user` expects to use the generated ' +
               '`MyComponent_user` flow type.'
         }
       ]
