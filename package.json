@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "3.19.0",
+    "eslint": "^3.19.0",
     "mocha": "^3.4.2",
     "prettier": "^1.4.4"
   }
