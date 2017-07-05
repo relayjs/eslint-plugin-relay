@@ -15,6 +15,8 @@ const path = require('path');
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
+const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
   parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
@@ -260,7 +262,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
@@ -273,7 +276,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -297,7 +301,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user, somethingElse: number};
@@ -310,7 +315,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -334,7 +340,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
@@ -347,7 +354,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -371,7 +379,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
@@ -384,7 +393,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -410,7 +420,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -425,7 +436,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -451,7 +463,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
@@ -466,7 +479,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -492,7 +506,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -507,7 +522,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -533,7 +549,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -548,7 +565,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -570,7 +588,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -585,7 +604,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -608,7 +628,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       options: [{haste: true}],
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -623,7 +644,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -647,7 +669,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
 
         type Props = {user: MyComponent_user};
@@ -663,7 +686,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -688,7 +712,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type aaa from 'aaa'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         import type zzz from 'zzz'
@@ -706,7 +731,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -731,7 +757,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import type {aaa} from 'aaa'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         import type zzz from 'zzz'
@@ -749,7 +776,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -774,7 +802,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import {aaa} from 'aaa'
         import zzz from 'zzz'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -792,7 +821,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -817,7 +847,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         const aaa = require('aaa')
         const zzz = require('zzz')
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -835,7 +866,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -864,7 +896,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         const aaa = require('aaa')
 
         import zzz from 'zzz'
@@ -886,7 +919,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:
@@ -911,7 +945,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: `
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
         import {aaa} from 'aaa'
         import zzz from 'zzz'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -929,7 +964,8 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `,
+      `
+        : null,
       errors: [
         {
           message:

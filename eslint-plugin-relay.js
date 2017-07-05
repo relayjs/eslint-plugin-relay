@@ -109,12 +109,14 @@ function getRange(context, templateNode, graphQLNode) {
 }
 
 const DEFAULT_FLOW_TYPES_OPTIONS = {
+  fix: false,
   haste: false
 };
 
 function getOptions(optionValue) {
   if (optionValue) {
     return {
+      fix: optionValue.fix || DEFAULT_FLOW_TYPES_OPTIONS.fix,
       haste: optionValue.haste || DEFAULT_FLOW_TYPES_OPTIONS.haste
     };
   }
@@ -279,23 +281,31 @@ function validateObjectTypeAnnotation(
         prop: propName,
         type
       },
-      fix: fixer => {
-        const whitespace = ' '.repeat(Component.parent.loc.start.column);
-        let fixes = [
-          genImportFixer(fixer, importFixRange, type, options.haste, whitespace)
-        ];
-        if (atleastOnePropertyExists) {
-          fixes.push(
-            fixer.insertTextBefore(
-              propType.properties[0],
-              `${propName}: ${type}, `
-            )
-          );
-        } else {
-          fixes.push(fixer.replaceText(propType, `{${propName}: ${type}}`));
-        }
-        return fixes;
-      },
+      fix: options.fix
+        ? fixer => {
+            const whitespace = ' '.repeat(Component.parent.loc.start.column);
+            let fixes = [
+              genImportFixer(
+                fixer,
+                importFixRange,
+                type,
+                options.haste,
+                whitespace
+              )
+            ];
+            if (atleastOnePropertyExists) {
+              fixes.push(
+                fixer.insertTextBefore(
+                  propType.properties[0],
+                  `${propName}: ${type}, `
+                )
+              );
+            } else {
+              fixes.push(fixer.replaceText(propType, `{${propName}: ${type}}`));
+            }
+            return fixes;
+          }
+        : null,
       loc: Component
     });
   } else if (
@@ -310,19 +320,21 @@ function validateObjectTypeAnnotation(
         prop: propName,
         type
       },
-      fix: fixer => {
-        const whitespace = ' '.repeat(Component.parent.loc.start.column);
-        return [
-          genImportFixer(
-            fixer,
-            importFixRange,
-            type,
-            options.haste,
-            whitespace
-          ),
-          fixer.replaceText(propTypeProperty.value, type)
-        ];
-      },
+      fix: options.fix
+        ? fixer => {
+            const whitespace = ' '.repeat(Component.parent.loc.start.column);
+            return [
+              genImportFixer(
+                fixer,
+                importFixRange,
+                type,
+                options.haste,
+                whitespace
+              ),
+              fixer.replaceText(propTypeProperty.value, type)
+            ];
+          }
+        : null,
       loc: Component
     });
   }
@@ -565,6 +577,9 @@ module.exports.rules = {
         {
           type: 'object',
           properties: {
+            fix: {
+              type: 'boolean'
+            },
             haste: {
               type: 'boolean'
             }
@@ -687,38 +702,40 @@ module.exports.rules = {
                   prop: propName,
                   type
                 },
-                fix: fixer => {
-                  const classBodyStart = Component.parent.body.body[0];
-                  if (!classBodyStart) {
-                    // HACK: There's nothing in the body. Let's not do anything
-                    // When something is added to the body, we'll have a fix
-                    return;
-                  }
-                  const aliasWhitespace = ' '.repeat(
-                    Component.parent.loc.start.column
-                  );
-                  const propsWhitespace = ' '.repeat(
-                    classBodyStart.loc.start.column
-                  );
-                  return [
-                    genImportFixer(
-                      fixer,
-                      importFixRange,
-                      type,
-                      options.haste,
-                      aliasWhitespace
-                    ),
-                    fixer.insertTextBefore(
-                      Component.parent,
-                      `type Props = {${propName}: ` +
-                        `${type}};\n\n${aliasWhitespace}`
-                    ),
-                    fixer.insertTextBefore(
-                      classBodyStart,
-                      `props: Props;\n\n${propsWhitespace}`
-                    )
-                  ];
-                },
+                fix: options.fix
+                  ? fixer => {
+                      const classBodyStart = Component.parent.body.body[0];
+                      if (!classBodyStart) {
+                        // HACK: There's nothing in the body. Let's not do anything
+                        // When something is added to the body, we'll have a fix
+                        return;
+                      }
+                      const aliasWhitespace = ' '.repeat(
+                        Component.parent.loc.start.column
+                      );
+                      const propsWhitespace = ' '.repeat(
+                        classBodyStart.loc.start.column
+                      );
+                      return [
+                        genImportFixer(
+                          fixer,
+                          importFixRange,
+                          type,
+                          options.haste,
+                          aliasWhitespace
+                        ),
+                        fixer.insertTextBefore(
+                          Component.parent,
+                          `type Props = {${propName}: ` +
+                            `${type}};\n\n${aliasWhitespace}`
+                        ),
+                        fixer.insertTextBefore(
+                          classBodyStart,
+                          `props: Props;\n\n${propsWhitespace}`
+                        )
+                      ];
+                    }
+                  : null,
                 loc: Component
               });
             }
