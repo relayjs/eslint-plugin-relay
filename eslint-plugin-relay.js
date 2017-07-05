@@ -124,10 +124,11 @@ function getOptions(optionValue) {
 
 function genImportFixRange(type, imports, requires) {
   const typeImports = imports.filter(node => node.importKind === 'type');
-  const alreadyHasImport = typeImports
-    .some(node =>
-      node.specifiers.some(specifier => (specifier.imported || specifier.local).name === type)
-    );
+  const alreadyHasImport = typeImports.some(node =>
+    node.specifiers.some(
+      specifier => (specifier.imported || specifier.local).name === type
+    )
+  );
 
   if (alreadyHasImport) {
     return null;
@@ -137,21 +138,24 @@ function genImportFixRange(type, imports, requires) {
     return (node.specifiers[0].local || node.specifiers[0].imported).name;
   }
 
-  if(typeImports.length > 0) {
+  if (typeImports.length > 0) {
     let precedingImportIndex = 0;
-    while(typeImports[precedingImportIndex+1] && getTypeImportName(typeImports[precedingImportIndex+1]) < type){
+    while (
+      typeImports[precedingImportIndex + 1] &&
+      getTypeImportName(typeImports[precedingImportIndex + 1]) < type
+    ) {
       precedingImportIndex++;
     }
 
     return typeImports[precedingImportIndex].range;
   }
 
-  if(imports.length > 0) {
-    return imports[imports.length-1].range;
+  if (imports.length > 0) {
+    return imports[imports.length - 1].range;
   }
 
-  if(requires.length > 0) {
-    return requires[requires.length-1].range;
+  if (requires.length > 0) {
+    return requires[requires.length - 1].range;
   }
 
   // start of file
@@ -159,9 +163,9 @@ function genImportFixRange(type, imports, requires) {
 }
 
 function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
-  if(!importFixRange) {
+  if (!importFixRange) {
     // HACK: insert nothing
-    return fixer.replaceTextRange([0, 0],'');
+    return fixer.replaceTextRange([0, 0], '');
   }
   if (haste) {
     return fixer.insertTextAfterRange(

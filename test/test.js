@@ -937,6 +937,6 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
               '`MyComponent_user` flow type.'
         }
       ]
-    },
+    }
   ]
 });
