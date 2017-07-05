@@ -123,25 +123,39 @@ function getOptions(optionValue) {
 }
 
 function genImportFixRange(type, imports, requires) {
-  const alreadyHasImport = imports
-    .filter(node => node.importKind === 'type')
+  const typeImports = imports.filter(node => node.importKind === 'type');
+  const alreadyHasImport = typeImports
     .some(node =>
-      node.specifiers.some(specifier => specifier.imported.name === type)
+      node.specifiers.some(specifier => (specifier.imported || specifier.local).name === type)
     );
 
   if (alreadyHasImport) {
     return null;
   }
 
-  // if(imports) {
-  //
-  // }
+  function getTypeImportName(node) {
+    return (node.specifiers[0].local || node.specifiers[0].imported).name;
+  }
+
+  if(typeImports.length > 0) {
+    // const sortedImports = typeImports.filter(node => node.specifiers[0]).sort(compareImports);
+    let precedingImportIndex = 0;
+    while(typeImports[precedingImportIndex+1] && getTypeImportName(typeImports[precedingImportIndex+1]) < type){
+      precedingImportIndex++;
+    }
+
+    return typeImports[precedingImportIndex].range;
+  }
 
   // start of file
   return [0, 0];
 }
 
 function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
+  if(!importFixRange) {
+    // HACK: insert nothing
+    return fixer.replaceTextRange([0, 0],'');
+  }
   if (haste) {
     return fixer.insertTextAfterRange(
       importFixRange,
