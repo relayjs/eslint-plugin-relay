@@ -597,6 +597,44 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       filename: 'MyComponent.jsx',
       code: `
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      options: [{haste: true}],
+      output: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
 
         class MyComponent extends React.Component {
@@ -637,7 +675,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       filename: 'MyComponent.jsx',
       code: `
-        import type aaa from 'abc'
+        import type aaa from 'aaa'
         import type zzz from 'zzz'
 
         class MyComponent extends React.Component {
@@ -651,7 +689,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
-        import type aaa from 'abc'
+        import type aaa from 'aaa'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         import type zzz from 'zzz'
 
@@ -680,7 +718,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       filename: 'MyComponent.jsx',
       code: `
-        import type {aaa} from 'abc'
+        import type {aaa} from 'aaa'
         import type zzz from 'zzz'
 
         class MyComponent extends React.Component {
@@ -694,7 +732,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
-        import type {aaa} from 'abc'
+        import type {aaa} from 'aaa'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         import type zzz from 'zzz'
 
@@ -723,7 +761,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       filename: 'MyComponent.jsx',
       code: `
-        import {aaa} from 'abc'
+        import {aaa} from 'aaa'
         import zzz from 'zzz'
 
         class MyComponent extends React.Component {
@@ -737,7 +775,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `,
       output: `
-        import {aaa} from 'abc'
+        import {aaa} from 'aaa'
         import zzz from 'zzz'
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
 
@@ -762,6 +800,143 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
               '`MyComponent_user` flow type.'
         }
       ]
-    }
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        const aaa = require('aaa')
+        const zzz = require('zzz')
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: `
+        const aaa = require('aaa')
+        const zzz = require('zzz')
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        const aaa = require('aaa')
+
+        import zzz from 'zzz'
+
+        import type ccc from 'ccc'
+        import type {xxx} from 'xxx'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: `
+        const aaa = require('aaa')
+
+        import zzz from 'zzz'
+
+        import type ccc from 'ccc'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        import type {xxx} from 'xxx'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type.'
+        }
+      ]
+    },
   ]
 });

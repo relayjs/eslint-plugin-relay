@@ -150,6 +150,10 @@ function genImportFixRange(type, imports, requires) {
     return imports[imports.length-1].range;
   }
 
+  if(requires.length > 0) {
+    return requires[requires.length-1].range;
+  }
+
   // start of file
   return [0, 0];
 }
@@ -162,7 +166,7 @@ function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
   if (haste) {
     return fixer.insertTextAfterRange(
       importFixRange,
-      `${whitespace}import type {${type}} from './${type}.graphql'`
+      `\n${whitespace}import type {${type}} from '${type}.graphql'`
     );
   } else {
     return fixer.insertTextAfterRange(
