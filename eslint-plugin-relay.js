@@ -138,13 +138,16 @@ function genImportFixRange(type, imports, requires) {
   }
 
   if(typeImports.length > 0) {
-    // const sortedImports = typeImports.filter(node => node.specifiers[0]).sort(compareImports);
     let precedingImportIndex = 0;
     while(typeImports[precedingImportIndex+1] && getTypeImportName(typeImports[precedingImportIndex+1]) < type){
       precedingImportIndex++;
     }
 
     return typeImports[precedingImportIndex].range;
+  }
+
+  if(imports.length > 0) {
+    return imports[imports.length-1].range;
   }
 
   // start of file
