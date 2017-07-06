@@ -276,7 +276,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'ADVICE: Component property `{{prop}}` expects to use the generated ' +
-          '`{{type}}` flow type.',
+          '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
@@ -315,7 +315,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'ADVICE: Component property `{{prop}}` expects to use the generated ' +
-          '`{{type}}` flow type.',
+          '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
@@ -697,7 +697,7 @@ module.exports.rules = {
               context.report({
                 message:
                   'ADVICE: Component property `{{prop}}` expects to use the ' +
-                    'generated `{{type}}` flow type.',
+                    'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
                 data: {
                   prop: propName,
                   type
