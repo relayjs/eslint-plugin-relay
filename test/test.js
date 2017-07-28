@@ -15,7 +15,12 @@ const path = require('path');
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
-const ruleTester = new RuleTester({parserOptions: {ecmaVersion: 6}});
+const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+
+const ruleTester = new RuleTester({
+  parser: 'babel-eslint',
+  parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
+});
 
 const valid = [
   {code: 'hello();'},
@@ -193,6 +198,779 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
           message:
             '`createFragmentContainer` expects fragment definitions to be ' +
             '`key: graphql`.'
+        }
+      ]
+    }
+  ]
+});
+
+ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
+  valid: [
+    ...valid,
+    // syntax error, covered by `graphql-syntax`
+    {code: 'graphql`query {{{`'},
+    {
+      code: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: MyComponent_user};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type Props = {
+          user: MyComponent_user,
+        }
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    }
+  ],
+  invalid: [
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          props: {};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: MyComponent_user};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          props: {somethingElse: number};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: MyComponent_user, somethingElse: number};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          props: {user: number};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: MyComponent_user};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          props: {user: Random_user};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: MyComponent_user};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type Props = {};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type Props = {somethingElse: number};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        type Props = {user: MyComponent_user, somethingElse: number};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type Props = {user: number};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type Props = {user: Random_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      options: [{haste: true}],
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import type aaa from 'aaa'
+        import type zzz from 'zzz'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type aaa from 'aaa'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        import type zzz from 'zzz'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import type {aaa} from 'aaa'
+        import type zzz from 'zzz'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {aaa} from 'aaa'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        import type zzz from 'zzz'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        const aaa = require('aaa')
+        const zzz = require('zzz')
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        const aaa = require('aaa')
+        const zzz = require('zzz')
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        const aaa = require('aaa')
+
+        import zzz from 'zzz'
+
+        import type ccc from 'ccc'
+        import type {xxx} from 'xxx'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        const aaa = require('aaa')
+
+        import zzz from 'zzz'
+
+        import type ccc from 'ccc'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+        import type {xxx} from 'xxx'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+
+        class MyComponent extends React.Component {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import {aaa} from 'aaa'
+        import zzz from 'zzz'
+        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
+
+        type Props = {user: MyComponent_user};
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+              '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
         }
       ]
     }
