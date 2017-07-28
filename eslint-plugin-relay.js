@@ -305,7 +305,7 @@ function validateObjectTypeAnnotation(
             return fixes;
           }
         : null,
-      loc: Component
+      loc: Component.loc
     });
   } else if (
     propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
@@ -334,7 +334,7 @@ function validateObjectTypeAnnotation(
             ];
           }
         : null,
-      loc: Component
+      loc: Component.loc
     });
   }
 }
@@ -735,7 +735,7 @@ module.exports.rules = {
                       ];
                     }
                   : null,
-                loc: Component
+                loc: Component.loc
               });
             }
           });
