@@ -244,6 +244,26 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `
+    },
+    {
+      code: `
+        import type {MyComponent_double_underscore} from 'MyComponent_double_underscore.graphql'
+        type Props = {
+          double_underscore: MyComponent_double_underscore,
+        }
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          double_underscore: graphql\`fragment MyComponent_double_underscore on User {id}\`,
+        });
+      `
     }
   ],
   invalid: [
