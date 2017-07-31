@@ -263,22 +263,23 @@ function validateObjectTypeAnnotation(
   importFixRange
 ) {
   const options = getOptions(context.options[0]);
-  const propTypeProperty = propType.properties.filter(
-    property => {
-      // HACK: Type annotations don't currently expose a 'key' property:
-      // https://github.com/babel/babel-eslint/issues/307
+  const propTypeProperty = propType.properties.filter(property => {
+    // HACK: Type annotations don't currently expose a 'key' property:
+    // https://github.com/babel/babel-eslint/issues/307
 
-      let tokenIndex = 0;
-      if (property.static) {
-        tokenIndex++;
-      }
-      if (property.variance) {
-        tokenIndex++;
-      }
-
-      return context.getSourceCode().getFirstToken(property, tokenIndex).value === propName
+    let tokenIndex = 0;
+    if (property.static) {
+      tokenIndex++;
     }
-  )[0];
+    if (property.variance) {
+      tokenIndex++;
+    }
+
+    return (
+      context.getSourceCode().getFirstToken(property, tokenIndex).value ===
+      propName
+    );
+  })[0];
 
   let atleastOnePropertyExists = !!propType.properties[0];
 
@@ -286,7 +287,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'ADVICE: Component property `{{prop}}` expects to use the generated ' +
-          '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
@@ -325,7 +326,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'ADVICE: Component property `{{prop}}` expects to use the generated ' +
-          '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
@@ -629,8 +630,9 @@ module.exports.rules = {
           componentMap[componentName] = {
             Component: node.id
           };
-          if(node.superTypeParameters && node.superTypeParameters.params[1]) {
-            componentMap[componentName].propType = node.superTypeParameters.params[1];
+          if (node.superTypeParameters && node.superTypeParameters.params[1]) {
+            componentMap[componentName].propType =
+              node.superTypeParameters.params[1];
           }
           node.body.body
             .filter(
@@ -640,7 +642,8 @@ module.exports.rules = {
                 child.typeAnnotation
             )
             .forEach(child => {
-              componentMap[componentName].propType = child.typeAnnotation.typeAnnotation;
+              componentMap[componentName].propType =
+                child.typeAnnotation.typeAnnotation;
             });
         },
         TaggedTemplateExpression(node) {
@@ -710,7 +713,7 @@ module.exports.rules = {
               context.report({
                 message:
                   'ADVICE: Component property `{{prop}}` expects to use the ' +
-                    'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+                  'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
                 data: {
                   prop: propName,
                   type
