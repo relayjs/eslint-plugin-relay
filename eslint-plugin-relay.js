@@ -264,9 +264,20 @@ function validateObjectTypeAnnotation(
 ) {
   const options = getOptions(context.options[0]);
   const propTypeProperty = propType.properties.filter(
-    property =>
-      // HACK: https://github.com/babel/babel-eslint/issues/307
-      context.getSourceCode().getFirstToken(property).value === propName
+    property => {
+      // HACK: Type annotations don't currently expose a 'key' property:
+      // https://github.com/babel/babel-eslint/issues/307
+
+      let tokenIndex = 0;
+      if (property.static) {
+        tokenIndex++;
+      }
+      if (property.variance) {
+        tokenIndex++;
+      }
+
+      return context.getSourceCode().getFirstToken(property, tokenIndex).value === propName
+    }
   )[0];
 
   let atleastOnePropertyExists = !!propType.properties[0];
