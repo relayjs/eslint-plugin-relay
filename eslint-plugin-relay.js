@@ -629,6 +629,9 @@ module.exports.rules = {
           componentMap[componentName] = {
             Component: node.id
           };
+          if(node.superTypeParameters && node.superTypeParameters.params[1]) {
+            componentMap[componentName].propType = node.superTypeParameters.params[1];
+          }
           node.body.body
             .filter(
               child =>
@@ -637,7 +640,7 @@ module.exports.rules = {
                 child.typeAnnotation
             )
             .forEach(child => {
-              componentMap[componentName].propType = child.typeAnnotation;
+              componentMap[componentName].propType = child.typeAnnotation.typeAnnotation;
             });
         },
         TaggedTemplateExpression(node) {
@@ -672,19 +675,19 @@ module.exports.rules = {
             if (propType) {
               // There exists a prop typeAnnotation. Let's look at how it's
               // structured
-              switch (propType.typeAnnotation.type) {
+              switch (propType.type) {
                 case 'ObjectTypeAnnotation':
                   validateObjectTypeAnnotation(
                     context,
                     Component,
                     type,
                     propName,
-                    propType.typeAnnotation,
+                    propType,
                     importFixRange
                   );
                   break;
                 case 'GenericTypeAnnotation':
-                  const alias = propType.typeAnnotation.id.name;
+                  const alias = propType.id.name;
                   if (
                     !typeAliasMap[alias] ||
                     typeAliasMap[alias].type !== 'ObjectTypeAnnotation'
