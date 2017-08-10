@@ -682,21 +682,25 @@ module.exports.rules = {
             const {Component, propType} = componentMap[componentName];
 
             const importedPropType = imports.reduce((acc, node) => {
-              if(node.specifiers){
+              if (node.specifiers) {
                 const typeSpecifier = node.specifiers.find(specifier => {
-                  if(specifier.type !== 'ImportSpecifier'){
+                  if (specifier.type !== 'ImportSpecifier') {
                     return false;
                   }
-                  return specifier.imported.name === type
+                  return specifier.imported.name === type;
                 });
-                if(typeSpecifier){
+                if (typeSpecifier) {
                   return typeSpecifier.local.name;
                 }
               }
               return acc;
             }, type);
 
-            const importFixRange = genImportFixRange(importedPropType, imports, requires);
+            const importFixRange = genImportFixRange(
+              importedPropType,
+              imports,
+              requires
+            );
 
             if (propType) {
               // There exists a prop typeAnnotation. Let's look at how it's
