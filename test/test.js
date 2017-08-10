@@ -227,6 +227,22 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     },
     {
       code: `
+        import type {MyComponent_user as User} from './__generated__/MyComponent_user.graphql'
+        class MyComponent extends React.Component {
+          props: {user: User};
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {
           user: MyComponent_user,
@@ -1089,6 +1105,48 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           message:
             'ADVICE: Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        import type {MyComponent_user as User} from 'aaa'
+
+        class MyComponent extends React.Component {
+          props: { user: MyComponent_user }
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      output: HAS_ESLINT_BEEN_UPGRADED_YET
+        ? `
+        import type {MyComponent_user as User} from 'aaa'
+
+        class MyComponent extends React.Component {
+          props: { user: User }
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+        : null,
+      errors: [
+        {
+          message:
+            'ADVICE: Component property `user` expects to use the generated ' +
+            '`User` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.'
         }
       ]
     }

@@ -681,7 +681,22 @@ module.exports.rules = {
             }
             const {Component, propType} = componentMap[componentName];
 
-            const importFixRange = genImportFixRange(type, imports, requires);
+            const importedPropType = imports.reduce((acc, node) => {
+              if(node.specifiers){
+                const typeSpecifier = node.specifiers.find(specifier => {
+                  if(specifier.type !== 'ImportSpecifier'){
+                    return false;
+                  }
+                  return specifier.imported.name === type
+                });
+                if(typeSpecifier){
+                  return typeSpecifier.local.name;
+                }
+              }
+              return acc;
+            }, type);
+
+            const importFixRange = genImportFixRange(importedPropType, imports, requires);
 
             if (propType) {
               // There exists a prop typeAnnotation. Let's look at how it's
@@ -691,7 +706,7 @@ module.exports.rules = {
                   validateObjectTypeAnnotation(
                     context,
                     Component,
-                    type,
+                    importedPropType,
                     propName,
                     propType,
                     importFixRange
@@ -710,7 +725,7 @@ module.exports.rules = {
                   validateObjectTypeAnnotation(
                     context,
                     Component,
-                    type,
+                    importedPropType,
                     propName,
                     typeAliasMap[alias],
                     importFixRange
@@ -724,7 +739,7 @@ module.exports.rules = {
                   'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
                 data: {
                   prop: propName,
-                  type
+                  type: importedPropType
                 },
                 fix: options.fix
                   ? fixer => {
@@ -744,14 +759,14 @@ module.exports.rules = {
                         genImportFixer(
                           fixer,
                           importFixRange,
-                          type,
+                          importedPropType,
                           options.haste,
                           aliasWhitespace
                         ),
                         fixer.insertTextBefore(
                           Component.parent,
                           `type Props = {${propName}: ` +
-                            `${type}};\n\n${aliasWhitespace}`
+                            `${importedPropType}};\n\n${aliasWhitespace}`
                         ),
                         fixer.insertTextBefore(
                           classBodyStart,
