@@ -681,6 +681,7 @@ module.exports.rules = {
             }
             const {Component, propType} = componentMap[componentName];
 
+            // resolve local type alias
             const importedPropType = imports.reduce((acc, node) => {
               if (node.specifiers) {
                 const typeSpecifier = node.specifiers.find(specifier => {
