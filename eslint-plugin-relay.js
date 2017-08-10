@@ -319,7 +319,15 @@ function validateObjectTypeAnnotation(
         : null,
       loc: Component.loc
     });
-  } else if (
+    return;
+  }
+  if (
+    propTypeProperty.value.type === 'NullableTypeAnnotation' &&
+    propTypeProperty.value.typeAnnotation.id.name === type
+  ) {
+    return;
+  }
+  if (
     propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
     propTypeProperty.value.id.name !== type
   ) {

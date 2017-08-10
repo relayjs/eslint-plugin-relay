@@ -328,6 +328,26 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type Props = {|
+          +user: ?MyComponent_user,
+        |}
+
+        class MyComponent extends React.Component {
+          props: Props;
+
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {
           user: MyComponent_user,
         }
