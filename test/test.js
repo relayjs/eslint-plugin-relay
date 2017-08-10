@@ -415,7 +415,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -456,7 +456,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -497,7 +497,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -538,7 +538,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -583,7 +583,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
@@ -628,7 +628,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
@@ -673,7 +673,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
@@ -718,7 +718,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
@@ -759,7 +759,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -801,7 +801,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -845,7 +845,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
@@ -892,7 +892,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 5,
           column: 15
@@ -939,7 +939,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 5,
           column: 15
@@ -986,7 +986,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 5,
           column: 15
@@ -1033,7 +1033,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 5,
           column: 15
@@ -1088,7 +1088,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 9,
           column: 15
@@ -1135,7 +1135,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 5,
           column: 15
@@ -1179,7 +1179,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            'ADVICE: Component property `user` expects to use the generated ' +
+            'Component property `user` expects to use the generated ' +
             '`User` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 4,
           column: 15
