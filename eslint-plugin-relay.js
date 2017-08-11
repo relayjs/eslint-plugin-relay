@@ -260,7 +260,8 @@ function validateObjectTypeAnnotation(
   type,
   propName,
   propType,
-  importFixRange
+  importFixRange,
+  onlyVerify
 ) {
   const options = getOptions(context.options[0]);
   const propTypeProperty = propType.properties.filter(property => {
@@ -284,6 +285,9 @@ function validateObjectTypeAnnotation(
   let atleastOnePropertyExists = !!propType.properties[0];
 
   if (!propTypeProperty) {
+    if (onlyVerify) {
+      return false;
+    }
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
@@ -319,18 +323,21 @@ function validateObjectTypeAnnotation(
         : null,
       loc: Component.loc
     });
-    return;
+    return false;
   }
   if (
     propTypeProperty.value.type === 'NullableTypeAnnotation' &&
     propTypeProperty.value.typeAnnotation.id.name === type
   ) {
-    return;
+    return true;
   }
   if (
     propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
     propTypeProperty.value.id.name !== type
   ) {
+    if (onlyVerify) {
+      return false;
+    }
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
@@ -356,7 +363,9 @@ function validateObjectTypeAnnotation(
         : null,
       loc: Component.loc
     });
+    return false;
   }
+  return true;
 }
 
 module.exports.rules = {
@@ -719,22 +728,65 @@ module.exports.rules = {
                   break;
                 case 'GenericTypeAnnotation':
                   const alias = propType.id.name;
-                  if (
-                    !typeAliasMap[alias] ||
-                    typeAliasMap[alias].type !== 'ObjectTypeAnnotation'
-                  ) {
+                  if (!typeAliasMap[alias]) {
                     // The type Alias doesn't exist, is invalid, or is being
                     // imported. Can't do anything.
                     break;
                   }
-                  validateObjectTypeAnnotation(
-                    context,
-                    Component,
-                    importedPropType,
-                    propName,
-                    typeAliasMap[alias],
-                    importFixRange
-                  );
+                  switch (typeAliasMap[alias].type) {
+                    case 'ObjectTypeAnnotation':
+                      validateObjectTypeAnnotation(
+                        context,
+                        Component,
+                        importedPropType,
+                        propName,
+                        typeAliasMap[alias],
+                        importFixRange
+                      );
+                      break;
+                    case 'IntersectionTypeAnnotation':
+                      const objectTypes = typeAliasMap[alias].types
+                        .map(intersectedType => {
+                          if (
+                            intersectedType.type === 'GenericTypeAnnotation'
+                          ) {
+                            return typeAliasMap[intersectedType.id.name];
+                          }
+                          if (intersectedType.type === 'ObjectTypeAnnotation') {
+                            return intersectedType;
+                          }
+                        })
+                        .filter(Boolean);
+                      if (!objectTypes.length) {
+                        // The type Alias is likely being imported.
+                        // Can't do anything.
+                        break;
+                      }
+                      const lintResults = objectTypes.map(objectType =>
+                        validateObjectTypeAnnotation(
+                          context,
+                          Component,
+                          importedPropType,
+                          propName,
+                          objectType,
+                          importFixRange,
+                          true // Return false if invalid instead of reporting
+                        )
+                      );
+                      if (lintResults.some(result => result)) {
+                        // One of the intersected bojects has it right
+                        break;
+                      }
+                      validateObjectTypeAnnotation(
+                        context,
+                        Component,
+                        importedPropType,
+                        propName,
+                        objectTypes[0],
+                        importFixRange
+                      );
+                      break;
+                  }
                   break;
               }
             } else {
