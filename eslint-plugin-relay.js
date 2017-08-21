@@ -264,7 +264,7 @@ function validateObjectTypeAnnotation(
   onlyVerify
 ) {
   const options = getOptions(context.options[0]);
-  const propTypeProperty = propType.properties.filter(property => {
+  const propTypeProperty = propType.properties.find(property => {
     // HACK: Type annotations don't currently expose a 'key' property:
     // https://github.com/babel/babel-eslint/issues/307
 
@@ -280,8 +280,7 @@ function validateObjectTypeAnnotation(
       context.getSourceCode().getFirstToken(property, tokenIndex).value ===
       propName
     );
-  })[0];
-
+  });
   let atleastOnePropertyExists = !!propType.properties[0];
 
   if (!propTypeProperty) {
@@ -290,8 +289,9 @@ function validateObjectTypeAnnotation(
     }
     context.report({
       message:
-        'Component property `{{prop}}` expects to use the generated ' +
-        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        '`{{prop}}` is not declared in the `props` of the React component or it is not marked with the ' +
+        'generated flow type `{{type}}`. See ' +
+        'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
@@ -647,21 +647,24 @@ module.exports.rules = {
           componentMap[componentName] = {
             Component: node.id
           };
-          if (node.superTypeParameters && node.superTypeParameters.params[1]) {
+          // new style React.Component accepts 'props' as the first parameter
+          if (node.superTypeParameters && node.superTypeParameters.params[0]) {
             componentMap[componentName].propType =
-              node.superTypeParameters.params[1];
+              node.superTypeParameters.params[0];
+          } else {
+            // old style React.Component declares the 'props' type inside the class
+            node.body.body
+              .filter(
+                child =>
+                  child.type === 'ClassProperty' &&
+                  child.key.name === 'props' &&
+                  child.typeAnnotation
+              )
+              .forEach(child => {
+                componentMap[componentName].propType =
+                  child.typeAnnotation.typeAnnotation;
+              });
           }
-          node.body.body
-            .filter(
-              child =>
-                child.type === 'ClassProperty' &&
-                child.key.name === 'props' &&
-                child.typeAnnotation
-            )
-            .forEach(child => {
-              componentMap[componentName].propType =
-                child.typeAnnotation.typeAnnotation;
-            });
         },
         TaggedTemplateExpression(node) {
           const ast = getGraphQLAST(node);
@@ -841,3 +844,4 @@ module.exports.rules = {
     }
   }
 };
+
