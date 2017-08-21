@@ -500,7 +500,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. '+
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
             'See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
           column: 15
@@ -1281,4 +1281,3 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     }
   ]
 });
-
