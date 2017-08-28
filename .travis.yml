@@ -1,0 +1,31 @@
+---
+language: node_js
+install: true
+cache: yarn
+
+matrix:
+  include:
+  - node_js: '8'
+    env: TEST=1
+  - node_js: '7'
+    env: TEST=1
+  - node_js: '6'
+    env: TEST=1
+  - node_js: '4'
+    env: TEST=1
+  - node_js: '8'
+    env: PRETTIER=1
+
+script:
+- |
+    if [ $TEST ]; then
+      yarn run test
+    fi
+- |
+    if [ $PRETTIER ]; then
+      yarn run prettier
+      if ! git diff-index --quiet HEAD --; then
+        echo "Please run `yarn run prettier`"
+        exit 1
+      fi
+    fi
