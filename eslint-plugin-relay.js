@@ -699,7 +699,8 @@ module.exports.rules = {
               // incorrect name, covered by graphql-naming/CallExpression
               return;
             }
-            const {Component, propType} = componentMap[componentName];
+            const Component = componentMap[componentName].Component;
+            const propType = componentMap[componentName].propType;
 
             // resolve local type alias
             const importedPropType = imports.reduce((acc, node) => {

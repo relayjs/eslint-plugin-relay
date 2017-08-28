@@ -112,11 +112,10 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
 });
 
 ruleTester.run('graphql-naming', rules['graphql-naming'], {
-  valid: [
-    ...valid,
+  valid: valid.concat([
     // syntax error, covered by `graphql-syntax`
     {code: 'graphql`query {{{`'}
-  ],
+  ]),
   invalid: [
     {
       filename: 'path/to/Example.react.js',
@@ -205,8 +204,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
 });
 
 ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
-  valid: [
-    ...valid,
+  valid: valid.concat([
     // syntax error, covered by `graphql-syntax`
     {code: 'graphql`query {{{`'},
     {
@@ -423,7 +421,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         });
       `
     }
-  ],
+  ]),
   invalid: [
     {
       filename: 'MyComponent.jsx',
