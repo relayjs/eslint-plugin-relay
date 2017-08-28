@@ -9,7 +9,10 @@
 
 'use strict';
 
-const {parse, visit, Source} = require('graphql');
+const graphql = require('graphql');
+const parse = graphql.parse;
+const visit = graphql.visit;
+const Source = graphql.Source;
 const path = require('path');
 
 function shouldLint(context) {
@@ -89,7 +92,9 @@ function getLocFromIndex(sourceCode, index) {
  * Returns a loc object for error reporting.
  */
 function getLoc(context, templateNode, graphQLNode) {
-  const [start, end] = getRange(context, templateNode, graphQLNode);
+  const startAndEnd = getRange(context, templateNode, graphQLNode);
+  const start = startAndEnd[0];
+  const end = startAndEnd[1];
   return {
     start: getLocFromIndex(context.getSourceCode(), start),
     end: getLocFromIndex(context.getSourceCode(), end)
