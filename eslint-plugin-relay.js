@@ -332,6 +332,7 @@ function validateObjectTypeAnnotation(
   }
   if (
     propTypeProperty.value.type === 'NullableTypeAnnotation' &&
+    propTypeProperty.value.typeAnnotation.type === 'GenericTypeAnnotation' &&
     propTypeProperty.value.typeAnnotation.id.name === type
   ) {
     return true;

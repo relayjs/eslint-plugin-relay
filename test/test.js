@@ -457,9 +457,39 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       errors: [
         {
           message:
-            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
-            'See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`user` is not declared in the `props` of the React component or ' +
+            'it is not marked with the generated flow type ' +
+            '`MyComponent_user`. See ' +
+            'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
           line: 2,
+          column: 15
+        }
+      ]
+    },
+    {
+      filename: 'Profile.js',
+      code: `
+        type Props = {
+          user: ?{
+            id: number,
+          },
+        };
+        class Profile extends React.Component<Props> {}
+        createFragmentContainer(Profile, {
+          user: graphql\`
+            fragment Profile_user on User {
+              id
+            }
+          \`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Component property `user` expects to use the generated ' +
+            '`Profile_user` flow type. See ' +
+            'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+          line: 7,
           column: 15
         }
       ]
