@@ -16,7 +16,7 @@
     "PATENTS"
   ],
   "dependencies": {
-    "graphql": "^0.10.5"
+    "graphql": "^0.11.2"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
