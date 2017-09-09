@@ -77,7 +77,28 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
         }
         module.exports = ThisComponent;
       `
+    },
+    {
+      filename: 'path/to/MyUtilModule.js',
+      code:`
+/* eslint relay/compat-uses-vars: 1 */
+const {graphql}  = require('RelayCompat');
+const localInlineFragment = graphql\`
+  fragment MyUtilModule_localInlineFragment on User {
+    can_viewer_send_money
+  }
+\`;
+
+module.exports = {
+  user: graphql\`
+    fragment MyUtilModule_user on User {
+      id
+      ...MyUtilModule_localInlineFragment @relay(mask: false)
     }
+  \`
+};
+`
+    },
   ],
   invalid: [
     {
@@ -98,7 +119,7 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
           ? "'OtherComponent' is defined but never used."
           : "'OtherComponent' is assigned a value but never used."
       ]
-    }
+    },
   ]
 });
 
@@ -142,6 +163,83 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
           endColumn: 40
         }
       ]
+    },
+    {
+      filename: 'path/to/MyUtilModule.js',
+      code:`
+const {graphql}  = require('RelayCompat');
+const localInlineFragment = graphql\`
+  fragment MyUtilModule_localInlineFragment on User {
+    can_viewer_send_money
+  }
+\`;
+
+module.exports = {
+  user: graphql\`
+    fragment MyUtilModule_user on User {
+      id
+      ...MyUtilModule_localInlineFragment
+    }
+  \`
+};
+`,
+      errors: [{
+        message:
+          'It looks like you are trying to spread a locally defined fragment. In compat mode, ' +
+          'Relay only supports that for `@relay(mask: false)` directive. If you intend to do ' +
+          'that, please add the directive to the fragment spread ' +
+          '`MyUtilModule_localInlineFragment`.',
+      }]
+    },
+    {
+      filename: 'path/to/MyUtilModule.js',
+      code:`
+const {graphql}  = require('RelayCompat');
+graphql\`
+  fragment MyUtilModule_localInlineFragment on User {
+    can_viewer_send_money
+  }
+\`;
+
+module.exports = {
+  user: graphql\`
+    fragment MyUtilModule_user on User {
+      id
+      ...MyUtilModule_localInlineFragment
+    }
+  \`
+};
+`,
+       errors: [{
+         message: 'When you are unmasking a locally defined fragment spread ' +
+         '`MyUtilModule_localInlineFragment`, please make sure the fragment is bound ' +
+         'to a variable named `localInlineFragment`',
+       }],
+    },
+    {
+      filename: 'path/to/MyUtilModule.js',
+      code:`
+const {graphql}  = require('RelayCompat');
+graphql\`
+  fragment MyUtilModule_localInlineFragment on User {
+    can_viewer_send_money
+  }
+\`;
+
+module.exports = {
+  user: graphql\`
+    fragment MyUtilModule_user on User {
+      id
+      ...MyUtilModule_localInlineFragment @relay(mask: false)
+    }
+  \`
+};
+`,
+      errors: [{
+        message: 'When you are unmasking a locally defined fragment spread ' +
+        '`MyUtilModule_localInlineFragment`, please make sure the fragment is ' +
+        'bound to a variable named `localInlineFragment`'
+      }]
     }
   ]
 });

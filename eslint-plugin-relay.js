@@ -9,10 +9,7 @@
 
 'use strict';
 
-const graphql = require('graphql');
-const parse = graphql.parse;
-const visit = graphql.visit;
-const Source = graphql.Source;
+const {parse, visit, Source} = require('graphql');
 const path = require('path');
 
 function shouldLint(context) {
@@ -92,9 +89,7 @@ function getLocFromIndex(sourceCode, index) {
  * Returns a loc object for error reporting.
  */
 function getLoc(context, templateNode, graphQLNode) {
-  const startAndEnd = getRange(context, templateNode, graphQLNode);
-  const start = startAndEnd[0];
-  const end = startAndEnd[1];
+  const [start, end] = getRange(context, templateNode, graphQLNode);
   return {
     start: getLocFromIndex(context.getSourceCode(), start),
     end: getLocFromIndex(context.getSourceCode(), end)
@@ -374,6 +369,15 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
+function validateInlineDirective(spreadNode) {
+  return !!spreadNode.directives
+    .filter(directive => directive.name.value === "relay")
+    .find(
+      directive =>
+        !!directive.arguments.find(argument => argument.name.value === "mask")
+    );
+}
+
 module.exports.rules = {
   'graphql-syntax': {
     meta: {
@@ -479,14 +483,43 @@ module.exports.rules = {
             FragmentSpread(spreadNode) {
               const m =
                 spreadNode.name &&
-                spreadNode.name.value.match(/^([a-z0-9]+)_/i);
-              if (!m) {
+                spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9]+)/i);
+              if (!m || m.length < 3) {
                 return;
               }
               const componentName = m[1];
+              const propName = m[2];
+              const loc = getLoc(context, taggedTemplateExpression, spreadNode.name);
               if (isInScope(componentName)) {
                 // if this variable is defined, mark it as used
                 context.markVariableAsUsed(componentName);
+              } else if (componentName === getModuleName(context.getFilename())) {
+                if (!isInScope(propName)) {
+                  context.report({
+                    message:
+                      'When you are unmasking a locally defined fragment spread `{{fragmentName}}`, please make sure ' +
+                      'the fragment is bound to a variable named `{{propName}}`',
+                    data: {
+                      fragmentName: spreadNode.name.value,
+                      propName: propName,
+                    },
+                    loc,
+                  });
+                  return;
+                }
+                if (!validateInlineDirective(spreadNode)) {
+                  context.report({
+                    message:
+                      'It looks like you are trying to spread a locally defined fragment. In compat mode, Relay ' +
+                      'only supports that for `@relay(mask: false)` directive. If you intend to do that, please ' +
+                      'add the directive to the fragment spread `{{fragmentName}}`.',
+                    data: {
+                      fragmentName: spreadNode.name.value,
+                    },
+                    loc,
+                  });
+                };
+                context.markVariableAsUsed(propName);
               } else {
                 // otherwise, yell about this needed to be defined
                 context.report({
@@ -498,11 +531,7 @@ module.exports.rules = {
                     fragmentName: spreadNode.name.value,
                     varName: componentName
                   },
-                  loc: getLoc(
-                    context,
-                    taggedTemplateExpression,
-                    spreadNode.name
-                  )
+                  loc,
                 });
               }
             }
@@ -692,16 +721,12 @@ module.exports.rules = {
         'Program:exit': function(node) {
           expectedTypes.forEach(type => {
             const componentName = type.split('_')[0];
-            const propName = type
-              .split('_')
-              .slice(1)
-              .join('_');
+            const propName = type.split('_').slice(1).join('_');
             if (!componentName || !propName || !componentMap[componentName]) {
               // incorrect name, covered by graphql-naming/CallExpression
               return;
             }
-            const Component = componentMap[componentName].Component;
-            const propType = componentMap[componentName].propType;
+            const {Component, propType} = componentMap[componentName];
 
             // resolve local type alias
             const importedPropType = imports.reduce((acc, node) => {
