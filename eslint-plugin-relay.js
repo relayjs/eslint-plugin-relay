@@ -494,11 +494,13 @@ module.exports.rules = {
                 // if this variable is defined, mark it as used
                 context.markVariableAsUsed(componentName);
               } else if (componentName === getModuleName(context.getFilename())) {
-                if (!isInScope(propName)) {
+                if (!validateInlineDirective(spreadNode)) {
                   context.report({
                     message:
-                      'When you are unmasking a locally defined fragment spread `{{fragmentName}}`, please make sure ' +
-                      'the fragment is bound to a variable named `{{propName}}`',
+                      'It looks like you are trying to spread the locally defined fragment `{{fragmentName}}`. ' +
+                      'In compat mode, Relay only supports that for `@relay(mask: false)` directive. ' +
+                      'If you intend to do that, please add the directive to the fragment spread `{{fragmentName}}` ' +
+                      'and make sure that it is bound to a local variable named `{{propName}}`.',
                     data: {
                       fragmentName: spreadNode.name.value,
                       propName: propName,
@@ -506,19 +508,20 @@ module.exports.rules = {
                     loc,
                   });
                   return;
-                }
-                if (!validateInlineDirective(spreadNode)) {
+                };
+
+                if (!isInScope(propName)) {
                   context.report({
                     message:
-                      'It looks like you are trying to spread a locally defined fragment. In compat mode, Relay ' +
-                      'only supports that for `@relay(mask: false)` directive. If you intend to do that, please ' +
-                      'add the directive to the fragment spread `{{fragmentName}}`.',
+                      'When you are unmasking the locally defined fragment spread `{{fragmentName}}`, please make sure ' +
+                      'the fragment is bound to a variable named `{{propName}}`.',
                     data: {
                       fragmentName: spreadNode.name.value,
+                      propName: propName,
                     },
                     loc,
                   });
-                };
+                }
                 context.markVariableAsUsed(propName);
               } else {
                 // otherwise, yell about this needed to be defined

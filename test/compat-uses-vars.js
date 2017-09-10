@@ -185,10 +185,11 @@ module.exports = {
 `,
       errors: [{
         message:
-          'It looks like you are trying to spread a locally defined fragment. In compat mode, ' +
-          'Relay only supports that for `@relay(mask: false)` directive. If you intend to do ' +
-          'that, please add the directive to the fragment spread ' +
-          '`MyUtilModule_localInlineFragment`.',
+          'It looks like you are trying to spread the locally defined fragment ' +
+          '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports that ' +
+          'for `@relay(mask: false)` directive. If you intend to do that, please add the ' +
+          'directive to the fragment spread `MyUtilModule_localInlineFragment` and make sure ' +
+          'that it is bound to a local variable named `localInlineFragment`.',
       }]
     },
     {
@@ -211,16 +212,19 @@ module.exports = {
 };
 `,
        errors: [{
-         message: 'When you are unmasking a locally defined fragment spread ' +
-         '`MyUtilModule_localInlineFragment`, please make sure the fragment is bound ' +
-         'to a variable named `localInlineFragment`',
+         message:
+           'It looks like you are trying to spread the locally defined fragment ' +
+           '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports ' +
+           'that for `@relay(mask: false)` directive. If you intend to do that, please add ' +
+           'the directive to the fragment spread `MyUtilModule_localInlineFragment` and ' +
+           'make sure that it is bound to a local variable named `localInlineFragment`.'
        }],
     },
     {
       filename: 'path/to/MyUtilModule.js',
       code:`
 const {graphql}  = require('RelayCompat');
-graphql\`
+const fragment = graphql\`
   fragment MyUtilModule_localInlineFragment on User {
     can_viewer_send_money
   }
@@ -236,9 +240,9 @@ module.exports = {
 };
 `,
       errors: [{
-        message: 'When you are unmasking a locally defined fragment spread ' +
+        message: 'When you are unmasking the locally defined fragment spread ' +
         '`MyUtilModule_localInlineFragment`, please make sure the fragment is ' +
-        'bound to a variable named `localInlineFragment`'
+        'bound to a variable named `localInlineFragment`.'
       }]
     }
   ]
