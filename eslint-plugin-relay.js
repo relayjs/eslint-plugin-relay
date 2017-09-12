@@ -9,7 +9,10 @@
 
 'use strict';
 
-const {parse, visit, Source} = require('graphql');
+const graphql = require('graphql');
+const parse = graphql.parse;
+const visit = graphql.visit;
+const Source = graphql.Source;
 const path = require('path');
 
 function shouldLint(context) {
@@ -89,7 +92,9 @@ function getLocFromIndex(sourceCode, index) {
  * Returns a loc object for error reporting.
  */
 function getLoc(context, templateNode, graphQLNode) {
-  const [start, end] = getRange(context, templateNode, graphQLNode);
+  const startAndEnd = getRange(context, templateNode, graphQLNode);
+  const start = startAndEnd[0];
+  const end = startAndEnd[1];
   return {
     start: getLocFromIndex(context.getSourceCode(), start),
     end: getLocFromIndex(context.getSourceCode(), end)
@@ -483,8 +488,8 @@ module.exports.rules = {
             FragmentSpread(spreadNode) {
               const m =
                 spreadNode.name &&
-                spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9]+)/i);
-              if (!m || m.length < 3) {
+                spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9\_]+)/i);
+              if (!m) {
                 return;
               }
               const componentName = m[1];
@@ -505,7 +510,7 @@ module.exports.rules = {
                       fragmentName: spreadNode.name.value,
                       propName: propName,
                     },
-                    loc,
+                    loc: loc,
                   });
                   return;
                 };
@@ -519,7 +524,7 @@ module.exports.rules = {
                       fragmentName: spreadNode.name.value,
                       propName: propName,
                     },
-                    loc,
+                    loc: loc,
                   });
                 }
                 context.markVariableAsUsed(propName);
@@ -534,7 +539,7 @@ module.exports.rules = {
                     fragmentName: spreadNode.name.value,
                     varName: componentName
                   },
-                  loc,
+                  loc: loc,
                 });
               }
             }
