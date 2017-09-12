@@ -374,6 +374,15 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
+function validateInlineDirective(spreadNode) {
+  return !!spreadNode.directives
+    .filter(directive => directive.name.value === 'relay')
+    .find(
+      directive =>
+        !!directive.arguments.find(argument => argument.name.value === 'mask')
+    );
+}
+
 module.exports.rules = {
   'graphql-syntax': {
     meta: {
@@ -479,14 +488,52 @@ module.exports.rules = {
             FragmentSpread(spreadNode) {
               const m =
                 spreadNode.name &&
-                spreadNode.name.value.match(/^([a-z0-9]+)_/i);
+                spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9\_]+)/i);
               if (!m) {
                 return;
               }
               const componentName = m[1];
+              const propName = m[2];
+              const loc = getLoc(
+                context,
+                taggedTemplateExpression,
+                spreadNode.name
+              );
               if (isInScope(componentName)) {
                 // if this variable is defined, mark it as used
                 context.markVariableAsUsed(componentName);
+              } else if (
+                componentName === getModuleName(context.getFilename())
+              ) {
+                if (!validateInlineDirective(spreadNode)) {
+                  context.report({
+                    message:
+                      'It looks like you are trying to spread the locally defined fragment `{{fragmentName}}`. ' +
+                      'In compat mode, Relay only supports that for `@relay(mask: false)` directive. ' +
+                      'If you intend to do that, please add the directive to the fragment spread `{{fragmentName}}` ' +
+                      'and make sure that it is bound to a local variable named `{{propName}}`.',
+                    data: {
+                      fragmentName: spreadNode.name.value,
+                      propName: propName
+                    },
+                    loc: loc
+                  });
+                  return;
+                }
+
+                if (!isInScope(propName)) {
+                  context.report({
+                    message:
+                      'When you are unmasking the locally defined fragment spread `{{fragmentName}}`, please make sure ' +
+                      'the fragment is bound to a variable named `{{propName}}`.',
+                    data: {
+                      fragmentName: spreadNode.name.value,
+                      propName: propName
+                    },
+                    loc: loc
+                  });
+                }
+                context.markVariableAsUsed(propName);
               } else {
                 // otherwise, yell about this needed to be defined
                 context.report({
@@ -498,11 +545,7 @@ module.exports.rules = {
                     fragmentName: spreadNode.name.value,
                     varName: componentName
                   },
-                  loc: getLoc(
-                    context,
-                    taggedTemplateExpression,
-                    spreadNode.name
-                  )
+                  loc: loc
                 });
               }
             }
