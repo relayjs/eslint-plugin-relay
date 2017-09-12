@@ -376,10 +376,10 @@ function validateObjectTypeAnnotation(
 
 function validateInlineDirective(spreadNode) {
   return !!spreadNode.directives
-    .filter(directive => directive.name.value === "relay")
+    .filter(directive => directive.name.value === 'relay')
     .find(
       directive =>
-        !!directive.arguments.find(argument => argument.name.value === "mask")
+        !!directive.arguments.find(argument => argument.name.value === 'mask')
     );
 }
 
@@ -494,11 +494,17 @@ module.exports.rules = {
               }
               const componentName = m[1];
               const propName = m[2];
-              const loc = getLoc(context, taggedTemplateExpression, spreadNode.name);
+              const loc = getLoc(
+                context,
+                taggedTemplateExpression,
+                spreadNode.name
+              );
               if (isInScope(componentName)) {
                 // if this variable is defined, mark it as used
                 context.markVariableAsUsed(componentName);
-              } else if (componentName === getModuleName(context.getFilename())) {
+              } else if (
+                componentName === getModuleName(context.getFilename())
+              ) {
                 if (!validateInlineDirective(spreadNode)) {
                   context.report({
                     message:
@@ -508,12 +514,12 @@ module.exports.rules = {
                       'and make sure that it is bound to a local variable named `{{propName}}`.',
                     data: {
                       fragmentName: spreadNode.name.value,
-                      propName: propName,
+                      propName: propName
                     },
-                    loc: loc,
+                    loc: loc
                   });
                   return;
-                };
+                }
 
                 if (!isInScope(propName)) {
                   context.report({
@@ -522,9 +528,9 @@ module.exports.rules = {
                       'the fragment is bound to a variable named `{{propName}}`.',
                     data: {
                       fragmentName: spreadNode.name.value,
-                      propName: propName,
+                      propName: propName
                     },
-                    loc: loc,
+                    loc: loc
                   });
                 }
                 context.markVariableAsUsed(propName);
@@ -539,7 +545,7 @@ module.exports.rules = {
                     fragmentName: spreadNode.name.value,
                     varName: componentName
                   },
-                  loc: loc,
+                  loc: loc
                 });
               }
             }
@@ -729,12 +735,16 @@ module.exports.rules = {
         'Program:exit': function(node) {
           expectedTypes.forEach(type => {
             const componentName = type.split('_')[0];
-            const propName = type.split('_').slice(1).join('_');
+            const propName = type
+              .split('_')
+              .slice(1)
+              .join('_');
             if (!componentName || !propName || !componentMap[componentName]) {
               // incorrect name, covered by graphql-naming/CallExpression
               return;
             }
-            const {Component, propType} = componentMap[componentName];
+            const Component = componentMap[componentName].Component;
+            const propType = componentMap[componentName].propType;
 
             // resolve local type alias
             const importedPropType = imports.reduce((acc, node) => {

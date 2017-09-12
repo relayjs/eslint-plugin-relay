@@ -80,7 +80,7 @@ ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
     },
     {
       filename: 'path/to/MyUtilModule.js',
-      code:`
+      code: `
 /* eslint relay/compat-uses-vars: 1 */
 const {graphql}  = require('RelayCompat');
 const localInlineFragment = graphql\`
@@ -98,7 +98,7 @@ module.exports = {
   \`
 };
 `
-    },
+    }
   ],
   invalid: [
     {
@@ -119,7 +119,7 @@ module.exports = {
           ? "'OtherComponent' is defined but never used."
           : "'OtherComponent' is assigned a value but never used."
       ]
-    },
+    }
   ]
 });
 
@@ -166,7 +166,7 @@ ruleTester.run('compat-uses-vars', rules['compat-uses-vars'], {
     },
     {
       filename: 'path/to/MyUtilModule.js',
-      code:`
+      code: `
 const {graphql}  = require('RelayCompat');
 const localInlineFragment = graphql\`
   fragment MyUtilModule_localInlineFragment on User {
@@ -183,18 +183,20 @@ module.exports = {
   \`
 };
 `,
-      errors: [{
-        message:
-          'It looks like you are trying to spread the locally defined fragment ' +
-          '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports that ' +
-          'for `@relay(mask: false)` directive. If you intend to do that, please add the ' +
-          'directive to the fragment spread `MyUtilModule_localInlineFragment` and make sure ' +
-          'that it is bound to a local variable named `localInlineFragment`.',
-      }]
+      errors: [
+        {
+          message:
+            'It looks like you are trying to spread the locally defined fragment ' +
+            '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports that ' +
+            'for `@relay(mask: false)` directive. If you intend to do that, please add the ' +
+            'directive to the fragment spread `MyUtilModule_localInlineFragment` and make sure ' +
+            'that it is bound to a local variable named `localInlineFragment`.'
+        }
+      ]
     },
     {
       filename: 'path/to/MyUtilModule.js',
-      code:`
+      code: `
 const {graphql}  = require('RelayCompat');
 graphql\`
   fragment MyUtilModule_localInlineFragment on User {
@@ -211,18 +213,20 @@ module.exports = {
   \`
 };
 `,
-       errors: [{
-         message:
-           'It looks like you are trying to spread the locally defined fragment ' +
-           '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports ' +
-           'that for `@relay(mask: false)` directive. If you intend to do that, please add ' +
-           'the directive to the fragment spread `MyUtilModule_localInlineFragment` and ' +
-           'make sure that it is bound to a local variable named `localInlineFragment`.'
-       }],
+      errors: [
+        {
+          message:
+            'It looks like you are trying to spread the locally defined fragment ' +
+            '`MyUtilModule_localInlineFragment`. In compat mode, Relay only supports ' +
+            'that for `@relay(mask: false)` directive. If you intend to do that, please add ' +
+            'the directive to the fragment spread `MyUtilModule_localInlineFragment` and ' +
+            'make sure that it is bound to a local variable named `localInlineFragment`.'
+        }
+      ]
     },
     {
       filename: 'path/to/MyUtilModule.js',
-      code:`
+      code: `
 const {graphql}  = require('RelayCompat');
 const fragment = graphql\`
   fragment MyUtilModule_localInlineFragment on User {
@@ -239,11 +243,14 @@ module.exports = {
   \`
 };
 `,
-      errors: [{
-        message: 'When you are unmasking the locally defined fragment spread ' +
-        '`MyUtilModule_localInlineFragment`, please make sure the fragment is ' +
-        'bound to a variable named `localInlineFragment`.'
-      }]
+      errors: [
+        {
+          message:
+            'When you are unmasking the locally defined fragment spread ' +
+            '`MyUtilModule_localInlineFragment`, please make sure the fragment is ' +
+            'bound to a variable named `localInlineFragment`.'
+        }
+      ]
     }
   ]
 });
