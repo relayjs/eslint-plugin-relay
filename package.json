@@ -22,6 +22,6 @@
     "babel-eslint": "^7.2.3",
     "eslint": "^3.19.0",
     "mocha": "^3.5.0",
-    "prettier": "^1.6.1"
+    "prettier": "^1.7.0"
   }
 }
