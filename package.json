@@ -12,6 +12,7 @@
   },
   "files": [
     "eslint-plugin-relay.js",
+    "src/",
     "LICENSE",
     "PATENTS"
   ],
