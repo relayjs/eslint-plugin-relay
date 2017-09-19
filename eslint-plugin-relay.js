@@ -9,31 +9,19 @@
 
 'use strict';
 
+const path = require('path');
+
 const graphql = require('graphql');
 const parse = graphql.parse;
 const visit = graphql.visit;
 const Source = graphql.Source;
-const path = require('path');
 
-function shouldLint(context) {
-  return /graphql|relay/i.test(context.getSourceCode().text);
-}
-
-function getGraphQLTagName(tag) {
-  if (tag.type === 'Identifier' && tag.name === 'graphql') {
-    return 'graphql';
-  } else if (
-    tag.type === 'MemberExpression' &&
-    tag.object.type === 'Identifier' &&
-    tag.object.name === 'graphql' &&
-    tag.property.type === 'Identifier' &&
-    tag.property.name === 'experimental'
-  ) {
-    return 'graphql.experimental';
-  } else {
-    return null;
-  }
-}
+const utils = require('./src/utils');
+const shouldLint = utils.shouldLint;
+const getGraphQLTagName = utils.getGraphQLTagName;
+const getRange = utils.getRange;
+const getLoc = utils.getLoc;
+const getLocFromIndex = utils.getLocFromIndex;
 
 function getGraphQLAST(taggedTemplateExpression) {
   if (!getGraphQLTagName(taggedTemplateExpression.tag)) {
@@ -70,46 +58,6 @@ function getModuleName(filePath) {
   );
 
   return moduleName;
-}
-
-// TODO remove after we no longer have to support ESLint 3.5.0
-function getLocFromIndex(sourceCode, index) {
-  if (sourceCode.getSourceCode) {
-    return sourceCode.getSourceCode(index);
-  }
-  let pos = 0;
-  for (let line = 0; line < sourceCode.lines.length; line++) {
-    const lineLength = sourceCode.lines[line].length;
-    if (index <= pos + lineLength) {
-      return {line: line + 1, column: index - pos};
-    }
-    pos += lineLength + 1;
-  }
-  return null;
-}
-
-/**
- * Returns a loc object for error reporting.
- */
-function getLoc(context, templateNode, graphQLNode) {
-  const startAndEnd = getRange(context, templateNode, graphQLNode);
-  const start = startAndEnd[0];
-  const end = startAndEnd[1];
-  return {
-    start: getLocFromIndex(context.getSourceCode(), start),
-    end: getLocFromIndex(context.getSourceCode(), end)
-  };
-}
-
-/**
- * Returns a range object for auto fixers.
- */
-function getRange(context, templateNode, graphQLNode) {
-  const graphQLStart = templateNode.quasi.quasis[0].start;
-  return [
-    graphQLStart + graphQLNode.loc.start,
-    graphQLStart + graphQLNode.loc.end
-  ];
 }
 
 const DEFAULT_FLOW_TYPES_OPTIONS = {
@@ -384,54 +332,7 @@ function validateInlineDirective(spreadNode) {
 }
 
 module.exports.rules = {
-  'graphql-syntax': {
-    meta: {
-      docs: {
-        description:
-          'Validates the syntax of all graphql`...` and ' +
-          'graphql.experimental`...` templates.'
-      }
-    },
-    create(context) {
-      if (!shouldLint(context)) {
-        return {};
-      }
-      return {
-        TaggedTemplateExpression(node) {
-          if (!getGraphQLTagName(node.tag)) {
-            return;
-          }
-          const quasi = node.quasi.quasis[0];
-          if (node.quasi.quasis.length !== 1) {
-            context.report({
-              node: node,
-              message:
-                'graphql tagged templates do not support ${...} substitutions.'
-            });
-            return;
-          }
-          try {
-            const filename = path.basename(context.getFilename());
-            const ast = parse(new Source(quasi.value.cooked, filename));
-            ast.definitions.forEach(definition => {
-              if (!definition.name) {
-                context.report({
-                  message: 'Operations in graphql tags require a name.',
-                  loc: getLoc(context, node, definition)
-                });
-              }
-            });
-          } catch (error) {
-            context.report({
-              node: node,
-              message: '{{message}}',
-              data: {message: error.message}
-            });
-          }
-        }
-      };
-    }
-  },
+  'graphql-syntax': require('./src/rule-graphql-syntax'),
   'compat-uses-vars': {
     meta: {
       docs: {
