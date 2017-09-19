@@ -9,6 +9,28 @@
 
 'use strict';
 
+const path = require('path');
+
+const graphql = require('graphql');
+const parse = graphql.parse;
+
+function getGraphQLAST(taggedTemplateExpression) {
+  if (!getGraphQLTagName(taggedTemplateExpression.tag)) {
+    return null;
+  }
+  if (taggedTemplateExpression.quasi.quasis.length !== 1) {
+    // has substitutions, covered by graphql-syntax rule
+    return null;
+  }
+  const quasi = taggedTemplateExpression.quasi.quasis[0];
+  try {
+    return parse(quasi.value.cooked);
+  } catch (error) {
+    // Invalid syntax, covered by graphql-syntax rule
+    return null;
+  }
+}
+
 function getGraphQLTagName(tag) {
   if (tag.type === 'Identifier' && tag.name === 'graphql') {
     return 'graphql';
@@ -54,6 +76,26 @@ function getLocFromIndex(sourceCode, index) {
   return null;
 }
 
+// Copied directly from Relay
+function getModuleName(filePath) {
+  const filename = path.basename(filePath, path.extname(filePath));
+  // /path/to/button/index.js -> button
+  let moduleName =
+    filename === 'index' ? path.basename(path.dirname(filePath)) : filename;
+
+  // Example.ios -> Example
+  // Example.product.android -> Example
+  moduleName = moduleName.replace(/(?:\.\w+)+/, '');
+
+  // foo-bar -> fooBar
+  // Relay compatibility mode splits on _, so we can't use that here.
+  moduleName = moduleName.replace(/[^a-zA-Z0-9]+(\w?)/g, (match, next) =>
+    next.toUpperCase()
+  );
+
+  return moduleName;
+}
+
 /**
  * Returns a range object for auto fixers.
  */
@@ -70,9 +112,11 @@ function shouldLint(context) {
 }
 
 module.exports = {
+  getGraphQLAST: getGraphQLAST,
   getGraphQLTagName: getGraphQLTagName,
   getLoc: getLoc,
   getLocFromIndex: getLocFromIndex,
+  getModuleName: getModuleName,
   getRange: getRange,
   shouldLint: shouldLint
 };
