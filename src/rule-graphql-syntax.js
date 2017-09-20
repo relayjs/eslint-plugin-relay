@@ -12,9 +12,9 @@
 const path = require('path');
 
 const utils = require('./utils');
-const shouldLint = utils.shouldLint;
-const getGraphQLTagName = utils.getGraphQLTagName;
 const getLoc = utils.getLoc;
+const isGraphQLTag = utils.isGraphQLTag;
+const shouldLint = utils.shouldLint;
 
 const graphql = require('graphql');
 const parse = graphql.parse;
@@ -23,9 +23,7 @@ const Source = graphql.Source;
 module.exports = {
   meta: {
     docs: {
-      description:
-        'Validates the syntax of all graphql`...` and ' +
-        'graphql.experimental`...` templates.'
+      description: 'Validates the syntax of graphql`...` templates.'
     }
   },
   create(context) {
@@ -34,7 +32,7 @@ module.exports = {
     }
     return {
       TaggedTemplateExpression(node) {
-        if (!getGraphQLTagName(node.tag)) {
+        if (!isGraphQLTag(node.tag)) {
           return;
         }
         const quasi = node.quasi.quasis[0];

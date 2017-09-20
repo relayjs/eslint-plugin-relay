@@ -10,12 +10,12 @@
 'use strict';
 
 const utils = require('./utils');
-const shouldLint = utils.shouldLint;
 const getGraphQLAST = utils.getGraphQLAST;
-const getModuleName = utils.getModuleName;
 const getLoc = utils.getLoc;
-const getGraphQLTagName = utils.getGraphQLTagName;
+const getModuleName = utils.getModuleName;
 const getRange = utils.getRange;
+const isGraphQLTag = utils.isGraphQLTag;
+const shouldLint = utils.shouldLint;
 
 const CREATE_CONTAINER_FUNCTIONS = new Set([
   'createFragmentContainer',
@@ -148,14 +148,12 @@ module.exports = {
               property.computed === false &&
               property.value.type === 'TaggedTemplateExpression'
             ) {
-              const tagName = getGraphQLTagName(property.value.tag);
-
-              if (!tagName) {
+              if (!isGraphQLTag(property.value.tag)) {
                 context.report({
                   node: property.value.tag,
                   message:
                     '`{{callee}}` expects GraphQL to be tagged with ' +
-                    'graphql`...` or graphql.experimental`...`.',
+                    'graphql`...`.',
                   data: {
                     callee: calleeToString(node.callee)
                   }
