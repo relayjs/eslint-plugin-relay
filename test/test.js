@@ -145,7 +145,7 @@ ruleTester.run('graphql-naming', rules['graphql-naming'], {
         {
           message:
             '`createFragmentContainer` expects GraphQL to be tagged with ' +
-            'graphql`...` or graphql.experimental`...`.'
+            'graphql`...`.'
         }
       ]
     },

@@ -15,7 +15,7 @@ const graphql = require('graphql');
 const parse = graphql.parse;
 
 function getGraphQLAST(taggedTemplateExpression) {
-  if (!getGraphQLTagName(taggedTemplateExpression.tag)) {
+  if (!isGraphQLTag(taggedTemplateExpression.tag)) {
     return null;
   }
   if (taggedTemplateExpression.quasi.quasis.length !== 1) {
@@ -27,22 +27,6 @@ function getGraphQLAST(taggedTemplateExpression) {
     return parse(quasi.value.cooked);
   } catch (error) {
     // Invalid syntax, covered by graphql-syntax rule
-    return null;
-  }
-}
-
-function getGraphQLTagName(tag) {
-  if (tag.type === 'Identifier' && tag.name === 'graphql') {
-    return 'graphql';
-  } else if (
-    tag.type === 'MemberExpression' &&
-    tag.object.type === 'Identifier' &&
-    tag.object.name === 'graphql' &&
-    tag.property.type === 'Identifier' &&
-    tag.property.name === 'experimental'
-  ) {
-    return 'graphql.experimental';
-  } else {
     return null;
   }
 }
@@ -107,16 +91,20 @@ function getRange(context, templateNode, graphQLNode) {
   ];
 }
 
+function isGraphQLTag(tag) {
+  return tag.type === 'Identifier' && tag.name === 'graphql';
+}
+
 function shouldLint(context) {
   return /graphql|relay/i.test(context.getSourceCode().text);
 }
 
 module.exports = {
   getGraphQLAST: getGraphQLAST,
-  getGraphQLTagName: getGraphQLTagName,
   getLoc: getLoc,
   getLocFromIndex: getLocFromIndex,
   getModuleName: getModuleName,
   getRange: getRange,
+  isGraphQLTag: isGraphQLTag,
   shouldLint: shouldLint
 };
