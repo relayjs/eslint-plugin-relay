@@ -7,7 +7,7 @@
 
 ## How To Use
 1. Add `"relay"` to your eslint `plugins` section.
-2. Add `"relay/graphql-syntax": "error"` to your eslint `rules` section.
+2. Add the relay rules such as `"relay/graphql-syntax": "error"` to your eslint `rules` section, see the example for all rules.
 
 Example .eslintrc.js:
 
@@ -16,6 +16,9 @@ module.exports = {
   // Other eslint properties here
   rules: {
     'relay/graphql-syntax': 'error',
+    'relay/compat-uses-vars': 'warning',
+    'relay/graphql-naming': 'error',
+    'relay/generated-flow-types': 'warning',
   },
   plugins: [
     'relay',
