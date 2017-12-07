@@ -2,6 +2,27 @@
 
 `eslint-plugin-relay` is a plugin for [ESLint](http://eslint.org/) to catch common problems in code using [Relay](https://facebook.github.io/relay/) early.
 
+## Install
+`npm i --save-dev eslint-plugin-relay`
+
+## How To Use
+1. Add `"relay"` to your eslint `plugins` section.
+2. Add `"relay/graphql-syntax": "error"` to your eslint `rules` section.
+
+Example .eslintrc.js:
+
+```js
+module.exports = {
+  // Other eslint properties here
+  rules: {
+    'relay/graphql-syntax': 'error',
+  },
+  plugins: [
+    'relay',
+  ]
+}
+```
+
 ## Contribute
 
 We actively welcome pull requests, learn how to [contribute](./CONTRIBUTING.md).
