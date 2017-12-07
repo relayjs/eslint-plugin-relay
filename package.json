@@ -8,7 +8,7 @@
   "scripts": {
     "test": "mocha",
     "test-watch": "mocha --watch",
-    "prettier": "find . -name node_modules -prune -or -name '*.js' -exec prettier --write {} +"
+    "prettier": "prettier --write '**/*.js'"
   },
   "files": [
     "eslint-plugin-relay.js",
