@@ -98,13 +98,7 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
       code: 'graphql`fragment F on User {\n  id()\n}`;',
       errors: [
         {
-          message: `Syntax Error test.js (2:6) Expected Name, found )
-
-1: fragment F on User {
-2:   id()
-        ^
-3: }
-`
+          message: `Syntax Error: Expected Name, found )`
         }
       ]
     }
