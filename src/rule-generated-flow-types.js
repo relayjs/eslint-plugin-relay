@@ -175,7 +175,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
-        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions.',
       data: {
         prop: propName,
         type
