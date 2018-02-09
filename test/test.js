@@ -454,7 +454,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
             '`user` is not declared in the `props` of the React component or ' +
             'it is not marked with the generated flow type ' +
             '`MyComponent_user`. See ' +
-            'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            'https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -482,7 +482,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           message:
             'Component property `user` expects to use the generated ' +
             '`Profile_user` flow type. See ' +
-            'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            'https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 7,
           column: 15
         }
@@ -523,7 +523,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
-            'See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -564,7 +564,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -605,7 +605,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -650,7 +650,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
-            'See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -695,7 +695,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
-            'See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -740,7 +740,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -785,7 +785,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -826,7 +826,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -868,7 +868,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 2,
           column: 15
         }
@@ -912,7 +912,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -959,7 +959,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 5,
           column: 15
         }
@@ -1006,7 +1006,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 5,
           column: 15
         }
@@ -1053,7 +1053,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 5,
           column: 15
         }
@@ -1100,7 +1100,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 5,
           column: 15
         }
@@ -1155,7 +1155,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 9,
           column: 15
         }
@@ -1202,7 +1202,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 5,
           column: 15
         }
@@ -1246,7 +1246,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`User` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`User` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 4,
           column: 15
         }
@@ -1295,7 +1295,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         {
           message:
             'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 10,
           column: 15
         }
