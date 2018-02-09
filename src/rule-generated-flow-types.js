@@ -124,7 +124,7 @@ function validateObjectTypeAnnotation(
       message:
         '`{{prop}}` is not declared in the `props` of the React component or it is not marked with the ' +
         'generated flow type `{{type}}`. See ' +
-        'https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        'https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
       data: {
         prop: propName,
         type
@@ -175,7 +175,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
-        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
       data: {
         prop: propName,
         type
@@ -405,7 +405,7 @@ module.exports = {
             context.report({
               message:
                 'Component property `{{prop}}` expects to use the ' +
-                'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/relay-compiler.html#importing-generated-definitions.',
+                'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
               data: {
                 prop: propName,
                 type: importedPropType
