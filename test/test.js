@@ -571,6 +571,28 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       ]
     },
     {
+      filename: 'path/to/Example.js',
+      // Test multiple layers of intersection types.
+      code: `
+        type Props = {} & {};
+        type MergedProps = {} & Props;
+        class Example extends React.PureComponent<MergedProps> {
+        }
+        module.exports = createFragmentContainer(Example, {
+          user: graphql\`fragment Example_user on User { id }\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `Example_user`. ' +
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+          line: 4,
+          column: 15
+        }
+      ]
+    },
+    {
       filename: 'MyComponent.jsx',
       code: `
         class MyComponent extends React.Component {
