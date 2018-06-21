@@ -97,9 +97,6 @@ function validateObjectTypeAnnotation(
   onlyVerify
 ) {
   const options = getOptions(context.options[0]);
-  if (!propType.properties) {
-    console.log(propType);
-  }
   const propTypeProperty = propType.properties.find(property => {
     // HACK: Type annotations don't currently expose a 'key' property:
     // https://github.com/babel/babel-eslint/issues/307
