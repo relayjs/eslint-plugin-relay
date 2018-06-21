@@ -4,17 +4,11 @@ cache: yarn
 
 matrix:
   include:
-  - node_js: '9'
+  - node_js: '10'
     env: TEST=1
   - node_js: '8'
     env: TEST=1
-  - node_js: '7'
-    env: TEST=1
-  - node_js: '6'
-    env: TEST=1
-  - node_js: '4'
-    env: TEST=1
-  - node_js: '8'
+  - node_js: '10'
     env: PRETTIER=1
 
 script:
