@@ -388,7 +388,7 @@ module.exports = {
                         )
                     );
                     if (lintResults.some(result => result)) {
-                      // One of the intersected ojects has it right
+                      // One of the intersected objects has it right
                       break;
                     }
                     validateObjectTypeAnnotation(
