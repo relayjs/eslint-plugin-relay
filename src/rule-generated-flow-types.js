@@ -97,6 +97,9 @@ function validateObjectTypeAnnotation(
   onlyVerify
 ) {
   const options = getOptions(context.options[0]);
+  if (!propType.properties) {
+    console.log(propType);
+  }
   const propTypeProperty = propType.properties.find(property => {
     // HACK: Type annotations don't currently expose a 'key' property:
     // https://github.com/babel/babel-eslint/issues/307
@@ -374,19 +377,21 @@ module.exports = {
                       // Can't do anything.
                       break;
                     }
-                    const lintResults = objectTypes.map(objectType =>
-                      validateObjectTypeAnnotation(
-                        context,
-                        Component,
-                        importedPropType,
-                        propName,
-                        objectType,
-                        importFixRange,
-                        true // Return false if invalid instead of reporting
-                      )
+                    const lintResults = objectTypes.map(
+                      objectType =>
+                        objectType.type === 'ObjectTypeAnnotation' &&
+                        validateObjectTypeAnnotation(
+                          context,
+                          Component,
+                          importedPropType,
+                          propName,
+                          objectType,
+                          importFixRange,
+                          true // Return false if invalid instead of reporting
+                        )
                     );
                     if (lintResults.some(result => result)) {
-                      // One of the intersected bojects has it right
+                      // One of the intersected ojects has it right
                       break;
                     }
                     validateObjectTypeAnnotation(
