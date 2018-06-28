@@ -9,9 +9,6 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 

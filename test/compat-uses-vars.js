@@ -9,9 +9,6 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-
 var eslint = require('eslint');
 var ruleNoUnusedVars = require('eslint/lib/rules/no-unused-vars');
 var ruleNoUndef = require('eslint/lib/rules/no-undef');
