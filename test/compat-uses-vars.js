@@ -9,12 +9,10 @@
 
 'use strict';
 
-var eslint = require('eslint');
-var ruleNoUnusedVars = require('eslint/lib/rules/no-unused-vars');
-var ruleNoUndef = require('eslint/lib/rules/no-undef');
-
+const ruleNoUnusedVars = require('eslint/lib/rules/no-unused-vars');
+const ruleNoUndef = require('eslint/lib/rules/no-undef');
+const RuleTester = require('eslint').RuleTester;
 const rules = require('..').rules;
-const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
   parserOptions: {ecmaVersion: 6, sourceType: 'module'}

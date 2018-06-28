@@ -13,5 +13,6 @@ module.exports.rules = {
   'graphql-syntax': require('./src/rule-graphql-syntax'),
   'compat-uses-vars': require('./src/rule-compat-uses-vars'),
   'graphql-naming': require('./src/rule-graphql-naming'),
-  'generated-flow-types': require('./src/rule-generated-flow-types')
+  'generated-flow-types': require('./src/rule-generated-flow-types'),
+  'unused-fields': require('./src/rule-unused-fields')
 };
