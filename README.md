@@ -16,9 +16,9 @@ module.exports = {
   // Other eslint properties here
   rules: {
     'relay/graphql-syntax': 'error',
-    'relay/compat-uses-vars': 'warning',
+    'relay/compat-uses-vars': 'warn',
     'relay/graphql-naming': 'error',
-    'relay/generated-flow-types': 'warning',
+    'relay/generated-flow-types': 'warn',
   },
   plugins: [
     'relay',
