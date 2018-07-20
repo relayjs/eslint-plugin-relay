@@ -1322,3 +1322,31 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     }
   ]
 });
+
+const FUTURE_ADDED_VALUE_MESSAGE =
+  "Do not use `'%future added value'`. It represents any potential " +
+  'value that the server might return in the future that the code ' +
+  'should handle.';
+ruleTester.run('no-future-added-value', rules['no-future-added-value'], {
+  valid: valid.concat([`const response: 'YES' | 'NO' = 'YES';`]),
+  invalid: [
+    {
+      // value location
+      code: `const response: 'YES' | 'NO' = '%future added value';`,
+      errors: [
+        {
+          message: FUTURE_ADDED_VALUE_MESSAGE
+        }
+      ]
+    },
+    {
+      // type location
+      code: `function test(x: 'EXAMPLE'|'%future added value'){ }`,
+      errors: [
+        {
+          message: FUTURE_ADDED_VALUE_MESSAGE
+        }
+      ]
+    }
+  ]
+});
