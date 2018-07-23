@@ -21,8 +21,8 @@ module.exports = {
     'relay/compat-uses-vars': 'warn',
     'relay/graphql-naming': 'error',
     'relay/generated-flow-types': 'warn',
-    'no-future-added-value': 'warn',
-    'unused-fields': 'warn'
+    'relay/no-future-added-value': 'warn',
+    'relay/unused-fields': 'warn'
   },
   plugins: ['relay']
 };
