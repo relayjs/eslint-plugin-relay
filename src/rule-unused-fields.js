@@ -19,8 +19,8 @@ function getGraphQLFieldNames(graphQLAst) {
 
   function walkAST(node, ignoreLevel) {
     if (node.kind === 'Field' && !ignoreLevel) {
-      const fieldName = (node.alias || node.name).value;
-      fieldNames[fieldName] = true;
+      const nameNode = node.alias || node.name;
+      fieldNames[nameNode.value] = nameNode;
     }
     if (node.kind === 'OperationDefinition') {
       if (node.operation === 'mutation' || node.operation === 'subscription') {
@@ -49,7 +49,7 @@ function getGraphQLFieldNames(graphQLAst) {
   }
 
   walkAST(graphQLAst);
-  return Object.keys(fieldNames);
+  return fieldNames;
 }
 
 function getGraphQLString(templateLiteral) {
@@ -130,25 +130,19 @@ function rule(context) {
         const graphQLAst = getGraphQLAST(templateLiteral);
 
         const queriedFields = getGraphQLFieldNames(graphQLAst);
-        const unusedFields = queriedFields.filter(
-          field => !foundMemberAccesses[field] && !isPageInfoField(field)
-        );
-        if (unusedFields.length === 0) {
-          return;
+        for (const field in queriedFields) {
+          if (!foundMemberAccesses[field] && !isPageInfoField(field)) {
+            context.report({
+              node: templateLiteral,
+              loc: utils.getLoc(context, templateLiteral, queriedFields[field]),
+              message:
+                `This queries for the field \`${field}\` but this file does ` +
+                'not seem to use it directly. If a different file needs this ' +
+                'information that file should export a fragment and colocate ' +
+                'the query for the data with the usage.'
+            });
+          }
         }
-        const whatsUnused =
-          unusedFields.length === 1
-            ? 'field `' + unusedFields[0] + '`'
-            : 'fields `' + unusedFields.join('`, `') + '`';
-        context.report(
-          templateLiteral,
-          'It looks like this queries for the ' +
-            whatsUnused +
-            ' but this ' +
-            'file is not using it directly. If a different file needs this ' +
-            'information that file should export a fragment and colocate the ' +
-            'query for the data with the usage.'
-        );
       });
     },
     CallExpression(node) {

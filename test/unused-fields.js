@@ -19,19 +19,12 @@ const ruleTester = new RuleTester({
   parserOptions: {ecmaVersion: 6, sourceType: 'module'}
 });
 
-function unusedFieldsWarning(...fields) {
-  const what =
-    (fields.length === 1 ? 'field' : 'fields') +
-    ' `' +
-    fields.join('`, `') +
-    '`';
+function unusedFieldsWarning(field) {
   return (
-    'It looks like this queries for the ' +
-    what +
-    ' but this file is ' +
-    'not using it directly. If a different file needs this information that ' +
-    'file should export a fragment and colocate the query for the data with ' +
-    'the usage.'
+    `This queries for the field \`${field}\` but this file does ` +
+    'not seem to use it directly. If a different file needs this ' +
+    'information that file should export a fragment and colocate ' +
+    'the query for the data with the usage.'
   );
 }
 
@@ -78,16 +71,26 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
   invalid: [
     {
       code: `
-        graphql\`fragment Test on Page { name, name2 }\`;
+        graphql\`
+          fragment Test on Page {
+            name
+            name2
+          }
+        \`;
         props.page.name;
       `,
-      errors: [unusedFieldsWarning('name2')]
+      errors: [
+        {
+          message: unusedFieldsWarning('name2'),
+          line: 5
+        }
+      ]
     },
     {
       code: `
         graphql\`fragment Test on Page { unused1, unused2 }\`;
       `,
-      errors: [unusedFieldsWarning('unused1', 'unused2')]
+      errors: [unusedFieldsWarning('unused1'), unusedFieldsWarning('unused2')]
     },
     {
       code: `
@@ -127,7 +130,16 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
           return x;
         }
       `,
-      errors: [unusedFieldsWarning('unused1', 'unused2')]
+      errors: [
+        {
+          message: unusedFieldsWarning('unused1'),
+          line: 3
+        },
+        {
+          message: unusedFieldsWarning('unused2'),
+          line: 4
+        }
+      ]
     }
   ]
 });
