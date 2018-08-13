@@ -35,6 +35,8 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
       props.page.name;
       foo.name2;
     `,
+    // Syntax error is ignored by this rule
+    `graphql\`fragment Test { name2 }\`;`,
     `
       graphql\`fragment Test on InternalTask {
         owner: task_owner {
