@@ -52,10 +52,6 @@ function getGraphQLFieldNames(graphQLAst) {
   return fieldNames;
 }
 
-function getGraphQLString(templateLiteral) {
-  return templateLiteral.quasi.quasis[0].value.cooked;
-}
-
 function isGraphQLTemplate(node) {
   return (
     node.tag.type === 'Identifier' &&
@@ -128,6 +124,10 @@ function rule(context) {
     'Program:exit'(node) {
       templateLiterals.forEach(templateLiteral => {
         const graphQLAst = getGraphQLAST(templateLiteral);
+        if (!graphQLAst) {
+          // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
+          return;
+        }
 
         const queriedFields = getGraphQLFieldNames(graphQLAst);
         for (const field in queriedFields) {
