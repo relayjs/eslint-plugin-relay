@@ -9,16 +9,6 @@
 
 'use strict';
 
-const path = require('path');
-
-const utils = require('./utils');
-const getLoc = utils.getLoc;
-const isGraphQLTag = utils.isGraphQLTag;
-
-const graphql = require('graphql');
-const parse = graphql.parse;
-const Source = graphql.Source;
-
 module.exports = context => {
   function validateValue(node) {
     if (node.value === '%future added value') {
@@ -31,7 +21,10 @@ module.exports = context => {
     }
   }
   return {
-    Literal: validateValue,
-    StringLiteralTypeAnnotation: validateValue
+    "Literal[value='%future added value']": validateValue,
+
+    // StringLiteralTypeAnnotations that are not children of a default case
+    [':not(SwitchCase[test=null] StringLiteralTypeAnnotation)' +
+    "StringLiteralTypeAnnotation[value='%future added value']"]: validateValue
   };
 };
