@@ -11,20 +11,17 @@
 
 module.exports = context => {
   function validateValue(node) {
-    if (node.value === '%future added value') {
-      context.report(
-        node,
-        "Do not use `'%future added value'`. It represents any potential " +
-          'value that the server might return in the future that the code ' +
-          'should handle.'
-      );
-    }
+    context.report(
+      node,
+      "Do not use `'%future added value'`. It represents any potential " +
+        'value that the server might return in the future that the code ' +
+        'should handle.'
+    );
   }
   return {
     "Literal[value='%future added value']": validateValue,
 
     // StringLiteralTypeAnnotations that are not children of a default case
-    [':not(SwitchCase[test=null] StringLiteralTypeAnnotation)' +
-    "StringLiteralTypeAnnotation[value='%future added value']"]: validateValue
+    ":not(SwitchCase[test=null] StringLiteralTypeAnnotation)StringLiteralTypeAnnotation[value='%future added value']": validateValue
   };
 };
