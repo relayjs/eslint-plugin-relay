@@ -91,6 +91,16 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
       ]
     },
     {
+      code:
+        'graphql`fragment Test on User { id } fragment Test2 on User { id }`;',
+      errors: [
+        {
+          message:
+            'graphql tagged templates can only contain a single definition.'
+        }
+      ]
+    },
+    {
       filename: '/path/to/test.js',
       code: 'graphql`fragment F on User {\n  id()\n}`;',
       errors: [
