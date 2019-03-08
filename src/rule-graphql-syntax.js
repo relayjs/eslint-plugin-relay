@@ -47,14 +47,18 @@ module.exports = {
         try {
           const filename = path.basename(context.getFilename());
           const ast = parse(new Source(quasi.value.cooked, filename));
-          ast.definitions.forEach(definition => {
-            if (!definition.name) {
-              context.report({
-                message: 'Operations in graphql tags require a name.',
-                loc: getLoc(context, node, definition)
-              });
-            }
-          });
+          if (ast.definitions.length !== 1) {
+            context.report({
+              node: node,
+              message:
+                'graphql tagged templates can only contain a single definition.'
+            });
+          } else if (!ast.definitions[0].name) {
+            context.report({
+              message: 'Operations in graphql tags require a name.',
+              loc: getLoc(context, node, ast.definitions[0])
+            });
+          }
         } catch (error) {
           context.report({
             node: node,
