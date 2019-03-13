@@ -9,7 +9,7 @@ matrix:
   - node_js: '8'
     env: TEST=1
   - node_js: '10'
-    env: PRETTIER=1
+    env: LINT=1
 
 script:
 - |
@@ -17,10 +17,6 @@ script:
       yarn run test
     fi
 - |
-    if [ $PRETTIER ]; then
-      yarn run prettier
-      if ! git diff-index --quiet HEAD --; then
-        echo "Please run `yarn run prettier`"
-        exit 1
-      fi
+    if [ $LINT ]; then
+      yarn run lint
     fi

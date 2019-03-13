@@ -46,7 +46,6 @@ module.exports = {
     }
     function isInScope(name) {
       var scope = context.getScope();
-      var sourceCode = context.getSourceCode();
       var variables = scope.variables;
 
       while (scope.type !== 'global') {
@@ -81,7 +80,7 @@ module.exports = {
           FragmentSpread(spreadNode) {
             const m =
               spreadNode.name &&
-              spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9\_]+)/i);
+              spreadNode.name.value.match(/^([a-z0-9]+)_([a-z0-9_]+)/i);
             if (!m) {
               return;
             }
