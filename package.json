@@ -6,6 +6,7 @@
   "repository": "relayjs/eslint-plugin-relay",
   "license": "BSD-3-Clause",
   "scripts": {
+    "lint": "eslint eslint-plugin-relay.js src",
     "test": "mocha",
     "test-watch": "mocha --watch",
     "prettier": "prettier --write '**/*.js'"
@@ -22,6 +23,8 @@
   "devDependencies": {
     "babel-eslint": "^10.0.1",
     "eslint": "^5.15.1",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "mocha": "^6.0.2",
     "prettier": "^1.16.4"
   }
