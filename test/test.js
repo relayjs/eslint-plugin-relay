@@ -426,13 +426,26 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
   ]),
   invalid: [
     {
-      code: 'useQuery(graphql`query Foo { id }`)',
+      code: 'useQuery(graphql`query FooQuery { id }`)',
       errors: [
         {
           message:
-            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<MyQuery>(...)',
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
           line: 1,
           column: 1
+        }
+      ]
+    },
+    {
+      code: `
+        const query = graphql\`query FooQuery { id }\`;
+        useQuery(query);
+      `,
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<ExampleQuery>(...)',
+          line: 3
         }
       ]
     },

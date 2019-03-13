@@ -195,6 +195,18 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
+function getDefinitionName(arg) {
+  if (arg.type !== 'TaggedTemplateExpression') {
+    // TODO: maybe follow variables, see context.getScope()
+    return null;
+  }
+  const ast = getGraphQLAST(firstArg);
+  if (ast == null) {
+    return null;
+  }
+  return ast.definitions[0].name.value;
+}
+
 module.exports = {
   meta: {
     fixable: 'code',
@@ -243,10 +255,18 @@ module.exports = {
         typeAliasMap[node.id.name] = node.right;
       },
       'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const queryName = getDefinitionName(firstArg) || 'ExampleQuery';
         context.report({
           node: node,
           message:
-            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<MyQuery>(...)'
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<{{queryName}}>(...)',
+          data: {
+            queryName: queryName
+          }
         });
       },
       ClassDeclaration(node) {
