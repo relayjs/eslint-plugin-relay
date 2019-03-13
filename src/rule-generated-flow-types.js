@@ -195,6 +195,11 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
+/**
+ * Tries to find a GraphQL definition node for a given argument.
+ * Currently, only supports a graphql`...` literal inline, but could be
+ * improved to follow a variable definition.
+ */
 function getDefinitionName(arg) {
   if (arg.type !== 'TaggedTemplateExpression') {
     // TODO: maybe follow variables, see context.getScope()
@@ -254,6 +259,10 @@ module.exports = {
       TypeAlias(node) {
         typeAliasMap[node.id.name] = node.right;
       },
+
+      /**
+       * Find useQuery() calls without type arguments.
+       */
       'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
         const firstArg = node.arguments[0];
         if (firstArg == null) {
