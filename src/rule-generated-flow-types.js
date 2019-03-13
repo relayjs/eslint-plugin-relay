@@ -28,6 +28,10 @@ function getOptions(optionValue) {
   return DEFAULT_FLOW_TYPES_OPTIONS;
 }
 
+function getTypeImportName(node) {
+  return (node.specifiers[0].local || node.specifiers[0].imported).name;
+}
+
 function genImportFixRange(type, imports, requires) {
   const typeImports = imports.filter(node => node.importKind === 'type');
   const alreadyHasImport = typeImports.some(node =>
@@ -35,15 +39,9 @@ function genImportFixRange(type, imports, requires) {
       specifier => (specifier.imported || specifier.local).name === type
     )
   );
-
   if (alreadyHasImport) {
     return null;
   }
-
-  function getTypeImportName(node) {
-    return (node.specifiers[0].local || node.specifiers[0].imported).name;
-  }
-
   if (typeImports.length > 0) {
     let precedingImportIndex = 0;
     while (
@@ -52,18 +50,14 @@ function genImportFixRange(type, imports, requires) {
     ) {
       precedingImportIndex++;
     }
-
     return typeImports[precedingImportIndex].range;
   }
-
   if (imports.length > 0) {
     return imports[imports.length - 1].range;
   }
-
   if (requires.length > 0) {
     return requires[requires.length - 1].range;
   }
-
   // start of file
   return [0, 0];
 }

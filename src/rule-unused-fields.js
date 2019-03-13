@@ -168,12 +168,11 @@ function rule(context) {
     MemberExpression: visitMemberExpression,
     OptionalMemberExpression: visitMemberExpression,
     ObjectPattern(node) {
-      node.properties
-        .filter(node => node.type === 'Property')
-        .filter(node => !node.computed)
-        .forEach(node => {
+      node.properties.forEach(node => {
+        if (node.type === 'Property' && !node.computed) {
           foundMemberAccesses[node.key.name] = true;
-        });
+        }
+      });
     },
     MethodDefinition(node) {
       currentMethod.unshift(node.key.name);
