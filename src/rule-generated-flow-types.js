@@ -201,7 +201,7 @@ function getDefinitionName(arg) {
     return null;
   }
   const ast = getGraphQLAST(firstArg);
-  if (ast == null) {
+  if (ast == null || ast.definitions.length === 0) {
     return null;
   }
   return ast.definitions[0].name.value;
