@@ -11,7 +11,6 @@
 
 const utils = require('./utils');
 
-const isGraphQLTag = utils.isGraphQLTag;
 const getGraphQLAST = utils.getGraphQLAST;
 
 function getGraphQLFieldNames(graphQLAst) {
@@ -116,12 +115,12 @@ function rule(context) {
   }
 
   return {
-    Program(node) {
+    Program(_node) {
       currentMethod = [];
       foundMemberAccesses = {};
       templateLiterals = [];
     },
-    'Program:exit'(node) {
+    'Program:exit'(_node) {
       templateLiterals.forEach(templateLiteral => {
         const graphQLAst = getGraphQLAST(templateLiteral);
         if (!graphQLAst) {
@@ -179,7 +178,7 @@ function rule(context) {
     MethodDefinition(node) {
       currentMethod.unshift(node.key.name);
     },
-    'MethodDefinition:exit'(node) {
+    'MethodDefinition:exit'(_node) {
       currentMethod.shift();
     }
   };

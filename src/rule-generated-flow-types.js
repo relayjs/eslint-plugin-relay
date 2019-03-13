@@ -12,7 +12,6 @@
 const utils = require('./utils');
 const shouldLint = utils.shouldLint;
 const getGraphQLAST = utils.getGraphQLAST;
-const getModuleName = utils.getModuleName;
 
 const DEFAULT_FLOW_TYPES_OPTIONS = {
   fix: false,
@@ -278,8 +277,6 @@ module.exports = {
         if (!ast) {
           return;
         }
-
-        const moduleName = getModuleName(context.getFilename());
         ast.definitions.forEach(def => {
           if (!def.name) {
             // no name, covered by graphql-naming/TaggedTemplateExpression
@@ -290,7 +287,7 @@ module.exports = {
           }
         });
       },
-      'Program:exit': function(node) {
+      'Program:exit': function(_node) {
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];
           const propName = type
@@ -330,7 +327,7 @@ module.exports = {
             // There exists a prop typeAnnotation. Let's look at how it's
             // structured
             switch (propType.type) {
-              case 'ObjectTypeAnnotation':
+              case 'ObjectTypeAnnotation': {
                 validateObjectTypeAnnotation(
                   context,
                   Component,
@@ -340,7 +337,8 @@ module.exports = {
                   importFixRange
                 );
                 break;
-              case 'GenericTypeAnnotation':
+              }
+              case 'GenericTypeAnnotation': {
                 const alias = propType.id.name;
                 if (!typeAliasMap[alias]) {
                   // The type Alias doesn't exist, is invalid, or is being
@@ -348,7 +346,7 @@ module.exports = {
                   break;
                 }
                 switch (typeAliasMap[alias].type) {
-                  case 'ObjectTypeAnnotation':
+                  case 'ObjectTypeAnnotation': {
                     validateObjectTypeAnnotation(
                       context,
                       Component,
@@ -358,7 +356,8 @@ module.exports = {
                       importFixRange
                     );
                     break;
-                  case 'IntersectionTypeAnnotation':
+                  }
+                  case 'IntersectionTypeAnnotation': {
                     const objectTypes = typeAliasMap[alias].types
                       .map(intersectedType => {
                         if (intersectedType.type === 'GenericTypeAnnotation') {
@@ -400,8 +399,10 @@ module.exports = {
                       importFixRange
                     );
                     break;
+                  }
                 }
                 break;
+              }
             }
           } else {
             context.report({

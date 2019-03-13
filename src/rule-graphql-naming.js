@@ -110,7 +110,7 @@ module.exports = {
 
         ast.definitions.forEach(definition => {
           switch (definition.kind) {
-            case 'OperationDefinition':
+            case 'OperationDefinition': {
               const moduleName = getModuleName(context.getFilename());
               const name = definition.name;
               if (!name) {
@@ -131,6 +131,7 @@ module.exports = {
                 });
               }
               break;
+            }
             default:
           }
         });
