@@ -242,6 +242,13 @@ module.exports = {
       TypeAlias(node) {
         typeAliasMap[node.id.name] = node.right;
       },
+      'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
+        context.report({
+          node: node,
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<MyQuery>(...)'
+        });
+      },
       ClassDeclaration(node) {
         const componentName = node.id.name;
         componentMap[componentName] = {

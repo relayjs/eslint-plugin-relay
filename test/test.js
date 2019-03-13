@@ -208,6 +208,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
   valid: valid.concat([
     // syntax error, covered by `graphql-syntax`
     {code: 'graphql`query {{{`'},
+    {code: 'useQuery<FooResponse>(graphql`query Foo { id }`)'},
     {
       code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -424,6 +425,17 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     }
   ]),
   invalid: [
+    {
+      code: 'useQuery(graphql`query Foo { id }`)',
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<MyQuery>(...)',
+          line: 1,
+          column: 1
+        }
+      ]
+    },
     {
       filename: 'MyComponent.jsx',
       code: `
