@@ -205,7 +205,7 @@ function getDefinitionName(arg) {
     // TODO: maybe follow variables, see context.getScope()
     return null;
   }
-  const ast = getGraphQLAST(firstArg);
+  const ast = getGraphQLAST(arg);
   if (ast == null || ast.definitions.length === 0) {
     return null;
   }
@@ -243,6 +243,7 @@ module.exports = {
     const imports = [];
     const requires = [];
     const typeAliasMap = {};
+    const useFragmentInstances = [];
     return {
       ImportDeclaration(node) {
         imports.push(node);
@@ -278,6 +279,25 @@ module.exports = {
           }
         });
       },
+
+      /**
+       * useFragment() calls
+       */
+      'CallExpression[callee.name=useFragment]'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const fragmentName = getDefinitionName(firstArg);
+        if (fragmentName == null) {
+          return;
+        }
+        useFragmentInstances.push({
+          fragmentName: fragmentName,
+          node: node
+        });
+      },
+
       ClassDeclaration(node) {
         const componentName = node.id.name;
         componentMap[componentName] = {
@@ -318,6 +338,28 @@ module.exports = {
         });
       },
       'Program:exit': function(_node) {
+        useFragmentInstances.forEach(useFragmentInstance => {
+          const fragmentName = useFragmentInstance.fragmentName;
+          const node = useFragmentInstance.node;
+          console.log({imports});
+          const foundImport = imports.find(importDeclaration => {
+            const importedFromModuleName = importDeclaration.source.value;
+            return importedFromModuleName.endsWith(fragmentName + '.graphql');
+          });
+          if (!foundImport) {
+            context.report({
+              node: node,
+              message:
+                'The prop passed to useFragment() should be typed with the ' +
+                'type {{name}} imported from {{name}}.graphql, e.g.:\n' +
+                '\n' +
+                "  import type {{{name}}} from '{{name}}.graphql;",
+              data: {
+                name: fragmentName
+              }
+            });
+          }
+        });
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];
           const propName = type
