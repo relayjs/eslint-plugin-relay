@@ -336,30 +336,22 @@ module.exports = {
             }
             // import type {...} from '...';
             if (importDeclaration.importKind === 'type') {
-              return importDeclaration.specifiers.some(specifier => {
-                console.log(
-                  // specifier,
-                  'HERE',
-                  specifier.importKind,
-                  specifier.type === 'ImportSpecifier',
-                  specifier.imported.name === fragmentName + '$ref'
-                );
-                return (
+              return importDeclaration.specifiers.some(
+                specifier =>
                   specifier.type === 'ImportSpecifier' &&
                   specifier.imported.name === fragmentName + '$ref'
-                );
-              });
+              );
             }
             // import {type xyz} from '...';
             if (importDeclaration.importKind === 'value') {
-              return importDeclaration.specifiers.some(specifier => {
-                return (
+              return importDeclaration.specifiers.some(
+                specifier =>
                   specifier.type === 'ImportSpecifier' &&
                   specifier.importKind === 'type' &&
                   specifier.imported.name === fragmentName + '$ref'
-                );
-              });
+              );
             }
+            return false;
           });
           if (!foundImport) {
             context.report({
