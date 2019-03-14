@@ -144,7 +144,9 @@ function rule(context) {
                 `This queries for the field \`${field}\` but this file does ` +
                 'not seem to use it directly. If a different file needs this ' +
                 'information that file should export a fragment and colocate ' +
-                'the query for the data with the usage.'
+                'the query for the data with the usage.\n' +
+                'If only interested in the existence of a record, __typename ' +
+                'can be used without this warning.'
             });
           }
         }
