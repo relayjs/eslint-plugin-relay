@@ -130,7 +130,13 @@ function rule(context) {
 
         const queriedFields = getGraphQLFieldNames(graphQLAst);
         for (const field in queriedFields) {
-          if (!foundMemberAccesses[field] && !isPageInfoField(field)) {
+          if (
+            !foundMemberAccesses[field] &&
+            !isPageInfoField(field) &&
+            // Do not warn for unused __typename which can be a workaround
+            // when only interested in existence of an object.
+            field !== '__typename'
+          ) {
             context.report({
               node: templateLiteral,
               loc: utils.getLoc(context, templateLiteral, queriedFields[field]),
