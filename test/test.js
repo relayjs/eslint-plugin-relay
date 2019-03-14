@@ -224,9 +224,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user};
-
+        class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
             return <div />;
           }
@@ -240,9 +238,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user as User} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: User};
-
+        class MyComponent extends React.Component<{user: User}> {
           render() {
             return <div />;
           }
@@ -260,9 +256,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: MyComponent_user,
         }
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -280,9 +274,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           double_underscore: MyComponent_double_underscore,
         }
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -300,9 +292,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           +user: MyComponent_user,
         }
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -320,9 +310,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user?: MyComponent_user,
         }
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -340,9 +328,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           +user: MyComponent_user,
         |}
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -360,9 +346,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           +user: ?MyComponent_user,
         |}
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -422,9 +406,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           other: ?Object,
         } & RelayProps;
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -480,9 +462,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
     {
       filename: 'MyComponent.jsx',
       code: `
-        class MyComponent extends React.Component {
-          props: {};
-
+        class MyComponent extends React.Component<{}> {
           render() {
             return <div />;
           }
@@ -495,9 +475,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       output: HAS_ESLINT_BEEN_UPGRADED_YET
         ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user};
-
+        class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
             return <div />;
           }
@@ -551,9 +529,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
     {
       filename: 'MyComponent.jsx',
       code: `
-        class MyComponent extends React.Component {
-          props: {somethingElse: number};
-
+        class MyComponent extends React.Component<{somethingElse: number}> {
           render() {
             return <div />;
           }
@@ -566,9 +542,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       output: HAS_ESLINT_BEEN_UPGRADED_YET
         ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user, somethingElse: number};
-
+        class MyComponent extends React.Component<{user: MyComponent_user, somethingElse: number}> {
           render() {
             return <div />;
           }
@@ -592,9 +566,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
     {
       filename: 'MyComponent.jsx',
       code: `
-        class MyComponent extends React.Component {
-          props: {user: number};
-
+        class MyComponent extends React.Component<{user: number}> {
           render() {
             return <div />;
           }
@@ -607,9 +579,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       output: HAS_ESLINT_BEEN_UPGRADED_YET
         ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user};
-
+        class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
             return <div />;
           }
@@ -655,9 +625,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
     {
       filename: 'MyComponent.jsx',
       code: `
-        class MyComponent extends React.Component {
-          props: {user: Random_user};
-
+        class MyComponent extends React.Component<{user: Random_user}> {
           render() {
             return <div />;
           }
@@ -670,9 +638,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       output: HAS_ESLINT_BEEN_UPGRADED_YET
         ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user};
-
+        class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
             return <div />;
           }
@@ -698,9 +664,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       code: `
         type Props = {};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -715,9 +679,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -743,9 +705,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       code: `
         type Props = {somethingElse: number};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -760,9 +720,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -788,9 +746,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       code: `
         type Props = {user: number};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -805,9 +761,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -833,9 +787,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       code: `
         type Props = {user: Random_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -850,9 +802,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -891,9 +841,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -933,9 +881,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -977,9 +923,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1024,9 +968,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1071,9 +1013,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1118,9 +1058,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1165,9 +1103,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1220,9 +1156,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1267,9 +1201,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
 
         type Props = {user: MyComponent_user};
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1295,9 +1227,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       code: `
         import type {MyComponent_user as User} from 'aaa'
 
-        class MyComponent extends React.Component {
-          props: { user: MyComponent_user }
-
+        class MyComponent extends React.Component<{ user: MyComponent_user }> {
           render() {
             return <div />;
           }
@@ -1311,9 +1241,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
         ? `
         import type {MyComponent_user as User} from 'aaa'
 
-        class MyComponent extends React.Component {
-          props: { user: User }
-
+        class MyComponent extends React.Component<{ user: User }> {
           render() {
             return <div />;
           }
@@ -1345,9 +1273,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
           user: ?Object,
         } & OtherProps;
 
-        class MyComponent extends React.Component {
-          props: Props;
-
+        class MyComponent extends React.Component<Props> {
           render() {
             return <div />;
           }
@@ -1360,9 +1286,7 @@ The prop passed to useFragment() should be typed with the type TestFragment_foo 
       output: HAS_ESLINT_BEEN_UPGRADED_YET
         ? `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-        class MyComponent extends React.Component {
-          props: {user: MyComponent_user};
-
+        class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
             return <div />;
           }
