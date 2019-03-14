@@ -210,13 +210,19 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {code: 'graphql`query {{{`'},
     {
       code: `
-        import type {TestFragment_foo} from 'TestFragment_foo.graphql';
+        import type {TestFragment_foo$ref} from 'TestFragment_foo.graphql';
         useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
       `
     },
     {
       code: `
-        import type {TestFragment_foo} from './path/to/TestFragment_foo.graphql';
+        import type {TestFragment_foo$ref} from './path/to/TestFragment_foo.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `
+    },
+    {
+      code: `
+        import {type TestFragment_foo$ref} from './path/to/TestFragment_foo.graphql';
         useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
       `
     },
@@ -421,15 +427,48 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
   invalid: [
     {
       code: `
-        import type {TestFragment_other} from './path/to/TestFragment_other.graphql';
+        import type {TestFragment_other$ref} from './path/to/TestFragment_other.graphql';
         useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
       `,
       errors: [
         {
           message: `
-The prop passed to useFragment() should be typed with the type TestFragment_foo imported from TestFragment_foo.graphql, e.g.:
+The prop passed to useFragment() should be typed with the type 'TestFragment_foo$ref' imported from 'TestFragment_foo.graphql', e.g.:
 
-  import type {TestFragment_foo} from 'TestFragment_foo.graphql;`.trim(),
+  import type {TestFragment_foo} from 'TestFragment_foo.graphql';`.trim(),
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      // Should import the type
+      code: `
+        import {TestFragment_foo$ref} from './path/to/TestFragment_foo.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useFragment() should be typed with the type 'TestFragment_foo$ref' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo} from 'TestFragment_foo.graphql';`.trim(),
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {other} from 'TestFragment_foo.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useFragment() should be typed with the type 'TestFragment_foo$ref' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo} from 'TestFragment_foo.graphql';`.trim(),
           line: 3,
           column: 9
         }

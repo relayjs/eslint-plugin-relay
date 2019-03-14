@@ -328,18 +328,48 @@ module.exports = {
         useFragmentInstances.forEach(useFragmentInstance => {
           const fragmentName = useFragmentInstance.fragmentName;
           const node = useFragmentInstance.node;
-          const foundImport = imports.find(importDeclaration => {
+          const foundImport = imports.some(importDeclaration => {
             const importedFromModuleName = importDeclaration.source.value;
-            return importedFromModuleName.endsWith(fragmentName + '.graphql');
+            // `includes()` to allow a suffix like `.js` or path prefixes
+            if (!importedFromModuleName.includes(fragmentName + '.graphql')) {
+              return false;
+            }
+            // import type {...} from '...';
+            if (importDeclaration.importKind === 'type') {
+              return importDeclaration.specifiers.some(specifier => {
+                console.log(
+                  // specifier,
+                  'HERE',
+                  specifier.importKind,
+                  specifier.type === 'ImportSpecifier',
+                  specifier.imported.name === fragmentName + '$ref'
+                );
+                return (
+                  specifier.type === 'ImportSpecifier' &&
+                  specifier.imported.name === fragmentName + '$ref'
+                );
+              });
+            }
+            // import {type xyz} from '...';
+            if (importDeclaration.importKind === 'value') {
+              return importDeclaration.specifiers.some(specifier => {
+                return (
+                  specifier.type === 'ImportSpecifier' &&
+                  specifier.importKind === 'type' &&
+                  specifier.imported.name === fragmentName + '$ref'
+                );
+              });
+            }
           });
           if (!foundImport) {
             context.report({
               node: node,
               message:
                 'The prop passed to useFragment() should be typed with the ' +
-                'type {{name}} imported from {{name}}.graphql, e.g.:\n' +
+                "type '{{name}}$ref' imported from '{{name}}.graphql', " +
+                'e.g.:\n' +
                 '\n' +
-                "  import type {{{name}}} from '{{name}}.graphql;",
+                "  import type {{{name}}} from '{{name}}.graphql';",
               data: {
                 name: fragmentName
               }
