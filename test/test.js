@@ -210,6 +210,19 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {code: 'graphql`query {{{`'},
     {
       code: `
+        import type {TestFragment_foo} from 'TestFragment_foo.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo} from './path/to/TestFragment_foo.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `
+    },
+    {code: 'useQuery<FooResponse>(graphql`query Foo { id }`)'},
+    {
+      code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component {
           props: {user: MyComponent_user};
@@ -424,6 +437,46 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     }
   ]),
   invalid: [
+    {
+      code: `
+        import type {TestFragment_other} from './path/to/TestFragment_other.graphql';
+        useFragment<FooResponse>(graphql\`query TestFragment_foo { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useFragment() should be typed with the type TestFragment_foo imported from TestFragment_foo.graphql, e.g.:
+
+  import type {TestFragment_foo} from 'TestFragment_foo.graphql;`.trim(),
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: 'useQuery(graphql`query FooQuery { id }`)',
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
+          line: 1,
+          column: 1
+        }
+      ]
+    },
+    {
+      code: `
+        const query = graphql\`query FooQuery { id }\`;
+        useQuery(query);
+      `,
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<ExampleQuery>(...)',
+          line: 3
+        }
+      ]
+    },
     {
       filename: 'MyComponent.jsx',
       code: `

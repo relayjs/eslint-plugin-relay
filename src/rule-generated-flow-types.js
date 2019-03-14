@@ -195,6 +195,23 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
+/**
+ * Tries to find a GraphQL definition node for a given argument.
+ * Currently, only supports a graphql`...` literal inline, but could be
+ * improved to follow a variable definition.
+ */
+function getDefinitionName(arg) {
+  if (arg.type !== 'TaggedTemplateExpression') {
+    // TODO: maybe follow variables, see context.getScope()
+    return null;
+  }
+  const ast = getGraphQLAST(arg);
+  if (ast == null || ast.definitions.length === 0) {
+    return null;
+  }
+  return ast.definitions[0].name.value;
+}
+
 module.exports = {
   meta: {
     fixable: 'code',
@@ -226,6 +243,7 @@ module.exports = {
     const imports = [];
     const requires = [];
     const typeAliasMap = {};
+    const useFragmentInstances = [];
     return {
       ImportDeclaration(node) {
         imports.push(node);
@@ -242,6 +260,44 @@ module.exports = {
       TypeAlias(node) {
         typeAliasMap[node.id.name] = node.right;
       },
+
+      /**
+       * Find useQuery() calls without type arguments.
+       */
+      'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const queryName = getDefinitionName(firstArg) || 'ExampleQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<{{queryName}}>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * useFragment() calls
+       */
+      'CallExpression[callee.name=useFragment]'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const fragmentName = getDefinitionName(firstArg);
+        if (fragmentName == null) {
+          return;
+        }
+        useFragmentInstances.push({
+          fragmentName: fragmentName,
+          node: node
+        });
+      },
+
       ClassDeclaration(node) {
         const componentName = node.id.name;
         componentMap[componentName] = {
@@ -282,6 +338,27 @@ module.exports = {
         });
       },
       'Program:exit': function(_node) {
+        useFragmentInstances.forEach(useFragmentInstance => {
+          const fragmentName = useFragmentInstance.fragmentName;
+          const node = useFragmentInstance.node;
+          const foundImport = imports.find(importDeclaration => {
+            const importedFromModuleName = importDeclaration.source.value;
+            return importedFromModuleName.endsWith(fragmentName + '.graphql');
+          });
+          if (!foundImport) {
+            context.report({
+              node: node,
+              message:
+                'The prop passed to useFragment() should be typed with the ' +
+                'type {{name}} imported from {{name}}.graphql, e.g.:\n' +
+                '\n' +
+                "  import type {{{name}}} from '{{name}}.graphql;",
+              data: {
+                name: fragmentName
+              }
+            });
+          }
+        });
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];
           const propName = type
