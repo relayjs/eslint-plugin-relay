@@ -67,10 +67,15 @@ function isStringNode(node) {
 
 function isPageInfoField(field) {
   switch (field) {
+    case 'pageInfo':
     case 'page_info':
+    case 'hasNextPage':
     case 'has_next_page':
+    case 'hasPreviousPage':
     case 'has_previous_page':
+    case 'startCursor':
     case 'start_cursor':
+    case 'endCursor':
     case 'end_cursor':
       return true;
     default:
