@@ -341,7 +341,6 @@ module.exports = {
         useFragmentInstances.forEach(useFragmentInstance => {
           const fragmentName = useFragmentInstance.fragmentName;
           const node = useFragmentInstance.node;
-          console.log({imports});
           const foundImport = imports.find(importDeclaration => {
             const importedFromModuleName = importDeclaration.source.value;
             return importedFromModuleName.endsWith(fragmentName + '.graphql');
