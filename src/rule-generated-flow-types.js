@@ -307,19 +307,6 @@ module.exports = {
         if (node.superTypeParameters && node.superTypeParameters.params[0]) {
           componentMap[componentName].propType =
             node.superTypeParameters.params[0];
-        } else {
-          // old style React.Component declares the 'props' type inside the class
-          node.body.body
-            .filter(
-              child =>
-                child.type === 'ClassProperty' &&
-                child.key.name === 'props' &&
-                child.typeAnnotation
-            )
-            .forEach(child => {
-              componentMap[componentName].propType =
-                child.typeAnnotation.typeAnnotation;
-            });
         }
       },
       TaggedTemplateExpression(node) {
