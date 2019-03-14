@@ -24,7 +24,9 @@ function unusedFieldsWarning(field) {
     `This queries for the field \`${field}\` but this file does ` +
     'not seem to use it directly. If a different file needs this ' +
     'information that file should export a fragment and colocate ' +
-    'the query for the data with the usage.'
+    'the query for the data with the usage.\n' +
+    'If only interested in the existence of a record, __typename ' +
+    'can be used without this warning.'
   );
 }
 
@@ -35,6 +37,7 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
       props.page.name;
       foo.name2;
     `,
+    'graphql`fragment foo on Page { __typename }`;',
     // Syntax error is ignored by this rule
     `graphql\`fragment Test { name2 }\`;`,
     `

@@ -130,7 +130,13 @@ function rule(context) {
 
         const queriedFields = getGraphQLFieldNames(graphQLAst);
         for (const field in queriedFields) {
-          if (!foundMemberAccesses[field] && !isPageInfoField(field)) {
+          if (
+            !foundMemberAccesses[field] &&
+            !isPageInfoField(field) &&
+            // Do not warn for unused __typename which can be a workaround
+            // when only interested in existence of an object.
+            field !== '__typename'
+          ) {
             context.report({
               node: templateLiteral,
               loc: utils.getLoc(context, templateLiteral, queriedFields[field]),
@@ -138,7 +144,9 @@ function rule(context) {
                 `This queries for the field \`${field}\` but this file does ` +
                 'not seem to use it directly. If a different file needs this ' +
                 'information that file should export a fragment and colocate ' +
-                'the query for the data with the usage.'
+                'the query for the data with the usage.\n' +
+                'If only interested in the existence of a record, __typename ' +
+                'can be used without this warning.'
             });
           }
         }
