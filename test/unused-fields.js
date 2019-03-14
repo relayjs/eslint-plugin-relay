@@ -57,6 +57,7 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
     `,
     'graphql`mutation { page_unlike(data: $input) }`',
     'String.raw`foo bar`',
+    // Facebook naming of page info fields
     `
       graphql\`
         fragment foo on Page {
@@ -65,6 +66,19 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
              has_previous_page
              end_cursor
              start_cursor
+          }
+        }
+      \`;
+    `,
+    // OSS naming of page info fields
+    `
+      graphql\`
+        fragment foo on Page {
+          pageInfo {
+             hasNextPage
+             hasPreviousPage
+             endCursor
+             startCursor
           }
         }
       \`;
