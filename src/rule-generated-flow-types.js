@@ -107,7 +107,7 @@ function validateObjectTypeAnnotation(
       propName
     );
   });
-  let atleastOnePropertyExists = !!propType.properties[0];
+  const atleastOnePropertyExists = !!propType.properties[0];
 
   if (!propTypeProperty) {
     if (onlyVerify) {
@@ -125,7 +125,7 @@ function validateObjectTypeAnnotation(
       fix: options.fix
         ? fixer => {
             const whitespace = ' '.repeat(Component.parent.loc.start.column);
-            let fixes = [
+            const fixes = [
               genImportFixer(
                 fixer,
                 importFixRange,
@@ -221,11 +221,11 @@ module.exports = {
       return {};
     }
     const options = getOptions(context.options[0]);
-    let componentMap = {};
-    let expectedTypes = [];
-    let imports = [];
-    let requires = [];
-    let typeAliasMap = {};
+    const componentMap = {};
+    const expectedTypes = [];
+    const imports = [];
+    const requires = [];
+    const typeAliasMap = {};
     return {
       ImportDeclaration(node) {
         imports.push(node);

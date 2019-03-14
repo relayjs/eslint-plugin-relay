@@ -9,6 +9,7 @@
     "ecmaVersion": 2018
   },
   "rules": {
+    "prefer-const": "error",
     "no-unused-vars": [
       "error",
       {
