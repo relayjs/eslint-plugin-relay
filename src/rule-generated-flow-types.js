@@ -339,7 +339,7 @@ module.exports = {
               return importDeclaration.specifiers.some(
                 specifier =>
                   specifier.type === 'ImportSpecifier' &&
-                  specifier.imported.name === fragmentName + '$ref'
+                  specifier.imported.name === fragmentName + '$key'
               );
             }
             // import {type xyz} from '...';
@@ -348,7 +348,7 @@ module.exports = {
                 specifier =>
                   specifier.type === 'ImportSpecifier' &&
                   specifier.importKind === 'type' &&
-                  specifier.imported.name === fragmentName + '$ref'
+                  specifier.imported.name === fragmentName + '$key'
               );
             }
             return false;
@@ -358,10 +358,10 @@ module.exports = {
               node: node,
               message:
                 'The prop passed to useFragment() should be typed with the ' +
-                "type '{{name}}$ref' imported from '{{name}}.graphql', " +
+                "type '{{name}}$key' imported from '{{name}}.graphql', " +
                 'e.g.:\n' +
                 '\n' +
-                "  import type {{{name}}} from '{{name}}.graphql';",
+                "  import type {{{name}}$key} from '{{name}}.graphql';",
               data: {
                 name: fragmentName
               }
