@@ -30,12 +30,14 @@ module.exports = {
       }
     },
     strict: {
-      'relay/graphql-syntax': 'error',
-      'relay/compat-uses-vars': 'error',
-      'relay/graphql-naming': 'error',
-      'relay/generated-flow-types': 'error',
-      'relay/no-future-added-value': 'error',
-      'relay/unused-fields': 'error'
+      rules: {
+        'relay/graphql-syntax': 'error',
+        'relay/compat-uses-vars': 'error',
+        'relay/graphql-naming': 'error',
+        'relay/generated-flow-types': 'error',
+        'relay/no-future-added-value': 'error',
+        'relay/unused-fields': 'error'
+      }
     }
   }
 };
