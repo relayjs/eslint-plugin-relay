@@ -401,7 +401,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `
-    },
+    }
   ]),
   invalid: [
     {

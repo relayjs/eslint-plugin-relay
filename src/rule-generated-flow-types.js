@@ -481,8 +481,10 @@ module.exports = {
                       })
                       .filter(maybeObjectType => {
                         // GenericTypeAnnotation may not map to an object type
-                        return maybeObjectType &&
-                          maybeObjectType.type === 'ObjectTypeAnnotation';
+                        return (
+                          maybeObjectType &&
+                          maybeObjectType.type === 'ObjectTypeAnnotation'
+                        );
                       });
                     if (!objectTypes.length) {
                       // The type Alias is likely being imported.
