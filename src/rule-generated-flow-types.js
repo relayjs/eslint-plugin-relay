@@ -212,6 +212,34 @@ function getDefinitionName(arg) {
   return ast.definitions[0].name.value;
 }
 
+function extractReadOnlyType(genericType) {
+  let currentType = genericType;
+  while (
+    currentType != null &&
+    currentType.type === 'GenericTypeAnnotation' &&
+    currentType.id.name === '$ReadOnly' &&
+    currentType.typeParameters &&
+    currentType.typeParameters.type === 'TypeParameterInstantiation' &&
+    Array.isArray(currentType.typeParameters.params) &&
+    currentType.typeParameters.params.length === 1
+  ) {
+    currentType = currentType.typeParameters.params[0];
+  }
+  return currentType;
+}
+
+function resolveTypeAlias(genericType, typeAliasMap) {
+  let currentType = genericType;
+  while (
+    currentType != null &&
+    currentType.type === 'GenericTypeAnnotation' &&
+    typeAliasMap[currentType.id.name] != null
+  ) {
+    currentType = typeAliasMap[currentType.id.name];
+  }
+  return currentType;
+}
+
 module.exports = {
   meta: {
     fixable: 'code',
@@ -419,57 +447,65 @@ module.exports = {
                 break;
               }
               case 'GenericTypeAnnotation': {
-                const alias = propType.id.name;
-                if (!typeAliasMap[alias]) {
+                const aliasedObjectType = extractReadOnlyType(
+                  resolveTypeAlias(propType, typeAliasMap)
+                );
+                if (!aliasedObjectType) {
                   // The type Alias doesn't exist, is invalid, or is being
                   // imported. Can't do anything.
                   break;
                 }
-                switch (typeAliasMap[alias].type) {
+                switch (aliasedObjectType.type) {
                   case 'ObjectTypeAnnotation': {
                     validateObjectTypeAnnotation(
                       context,
                       Component,
                       importedPropType,
                       propName,
-                      typeAliasMap[alias],
+                      aliasedObjectType,
                       importFixRange
                     );
                     break;
                   }
                   case 'IntersectionTypeAnnotation': {
-                    const objectTypes = typeAliasMap[alias].types
+                    const objectTypes = aliasedObjectType.types
                       .map(intersectedType => {
                         if (intersectedType.type === 'GenericTypeAnnotation') {
-                          return typeAliasMap[intersectedType.id.name];
+                          return extractReadOnlyType(
+                            resolveTypeAlias(intersectedType, typeAliasMap)
+                          );
                         }
                         if (intersectedType.type === 'ObjectTypeAnnotation') {
                           return intersectedType;
                         }
                       })
-                      .filter(Boolean);
+                      .filter(maybeObjectType => {
+                        // GenericTypeAnnotation may not map to an object type
+                        return (
+                          maybeObjectType &&
+                          maybeObjectType.type === 'ObjectTypeAnnotation'
+                        );
+                      });
                     if (!objectTypes.length) {
                       // The type Alias is likely being imported.
                       // Can't do anything.
                       break;
                     }
-                    const lintResults = objectTypes.map(
-                      objectType =>
-                        objectType.type === 'ObjectTypeAnnotation' &&
-                        validateObjectTypeAnnotation(
-                          context,
-                          Component,
-                          importedPropType,
-                          propName,
-                          objectType,
-                          importFixRange,
-                          true // Return false if invalid instead of reporting
-                        )
-                    );
-                    if (lintResults.some(result => result)) {
-                      // One of the intersected objects has it right
-                      break;
+                    for (const objectType of objectTypes) {
+                      const isValid = validateObjectTypeAnnotation(
+                        context,
+                        Component,
+                        importedPropType,
+                        propName,
+                        objectType,
+                        importFixRange,
+                        true // Return false if invalid instead of reporting
+                      );
+                      if (isValid) {
+                        break;
+                      }
                     }
+                    // otherwise report an error at the first object
                     validateObjectTypeAnnotation(
                       context,
                       Component,

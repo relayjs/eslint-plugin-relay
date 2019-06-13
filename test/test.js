@@ -401,27 +401,6 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `
-    },
-    {
-      code: `
-        type RelayProps = {
-          user: MyComponent_user
-        }
-
-        type Props = {
-          other: ?Object,
-        } & RelayProps;
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
     }
   ]),
   invalid: [
@@ -1342,6 +1321,37 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           message:
             'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+          line: 10,
+          column: 15
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type RelayProps = {
+          user: MyComponent_user
+        }
+
+        type Props = {
+          other: ?Object,
+        } & RelayProps;
+
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 10,
           column: 15
         }
