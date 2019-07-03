@@ -95,6 +95,10 @@ function isGraphQLTag(tag) {
   return tag.type === 'Identifier' && tag.name === 'graphql';
 }
 
+function isGraphQLDeprecatedTag(tag) {
+  return tag.type === 'Identifier' && tag.name === 'graphql_DEPRECATED';
+}
+
 function shouldLint(context) {
   return /graphql|relay/i.test(context.getSourceCode().text);
 }
@@ -106,5 +110,6 @@ module.exports = {
   getModuleName: getModuleName,
   getRange: getRange,
   isGraphQLTag: isGraphQLTag,
+  isGraphQLDeprecatedTag: isGraphQLDeprecatedTag,
   shouldLint: shouldLint
 };
