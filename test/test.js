@@ -217,22 +217,31 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
     {
       code: `
         import type {TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
     {
       code: `
         import {type TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
-    {code: 'useQuery<FooResponse>(graphql`query Foo { id }`)'},
+    {
+      code:
+        'useRefetchableFragment<RefetchableQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+    },
+    {
+      code:
+        'usePaginationFragment<PaginationQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+    },
+    {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
+    {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {
       code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -414,7 +423,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       // imports TestFragment_other$key instead of TestFragment_foo$key
       code: `
         import type {TestFragment_other$key} from './path/to/TestFragment_other.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -431,7 +440,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
       // Should import the type using `import type {xyz} from ...` or `import {type xyz} from ...`
       code: `
         import {TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -447,7 +456,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
     {
       code: `
         import type {other} from 'TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -457,6 +466,30 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
   import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
           line: 3,
           column: 9
+        }
+      ]
+    },
+    {
+      code:
+        'useRefetchableFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      errors: [
+        {
+          message:
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<RefetchableQuery, _>(...)',
+          line: 1,
+          column: 1
+        }
+      ]
+    },
+    {
+      code:
+        'usePaginationFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      errors: [
+        {
+          message:
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<PaginationQuery, _>(...)',
+          line: 1,
+          column: 1
         }
       ]
     },
