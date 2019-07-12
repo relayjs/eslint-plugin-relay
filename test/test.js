@@ -232,8 +232,14 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
-    {code: 'useRefetchableFragment<RefetchableQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'},
-    {code: 'usePaginationFragment<PaginationQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'},
+    {
+      code:
+        'useRefetchableFragment<RefetchableQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+    },
+    {
+      code:
+        'usePaginationFragment<PaginationQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+    },
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {
@@ -464,7 +470,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
       ]
     },
     {
-      code: 'useRefetchableFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      code:
+        'useRefetchableFragment(graphql`fragment TestFragment_foo on User { id }`)',
       errors: [
         {
           message:
@@ -475,7 +482,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
       ]
     },
     {
-      code: 'usePaginationFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      code:
+        'usePaginationFragment(graphql`fragment TestFragment_foo on User { id }`)',
       errors: [
         {
           message:

@@ -311,7 +311,9 @@ module.exports = {
       /**
        * Find usePaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(node) {
+      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
+        node
+      ) {
         const queryName = 'PaginationQuery';
         context.report({
           node: node,
@@ -326,7 +328,9 @@ module.exports = {
       /**
        * Find useRefetchableFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(node) {
+      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
+        node
+      ) {
         const queryName = 'RefetchableQuery';
         context.report({
           node: node,
