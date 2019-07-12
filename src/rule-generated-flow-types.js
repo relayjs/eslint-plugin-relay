@@ -309,6 +309,44 @@ module.exports = {
       },
 
       /**
+       * Find usePaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * Find useRefetchableFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(node) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const queryName = 'RefetchableQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
        * useFragment() calls
        */
       'CallExpression[callee.name=useFragment]'(node) {
