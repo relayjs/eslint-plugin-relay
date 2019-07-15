@@ -272,6 +272,23 @@ module.exports = {
     const requires = [];
     const typeAliasMap = {};
     const useFragmentInstances = [];
+
+    function trackHookCall(node, hookName) {
+      const firstArg = node.arguments[0];
+      if (firstArg == null) {
+        return;
+      }
+      const fragmentName = getDefinitionName(firstArg);
+      if (fragmentName == null) {
+        return;
+      }
+      useFragmentInstances.push({
+        fragmentName: fragmentName,
+        node: node,
+        hookName: hookName
+      });
+    }
+
     return {
       ImportDeclaration(node) {
         imports.push(node);
@@ -346,18 +363,21 @@ module.exports = {
        * useFragment() calls
        */
       'CallExpression[callee.name=useFragment]'(node) {
-        const firstArg = node.arguments[0];
-        if (firstArg == null) {
-          return;
-        }
-        const fragmentName = getDefinitionName(firstArg);
-        if (fragmentName == null) {
-          return;
-        }
-        useFragmentInstances.push({
-          fragmentName: fragmentName,
-          node: node
-        });
+        trackHookCall(node, 'useFragment');
+      },
+
+      /**
+       * usePaginationFragment() calls
+       */
+      'CallExpression[callee.name=usePaginationFragment]'(node) {
+        trackHookCall(node, 'usePaginationFragment');
+      },
+
+      /**
+       * useRefetchableFragment() calls
+       */
+      'CallExpression[callee.name=useRefetchableFragment]'(node) {
+        trackHookCall(node, 'useRefetchableFragment');
       },
 
       ClassDeclaration(node) {
@@ -389,6 +409,7 @@ module.exports = {
       'Program:exit': function(_node) {
         useFragmentInstances.forEach(useFragmentInstance => {
           const fragmentName = useFragmentInstance.fragmentName;
+          const hookName = useFragmentInstance.hookName;
           const node = useFragmentInstance.node;
           const foundImport = imports.some(importDeclaration => {
             const importedFromModuleName = importDeclaration.source.value;
@@ -419,13 +440,14 @@ module.exports = {
             context.report({
               node: node,
               message:
-                'The prop passed to useFragment() should be typed with the ' +
+                'The prop passed to {{hookName}}() should be typed with the ' +
                 "type '{{name}}$key' imported from '{{name}}.graphql', " +
                 'e.g.:\n' +
                 '\n' +
                 "  import type {{{name}}$key} from '{{name}}.graphql';",
               data: {
-                name: fragmentName
+                name: fragmentName,
+                hookName: hookName
               }
             });
           }

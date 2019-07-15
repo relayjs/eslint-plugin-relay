@@ -233,12 +233,16 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       `
     },
     {
-      code:
-        'useRefetchableFragment<RefetchableQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useRefetchableFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
     },
     {
-      code:
-        'usePaginationFragment<PaginationQuery, _>(graphql`fragment TestFragment_foo on User { id }`)'
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
     },
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
@@ -470,26 +474,60 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
       ]
     },
     {
-      code:
-        'useRefetchableFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useRefetchableFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
       errors: [
         {
           message:
             'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<RefetchableQuery, _>(...)',
-          line: 1,
-          column: 1
+          line: 3,
+          column: 9
         }
       ]
     },
     {
-      code:
-        'usePaginationFragment(graphql`fragment TestFragment_foo on User { id }`)',
+      code: `
+        useRefetchableFragment<RefetchQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useRefetchableFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        usePaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
       errors: [
         {
           message:
             'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<PaginationQuery, _>(...)',
-          line: 1,
-          column: 1
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
         }
       ]
     },
