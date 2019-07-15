@@ -272,6 +272,23 @@ module.exports = {
     const requires = [];
     const typeAliasMap = {};
     const useFragmentInstances = [];
+
+    function trackHookCall(node, hookName) {
+      const firstArg = node.arguments[0];
+      if (firstArg == null) {
+        return;
+      }
+      const fragmentName = getDefinitionName(firstArg);
+      if (fragmentName == null) {
+        return;
+      }
+      useFragmentInstances.push({
+        fragmentName: fragmentName,
+        node: node,
+        hookName: hookName
+      });
+    }
+
     return {
       ImportDeclaration(node) {
         imports.push(node);
@@ -346,57 +363,21 @@ module.exports = {
        * useFragment() calls
        */
       'CallExpression[callee.name=useFragment]'(node) {
-        const firstArg = node.arguments[0];
-        if (firstArg == null) {
-          return;
-        }
-        const fragmentName = getDefinitionName(firstArg);
-        if (fragmentName == null) {
-          return;
-        }
-        useFragmentInstances.push({
-          fragmentName: fragmentName,
-          node: node,
-          hookName: 'useFragment'
-        });
+        trackHookCall(node, 'useFragment');
       },
 
       /**
        * usePaginationFragment() calls
        */
       'CallExpression[callee.name=usePaginationFragment]'(node) {
-        const firstArg = node.arguments[0];
-        if (firstArg == null) {
-          return;
-        }
-        const fragmentName = getDefinitionName(firstArg);
-        if (fragmentName == null) {
-          return;
-        }
-        useFragmentInstances.push({
-          fragmentName: fragmentName,
-          node: node,
-          hookName: 'usePaginationFragment'
-        });
+        trackHookCall(node, 'usePaginationFragment');
       },
 
       /**
        * useRefetchableFragment() calls
        */
       'CallExpression[callee.name=useRefetchableFragment]'(node) {
-        const firstArg = node.arguments[0];
-        if (firstArg == null) {
-          return;
-        }
-        const fragmentName = getDefinitionName(firstArg);
-        if (fragmentName == null) {
-          return;
-        }
-        useFragmentInstances.push({
-          fragmentName: fragmentName,
-          node: node,
-          hookName: 'useRefetchableFragment'
-        });
+        trackHookCall(node, 'useRefetchableFragment');
       },
 
       ClassDeclaration(node) {
