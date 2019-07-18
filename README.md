@@ -45,4 +45,4 @@ We actively welcome pull requests, learn how to [contribute](./CONTRIBUTING.md).
 
 ## License
 
-eslint-plugin-relay is [BSD licensed](./LICENSE). We also provide an additional [patent grant](./PATENTS).
+`eslint-plugin-relay` is [MIT licensed](./LICENSE).

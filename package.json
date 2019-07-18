@@ -4,7 +4,7 @@
   "description": "ESLint plugin for Relay.",
   "main": "eslint-plugin-relay",
   "repository": "relayjs/eslint-plugin-relay",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint eslint-plugin-relay.js src",
     "test": "mocha",
@@ -14,8 +14,7 @@
   "files": [
     "eslint-plugin-relay.js",
     "src/",
-    "LICENSE",
-    "PATENTS"
+    "LICENSE"
   ],
   "dependencies": {
     "graphql": "^14.0.0"
