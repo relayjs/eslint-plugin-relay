@@ -341,6 +341,40 @@ module.exports = {
       },
 
       /**
+       * Find useBlockingPaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * Find useLegacyPaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
        * Find useRefetchableFragment() calls without type arguments.
        */
       'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
@@ -369,6 +403,20 @@ module.exports = {
        */
       'CallExpression[callee.name=usePaginationFragment]'(node) {
         trackHookCall(node, 'usePaginationFragment');
+      },
+
+      /**
+       * useBlockingPaginationFragment() calls
+       */
+      'CallExpression[callee.name=useBlockingPaginationFragment]'(node) {
+        trackHookCall(node, 'useBlockingPaginationFragment');
+      },
+
+      /**
+       * useLegacyPaginationFragment() calls
+       */
+      'CallExpression[callee.name=useLegacyPaginationFragment]'(node) {
+        trackHookCall(node, 'useLegacyPaginationFragment');
       },
 
       /**

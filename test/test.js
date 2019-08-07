@@ -242,6 +242,18 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {
@@ -529,6 +541,67 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestFr
         }
       ]
     },
+
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<PaginationQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useBlockingPaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useLegacyPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<PaginationQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useLegacyPaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+
     {
       code: 'useQuery(graphql`query FooQuery { id }`)',
       errors: [
