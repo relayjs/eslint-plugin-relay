@@ -482,21 +482,60 @@ module.exports = {
             }
             return false;
           });
-          if (!foundImport) {
-            context.report({
-              node: node,
-              message:
-                'The prop passed to {{hookName}}() should be typed with the ' +
-                "type '{{name}}$key' imported from '{{name}}.graphql', " +
-                'e.g.:\n' +
-                '\n' +
-                "  import type {{{name}}$key} from '{{name}}.graphql';",
-              data: {
-                name: fragmentName,
-                hookName: hookName
-              }
-            });
+
+          if (foundImport) {
+            return;
           }
+
+          // Check if the fragment ref that we're passing to the hook
+          // comes from a previous useFragment (or variants) hook call.
+          const fragmentRefArgName =
+            node.arguments[1] != null ? node.arguments[1].name : null;
+          const foundFragmentRefDeclaration = useFragmentInstances.some(
+            _useFragmentInstance => {
+              if (_useFragmentInstance === useFragmentInstance) {
+                return false;
+              }
+              const variableDeclaratorNode = _useFragmentInstance.node.parent;
+              if (
+                !variableDeclaratorNode ||
+                !variableDeclaratorNode.id ||
+                !variableDeclaratorNode.id.type
+              ) {
+                return false;
+              }
+              if (variableDeclaratorNode.id.type === 'Identifier') {
+                return (
+                  fragmentRefArgName != null &&
+                  variableDeclaratorNode.id.name === fragmentRefArgName
+                );
+              }
+              if (variableDeclaratorNode.id.type === 'ObjectPattern' && variableDeclaratorNode.id.properties != null) {
+                return variableDeclaratorNode.id.properties.some(prop => {
+                  return prop && prop.value && prop.value.name === fragmentRefArgName;
+                })
+              }
+              return false;
+            }
+          );
+
+          if (foundFragmentRefDeclaration) {
+            return;
+          }
+
+          context.report({
+            node: node,
+            message:
+              'The prop passed to {{hookName}}() should be typed with the ' +
+              "type '{{name}}$key' imported from '{{name}}.graphql', " +
+              'e.g.:\n' +
+              '\n' +
+              "  import type {{{name}}$key} from '{{name}}.graphql';",
+            data: {
+              name: fragmentName,
+              hookName: hookName
+            }
+          });
         });
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];

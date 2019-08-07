@@ -245,6 +245,22 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const ref = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const {data: ref} = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
         useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
@@ -541,7 +557,42 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestFr
         }
       ]
     },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 
+        const refUnused = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestPaginationFragment_foo$key' imported from 'TestPaginationFragment_foo.graphql', e.g.:
+
+  import type {TestPaginationFragment_foo$key} from 'TestPaginationFragment_foo.graphql';`.trim(),
+          line: 5,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const {data: refUnused }= useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestPaginationFragment_foo$key' imported from 'TestPaginationFragment_foo.graphql', e.g.:
+
+  import type {TestPaginationFragment_foo$key} from 'TestPaginationFragment_foo.graphql';`.trim(),
+          line: 5,
+          column: 9
+        }
+      ]
+    },
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
