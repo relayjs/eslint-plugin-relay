@@ -516,7 +516,10 @@ module.exports = {
               ) {
                 return variableDeclaratorNode.id.properties.some(prop => {
                   return (
-                    prop && prop.value && prop.value.name === fragmentRefArgName
+                    fragmentRefArgName != null &&
+                    prop &&
+                    prop.value &&
+                    prop.value.name === fragmentRefArgName
                   );
                 });
               }
