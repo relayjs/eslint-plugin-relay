@@ -510,10 +510,15 @@ module.exports = {
                   variableDeclaratorNode.id.name === fragmentRefArgName
                 );
               }
-              if (variableDeclaratorNode.id.type === 'ObjectPattern' && variableDeclaratorNode.id.properties != null) {
+              if (
+                variableDeclaratorNode.id.type === 'ObjectPattern' &&
+                variableDeclaratorNode.id.properties != null
+              ) {
                 return variableDeclaratorNode.id.properties.some(prop => {
-                  return prop && prop.value && prop.value.name === fragmentRefArgName;
-                })
+                  return (
+                    prop && prop.value && prop.value.name === fragmentRefArgName
+                  );
+                });
               }
               return false;
             }
