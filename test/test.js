@@ -11,6 +11,12 @@ const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
 const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+const DEFAULT_OPTIONS = [
+  {
+    fix: true,
+    haste: false
+  }
+];
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
@@ -690,8 +696,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -702,8 +708,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -757,8 +762,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user, somethingElse: number}> {
           render() {
@@ -769,8 +774,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -794,8 +798,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -806,8 +810,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -853,8 +856,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -865,8 +868,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -892,8 +894,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -906,8 +908,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -933,8 +934,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
@@ -947,8 +948,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -974,8 +974,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -988,8 +988,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -1015,8 +1014,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -1029,8 +1028,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
