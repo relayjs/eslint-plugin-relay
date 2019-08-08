@@ -258,7 +258,7 @@ module.exports = {
      * Tries to find a GraphQL definition node for a given argument.
      * Supports a graphql`...` literal inline and follows variable definitions.
      */
-    function getDefinitionName(arg) {
+    function getDefinition(arg) {
       if (arg == null) {
         return null;
       }
@@ -271,9 +271,7 @@ module.exports = {
               const definition = variable.defs.find(
                 def => def.node && def.node.type === 'VariableDeclarator'
               );
-              return definition
-                ? getDefinitionName(definition.node.init)
-                : null;
+              return definition ? getDefinition(definition.node.init) : null;
             }
           }
           scope = scope.upper;
@@ -283,11 +281,34 @@ module.exports = {
       if (arg.type !== 'TaggedTemplateExpression') {
         return null;
       }
-      const ast = getGraphQLAST(arg);
+      return getGraphQLAST(arg);
+    }
+
+    function getDefinitionName(arg) {
+      const ast = getDefinition(arg);
       if (ast == null || ast.definitions.length === 0) {
         return null;
       }
       return ast.definitions[0].name.value;
+    }
+
+    function getRefetchableQueryName(arg) {
+      const ast = getDefinition(arg);
+      if (ast == null || ast.definitions.length === 0) {
+        return null;
+      }
+      const refetchable = ast.definitions[0].directives.find(
+        d => d.name.value === 'refetchable'
+      );
+      if (!refetchable) {
+        return null;
+      }
+      const nameArg = refetchable.arguments.find(
+        a => a.name.value === 'queryName'
+      );
+      return nameArg && nameArg.value && nameArg.value.value
+        ? nameArg.value.value
+        : null;
     }
 
     function trackHookCall(node, hookName) {
@@ -303,6 +324,31 @@ module.exports = {
         fragmentName: fragmentName,
         node: node,
         hookName: hookName
+      });
+    }
+
+    function createHookTypeImportFixer(node, queryName, typeText) {
+      return fixer => {
+        const importFixRange = genImportFixRange(queryName, imports, requires);
+        return [
+          genImportFixer(fixer, importFixRange, queryName, options.haste, ''),
+          fixer.insertTextAfter(node.callee, `<${typeText}>`)
+        ];
+      };
+    }
+
+    function reportAndFixRefetchableType(node, hookName, defaultQueryName) {
+      const queryName = getRefetchableQueryName(node.arguments[0]);
+      context.report({
+        node: node,
+        message: `The \`${hookName}\` hook should be used with an explicit generated Flow type, e.g.: ${hookName}<{{queryName}}, _>(...)`,
+        data: {
+          queryName: queryName || defaultQueryName
+        },
+        fix:
+          queryName != null && options.fix
+            ? createHookTypeImportFixer(node, queryName, `${queryName}, _`)
+            : null
       });
     }
 
@@ -341,23 +387,7 @@ module.exports = {
           },
           fix:
             queryName != null && options.fix
-              ? fixer => {
-                  const importFixRange = genImportFixRange(
-                    queryName,
-                    imports,
-                    requires
-                  );
-                  return [
-                    genImportFixer(
-                      fixer,
-                      importFixRange,
-                      queryName,
-                      options.haste,
-                      ''
-                    ),
-                    fixer.insertTextAfter(node.callee, `<${queryName}>`)
-                  ];
-                }
+              ? createHookTypeImportFixer(node, queryName, queryName)
               : null
         });
       },
@@ -368,15 +398,11 @@ module.exports = {
       'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'usePaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -385,15 +411,11 @@ module.exports = {
       'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useBlockingPaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -402,15 +424,11 @@ module.exports = {
       'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useLegacyPaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -419,15 +437,11 @@ module.exports = {
       'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'RefetchableQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useRefetchableFragment',
+          'RefetchableQuery'
+        );
       },
 
       /**
