@@ -660,16 +660,19 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
     },
 
     {
-      code: 'useQuery(graphql`query FooQuery { id }`)',
+      code: `\nuseQuery(graphql\`query FooQuery { id }\`)`,
       errors: [
         {
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
-          line: 1,
+          line: 2,
           column: 1
         }
       ],
-      output: HAS_ESLINT_BEEN_UPGRADED_YET ? 'useQuery<FooQuery>(graphql`query FooQuery { id }`)' : null,
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+useQuery<FooQuery>(graphql\`query FooQuery { id }\`)`
     },
     {
       code: `
@@ -683,7 +686,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           line: 3
         }
       ],
-      output: null,
+      output: null
     },
     {
       filename: 'MyComponent.jsx',

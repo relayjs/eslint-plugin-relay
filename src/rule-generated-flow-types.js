@@ -318,7 +318,7 @@ module.exports = {
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<{{queryName}}>(...)',
           data: {
-            queryName: queryName || 'ExampleQuery',
+            queryName: queryName || 'ExampleQuery'
           },
           fix:
             queryName != null && options.fix
@@ -326,7 +326,7 @@ module.exports = {
                   const importFixRange = genImportFixRange(
                     queryName,
                     imports,
-                    requires,
+                    requires
                   );
                   return [
                     genImportFixer(
@@ -334,12 +334,12 @@ module.exports = {
                       importFixRange,
                       queryName,
                       options.haste,
-                      '',
+                      ''
                     ),
-                    fixer.insertTextAfter(node.callee, `<${queryName}>`),
+                    fixer.insertTextAfter(node.callee, `<${queryName}>`)
                   ];
                 }
-              : null,
+              : null
         });
       },
 
