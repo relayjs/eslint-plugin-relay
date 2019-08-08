@@ -677,6 +677,27 @@ useQuery<FooQuery>(graphql\`query FooQuery { id }\`)`
     {
       code: `
         const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useQuery(query2);
+      `,
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
+          line: 4
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+        const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useQuery<FooQuery>(query2);
+      `
+    },
+    {
+      code: `
+        const query = 'graphql';
         useQuery(query);
       `,
       errors: [

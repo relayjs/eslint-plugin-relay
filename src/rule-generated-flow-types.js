@@ -193,23 +193,6 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
-/**
- * Tries to find a GraphQL definition node for a given argument.
- * Currently, only supports a graphql`...` literal inline, but could be
- * improved to follow a variable definition.
- */
-function getDefinitionName(arg) {
-  if (arg.type !== 'TaggedTemplateExpression') {
-    // TODO: maybe follow variables, see context.getScope()
-    return null;
-  }
-  const ast = getGraphQLAST(arg);
-  if (ast == null || ast.definitions.length === 0) {
-    return null;
-  }
-  return ast.definitions[0].name.value;
-}
-
 function extractReadOnlyType(genericType) {
   let currentType = genericType;
   while (
@@ -270,6 +253,42 @@ module.exports = {
     const requires = [];
     const typeAliasMap = {};
     const useFragmentInstances = [];
+
+    /**
+     * Tries to find a GraphQL definition node for a given argument.
+     * Supports a graphql`...` literal inline and follows variable definitions.
+     */
+    function getDefinitionName(arg) {
+      if (arg == null) {
+        return null;
+      }
+      if (arg.type === 'Identifier') {
+        const name = arg.name;
+        let scope = context.getScope();
+        while (scope && scope.type != 'global') {
+          for (const variable of scope.variables) {
+            if (variable.name === name) {
+              const definition = variable.defs.find(
+                def => def.node && def.node.type === 'VariableDeclarator'
+              );
+              return definition
+                ? getDefinitionName(definition.node.init)
+                : null;
+            }
+          }
+          scope = scope.upper;
+        }
+        return null;
+      }
+      if (arg.type !== 'TaggedTemplateExpression') {
+        return null;
+      }
+      const ast = getGraphQLAST(arg);
+      if (ast == null || ast.definitions.length === 0) {
+        return null;
+      }
+      return ast.definitions[0].name.value;
+    }
 
     function trackHookCall(node, hookName) {
       const firstArg = node.arguments[0];
