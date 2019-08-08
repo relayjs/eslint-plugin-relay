@@ -12,7 +12,7 @@
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
-const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+const HAS_ESLINT_BEEN_UPGRADED_YET = true;
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
@@ -484,7 +484,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           line: 1,
           column: 1
         }
-      ]
+      ],
+      output: HAS_ESLINT_BEEN_UPGRADED_YET ? 'useQuery<FooQuery>(graphql`query FooQuery { id }`)' : null,
     },
     {
       code: `
@@ -497,7 +498,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<ExampleQuery>(...)',
           line: 3
         }
-      ]
+      ],
+      output: null,
     },
     {
       filename: 'MyComponent.jsx',
