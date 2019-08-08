@@ -1,10 +1,8 @@
 /**
- * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 'use strict';
@@ -212,6 +210,34 @@ function getDefinitionName(arg) {
   return ast.definitions[0].name.value;
 }
 
+function extractReadOnlyType(genericType) {
+  let currentType = genericType;
+  while (
+    currentType != null &&
+    currentType.type === 'GenericTypeAnnotation' &&
+    currentType.id.name === '$ReadOnly' &&
+    currentType.typeParameters &&
+    currentType.typeParameters.type === 'TypeParameterInstantiation' &&
+    Array.isArray(currentType.typeParameters.params) &&
+    currentType.typeParameters.params.length === 1
+  ) {
+    currentType = currentType.typeParameters.params[0];
+  }
+  return currentType;
+}
+
+function resolveTypeAlias(genericType, typeAliasMap) {
+  let currentType = genericType;
+  while (
+    currentType != null &&
+    currentType.type === 'GenericTypeAnnotation' &&
+    typeAliasMap[currentType.id.name] != null
+  ) {
+    currentType = typeAliasMap[currentType.id.name];
+  }
+  return currentType;
+}
+
 module.exports = {
   meta: {
     fixable: 'code',
@@ -244,6 +270,23 @@ module.exports = {
     const requires = [];
     const typeAliasMap = {};
     const useFragmentInstances = [];
+
+    function trackHookCall(node, hookName) {
+      const firstArg = node.arguments[0];
+      if (firstArg == null) {
+        return;
+      }
+      const fragmentName = getDefinitionName(firstArg);
+      if (fragmentName == null) {
+        return;
+      }
+      useFragmentInstances.push({
+        fragmentName: fragmentName,
+        node: node,
+        hookName: hookName
+      });
+    }
+
     return {
       ImportDeclaration(node) {
         imports.push(node);
@@ -301,21 +344,106 @@ module.exports = {
       },
 
       /**
+       * Find usePaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * Find useBlockingPaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * Find useLegacyPaginationFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'PaginationQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
+       * Find useRefetchableFragment() calls without type arguments.
+       */
+      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
+        node
+      ) {
+        const queryName = 'RefetchableQuery';
+        context.report({
+          node: node,
+          message:
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<{{queryName}}, _>(...)',
+          data: {
+            queryName: queryName
+          }
+        });
+      },
+
+      /**
        * useFragment() calls
        */
       'CallExpression[callee.name=useFragment]'(node) {
-        const firstArg = node.arguments[0];
-        if (firstArg == null) {
-          return;
-        }
-        const fragmentName = getDefinitionName(firstArg);
-        if (fragmentName == null) {
-          return;
-        }
-        useFragmentInstances.push({
-          fragmentName: fragmentName,
-          node: node
-        });
+        trackHookCall(node, 'useFragment');
+      },
+
+      /**
+       * usePaginationFragment() calls
+       */
+      'CallExpression[callee.name=usePaginationFragment]'(node) {
+        trackHookCall(node, 'usePaginationFragment');
+      },
+
+      /**
+       * useBlockingPaginationFragment() calls
+       */
+      'CallExpression[callee.name=useBlockingPaginationFragment]'(node) {
+        trackHookCall(node, 'useBlockingPaginationFragment');
+      },
+
+      /**
+       * useLegacyPaginationFragment() calls
+       */
+      'CallExpression[callee.name=useLegacyPaginationFragment]'(node) {
+        trackHookCall(node, 'useLegacyPaginationFragment');
+      },
+
+      /**
+       * useRefetchableFragment() calls
+       */
+      'CallExpression[callee.name=useRefetchableFragment]'(node) {
+        trackHookCall(node, 'useRefetchableFragment');
       },
 
       ClassDeclaration(node) {
@@ -347,6 +475,7 @@ module.exports = {
       'Program:exit': function(_node) {
         useFragmentInstances.forEach(useFragmentInstance => {
           const fragmentName = useFragmentInstance.fragmentName;
+          const hookName = useFragmentInstance.hookName;
           const node = useFragmentInstance.node;
           const foundImport = imports.some(importDeclaration => {
             const importedFromModuleName = importDeclaration.source.value;
@@ -373,20 +502,68 @@ module.exports = {
             }
             return false;
           });
-          if (!foundImport) {
-            context.report({
-              node: node,
-              message:
-                'The prop passed to useFragment() should be typed with the ' +
-                "type '{{name}}$key' imported from '{{name}}.graphql', " +
-                'e.g.:\n' +
-                '\n' +
-                "  import type {{{name}}$key} from '{{name}}.graphql';",
-              data: {
-                name: fragmentName
-              }
-            });
+
+          if (foundImport) {
+            return;
           }
+
+          // Check if the fragment ref that we're passing to the hook
+          // comes from a previous useFragment (or variants) hook call.
+          const fragmentRefArgName =
+            node.arguments[1] != null ? node.arguments[1].name : null;
+          const foundFragmentRefDeclaration = useFragmentInstances.some(
+            _useFragmentInstance => {
+              if (_useFragmentInstance === useFragmentInstance) {
+                return false;
+              }
+              const variableDeclaratorNode = _useFragmentInstance.node.parent;
+              if (
+                !variableDeclaratorNode ||
+                !variableDeclaratorNode.id ||
+                !variableDeclaratorNode.id.type
+              ) {
+                return false;
+              }
+              if (variableDeclaratorNode.id.type === 'Identifier') {
+                return (
+                  fragmentRefArgName != null &&
+                  variableDeclaratorNode.id.name === fragmentRefArgName
+                );
+              }
+              if (
+                variableDeclaratorNode.id.type === 'ObjectPattern' &&
+                variableDeclaratorNode.id.properties != null
+              ) {
+                return variableDeclaratorNode.id.properties.some(prop => {
+                  return (
+                    fragmentRefArgName != null &&
+                    prop &&
+                    prop.value &&
+                    prop.value.name === fragmentRefArgName
+                  );
+                });
+              }
+              return false;
+            }
+          );
+
+          if (foundFragmentRefDeclaration) {
+            return;
+          }
+
+          context.report({
+            node: node,
+            message:
+              'The prop passed to {{hookName}}() should be typed with the ' +
+              "type '{{name}}$key' imported from '{{name}}.graphql', " +
+              'e.g.:\n' +
+              '\n' +
+              "  import type {{{name}}$key} from '{{name}}.graphql';",
+            data: {
+              name: fragmentName,
+              hookName: hookName
+            }
+          });
         });
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];
@@ -439,57 +616,65 @@ module.exports = {
                 break;
               }
               case 'GenericTypeAnnotation': {
-                const alias = propType.id.name;
-                if (!typeAliasMap[alias]) {
+                const aliasedObjectType = extractReadOnlyType(
+                  resolveTypeAlias(propType, typeAliasMap)
+                );
+                if (!aliasedObjectType) {
                   // The type Alias doesn't exist, is invalid, or is being
                   // imported. Can't do anything.
                   break;
                 }
-                switch (typeAliasMap[alias].type) {
+                switch (aliasedObjectType.type) {
                   case 'ObjectTypeAnnotation': {
                     validateObjectTypeAnnotation(
                       context,
                       Component,
                       importedPropType,
                       propName,
-                      typeAliasMap[alias],
+                      aliasedObjectType,
                       importFixRange
                     );
                     break;
                   }
                   case 'IntersectionTypeAnnotation': {
-                    const objectTypes = typeAliasMap[alias].types
+                    const objectTypes = aliasedObjectType.types
                       .map(intersectedType => {
                         if (intersectedType.type === 'GenericTypeAnnotation') {
-                          return typeAliasMap[intersectedType.id.name];
+                          return extractReadOnlyType(
+                            resolveTypeAlias(intersectedType, typeAliasMap)
+                          );
                         }
                         if (intersectedType.type === 'ObjectTypeAnnotation') {
                           return intersectedType;
                         }
                       })
-                      .filter(Boolean);
+                      .filter(maybeObjectType => {
+                        // GenericTypeAnnotation may not map to an object type
+                        return (
+                          maybeObjectType &&
+                          maybeObjectType.type === 'ObjectTypeAnnotation'
+                        );
+                      });
                     if (!objectTypes.length) {
                       // The type Alias is likely being imported.
                       // Can't do anything.
                       break;
                     }
-                    const lintResults = objectTypes.map(
-                      objectType =>
-                        objectType.type === 'ObjectTypeAnnotation' &&
-                        validateObjectTypeAnnotation(
-                          context,
-                          Component,
-                          importedPropType,
-                          propName,
-                          objectType,
-                          importFixRange,
-                          true // Return false if invalid instead of reporting
-                        )
-                    );
-                    if (lintResults.some(result => result)) {
-                      // One of the intersected objects has it right
-                      break;
+                    for (const objectType of objectTypes) {
+                      const isValid = validateObjectTypeAnnotation(
+                        context,
+                        Component,
+                        importedPropType,
+                        propName,
+                        objectType,
+                        importFixRange,
+                        true // Return false if invalid instead of reporting
+                      );
+                      if (isValid) {
+                        break;
+                      }
                     }
+                    // otherwise report an error at the first object
                     validateObjectTypeAnnotation(
                       context,
                       Component,

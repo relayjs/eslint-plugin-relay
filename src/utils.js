@@ -1,10 +1,8 @@
 /**
- * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 'use strict';
@@ -95,6 +93,10 @@ function isGraphQLTag(tag) {
   return tag.type === 'Identifier' && tag.name === 'graphql';
 }
 
+function isGraphQLDeprecatedTag(tag) {
+  return tag.type === 'Identifier' && tag.name === 'graphql_DEPRECATED';
+}
+
 function shouldLint(context) {
   return /graphql|relay/i.test(context.getSourceCode().text);
 }
@@ -106,5 +108,6 @@ module.exports = {
   getModuleName: getModuleName,
   getRange: getRange,
   isGraphQLTag: isGraphQLTag,
+  isGraphQLDeprecatedTag: isGraphQLDeprecatedTag,
   shouldLint: shouldLint
 };

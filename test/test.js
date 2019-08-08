@@ -1,10 +1,8 @@
 /**
- * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 'use strict';
@@ -12,7 +10,13 @@
 const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
-const HAS_ESLINT_BEEN_UPGRADED_YET = true;
+const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+const DEFAULT_OPTIONS = [
+  {
+    fix: true,
+    haste: false
+  }
+];
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
@@ -42,6 +46,12 @@ const valid = [
     filename: 'path/to/MyComponent.jsx',
     code: `createFragmentContainer(Component, {
       user: graphql\`fragment MyComponent_user on User {id}\`,
+    });`
+  },
+  {
+    filename: 'path/to/MyDeprecatedComponent.jsx',
+    code: `createFragmentContainer(Component, {
+      user: graphql_DEPRECATED\`fragment MyComponent_user on User {id}\`,
     });`
   }
 ];
@@ -211,22 +221,63 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
     {
       code: `
         import type {TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
     {
       code: `
         import {type TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `
     },
-    {code: 'useQuery<FooResponse>(graphql`query Foo { id }`)'},
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useRefetchableFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const ref = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const {data: ref} = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `
+    },
+    {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
+    {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
     {
       code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -401,27 +452,6 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `
-    },
-    {
-      code: `
-        type RelayProps = {
-          user: MyComponent_user
-        }
-
-        type Props = {
-          other: ?Object,
-        } & RelayProps;
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
     }
   ]),
   invalid: [
@@ -429,7 +459,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       // imports TestFragment_other$key instead of TestFragment_foo$key
       code: `
         import type {TestFragment_other$key} from './path/to/TestFragment_other.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -446,7 +476,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
       // Should import the type using `import type {xyz} from ...` or `import {type xyz} from ...`
       code: `
         import {TestFragment_foo$key} from './path/to/TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -462,7 +492,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
     {
       code: `
         import type {other} from 'TestFragment_foo.graphql';
-        useFragment(graphql\`query TestFragment_foo { id }\`)
+        useFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
       errors: [
         {
@@ -475,6 +505,160 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         }
       ]
     },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useRefetchableFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<RefetchableQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        useRefetchableFragment<RefetchQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useRefetchableFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        usePaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<PaginationQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const refUnused = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestPaginationFragment_foo$key' imported from 'TestPaginationFragment_foo.graphql', e.g.:
+
+  import type {TestPaginationFragment_foo$key} from 'TestPaginationFragment_foo.graphql';`.trim(),
+          line: 5,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+
+        const {data: refUnused }= useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
+        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to usePaginationFragment() should be typed with the type 'TestPaginationFragment_foo$key' imported from 'TestPaginationFragment_foo.graphql', e.g.:
+
+  import type {TestPaginationFragment_foo$key} from 'TestPaginationFragment_foo.graphql';`.trim(),
+          line: 5,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<PaginationQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useBlockingPaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+
+    {
+      code: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+        useLegacyPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message:
+            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<PaginationQuery, _>(...)',
+          line: 3,
+          column: 9
+        }
+      ]
+    },
+    {
+      code: `
+        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+      `,
+      errors: [
+        {
+          message: `
+The prop passed to useLegacyPaginationFragment() should be typed with the type 'TestFragment_foo$key' imported from 'TestFragment_foo.graphql', e.g.:
+
+  import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';`.trim(),
+          line: 2,
+          column: 9
+        }
+      ]
+    },
+
     {
       code: 'useQuery(graphql`query FooQuery { id }`)',
       errors: [
@@ -514,8 +698,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -526,8 +710,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -581,8 +764,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user, somethingElse: number}> {
           render() {
@@ -593,8 +776,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -618,8 +800,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -630,8 +812,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -677,8 +858,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -689,8 +870,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -716,8 +896,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -730,8 +910,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -757,8 +936,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
@@ -771,8 +950,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -798,8 +976,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -812,8 +990,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -839,8 +1016,8 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -853,8 +1030,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -1344,6 +1520,37 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
           message:
             'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+          line: 10,
+          column: 15
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type RelayProps = {
+          user: MyComponent_user
+        }
+
+        type Props = {
+          other: ?Object,
+        } & RelayProps;
+
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 10,
           column: 15
         }
