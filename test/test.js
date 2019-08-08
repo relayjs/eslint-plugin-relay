@@ -508,16 +508,22 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useRefetchableFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        useRefetchableFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
       `,
       errors: [
         {
           message:
-            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<RefetchableQuery, _>(...)',
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
-      ]
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
+        useRefetchableFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
+      `
     },
     {
       code: `
@@ -537,16 +543,22 @@ The prop passed to useRefetchableFragment() should be typed with the type 'TestF
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        usePaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        usePaginationFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
-            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<PaginationQuery, _>(...)',
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
-      ]
+      ],
+      output: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
+        usePaginationFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
+      `
     },
     {
       code: `
@@ -602,12 +614,12 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestPa
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
       `,
       errors: [
         {
           message:
-            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<PaginationQuery, _>(...)',
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
@@ -634,6 +646,7 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
         useLegacyPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
@@ -641,7 +654,8 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
           line: 3,
           column: 9
         }
-      ]
+      ],
+      output: null
     },
     {
       code: `
@@ -700,6 +714,7 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
         const query = 'graphql';
         useQuery(query);
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
