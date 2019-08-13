@@ -312,14 +312,34 @@ module.exports = {
         if (firstArg == null) {
           return;
         }
-        const queryName = getDefinitionName(firstArg) || 'ExampleQuery';
+        const queryName = getDefinitionName(firstArg);
         context.report({
           node: node,
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<{{queryName}}>(...)',
           data: {
-            queryName: queryName
-          }
+            queryName: queryName || 'ExampleQuery'
+          },
+          fix:
+            queryName != null && options.fix
+              ? fixer => {
+                  const importFixRange = genImportFixRange(
+                    queryName,
+                    imports,
+                    requires
+                  );
+                  return [
+                    genImportFixer(
+                      fixer,
+                      importFixRange,
+                      queryName,
+                      options.haste,
+                      ''
+                    ),
+                    fixer.insertTextAfter(node.callee, `<${queryName}>`)
+                  ];
+                }
+              : null
         });
       },
 
