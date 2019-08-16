@@ -399,6 +399,52 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RelayProps = {|
+          +user: MyComponent_user,
+        |}
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = {
+          +user: MyComponent_user,
+        }
+        type RelayProps = {|
+          ...RelayProps,
+          ...RealProps
+        |}
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {|
           +user: ?MyComponent_user,
         |}
@@ -1576,6 +1622,38 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
             '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
             'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 10,
+          column: 15
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type RelayProps = {
+          users: MyComponent_user
+        }
+
+        type Props = {
+          other: ?Object,
+          ...RelayProps
+        }
+
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+          line: 11,
           column: 15
         }
       ]

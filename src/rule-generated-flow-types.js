@@ -78,6 +78,63 @@ function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
   }
 }
 
+function getPropTypeProperty(
+  context,
+  typeAliasMap,
+  propType,
+  propName,
+  visitedProps = new Set()
+) {
+  if (visitedProps.has(propType)) {
+    return null;
+  }
+  visitedProps.add(propType);
+  const spreadsToVisit = [];
+  for (const property of propType.properties) {
+    if (property.type === 'ObjectTypeSpreadProperty') {
+      spreadsToVisit.push(property);
+    } else {
+      // HACK: Type annotations don't currently expose a 'key' property:
+      // https://github.com/babel/babel-eslint/issues/307
+
+      let tokenIndex = 0;
+      if (property.static) {
+        tokenIndex++;
+      }
+      if (property.variance) {
+        tokenIndex++;
+      }
+
+      if (
+        context.getSourceCode().getFirstToken(property, tokenIndex).value ===
+        propName
+      ) {
+        return property;
+      }
+    }
+  }
+  for (const property of spreadsToVisit) {
+    if (
+      property.argument &&
+      property.argument.id &&
+      property.argument.id.name
+    ) {
+      const nextPropType = typeAliasMap[property.argument.id.name];
+      const result = getPropTypeProperty(
+        context,
+        typeAliasMap,
+        nextPropType,
+        propName,
+        visitedProps
+      );
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
+
 function validateObjectTypeAnnotation(
   context,
   Component,
@@ -85,26 +142,17 @@ function validateObjectTypeAnnotation(
   propName,
   propType,
   importFixRange,
+  typeAliasMap,
   onlyVerify
 ) {
   const options = getOptions(context.options[0]);
-  const propTypeProperty = propType.properties.find(property => {
-    // HACK: Type annotations don't currently expose a 'key' property:
-    // https://github.com/babel/babel-eslint/issues/307
+  const propTypeProperty = getPropTypeProperty(
+    context,
+    typeAliasMap,
+    propType,
+    propName
+  );
 
-    let tokenIndex = 0;
-    if (property.static) {
-      tokenIndex++;
-    }
-    if (property.variance) {
-      tokenIndex++;
-    }
-
-    return (
-      context.getSourceCode().getFirstToken(property, tokenIndex).value ===
-      propName
-    );
-  });
   const atleastOnePropertyExists = !!propType.properties[0];
 
   if (!propTypeProperty) {
@@ -630,7 +678,8 @@ module.exports = {
                   importedPropType,
                   propName,
                   propType,
-                  importFixRange
+                  importFixRange,
+                  typeAliasMap
                 );
                 break;
               }
@@ -651,7 +700,8 @@ module.exports = {
                       importedPropType,
                       propName,
                       aliasedObjectType,
-                      importFixRange
+                      importFixRange,
+                      typeAliasMap
                     );
                     break;
                   }
@@ -687,6 +737,7 @@ module.exports = {
                         propName,
                         objectType,
                         importFixRange,
+                        typeAliasMap,
                         true // Return false if invalid instead of reporting
                       );
                       if (isValid) {
@@ -700,7 +751,8 @@ module.exports = {
                       importedPropType,
                       propName,
                       objectTypes[0],
-                      importFixRange
+                      importFixRange,
+                      typeAliasMap
                     );
                     break;
                   }
