@@ -85,7 +85,7 @@ function getPropTypeProperty(
   propName,
   visitedProps = new Set()
 ) {
-  if (visitedProps.has(propType)) {
+  if (propType == null || visitedProps.has(propType)) {
     return null;
   }
   visitedProps.add(propType);
