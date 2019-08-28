@@ -85,11 +85,23 @@ function getPropTypeProperty(
   propName,
   visitedProps = new Set()
 ) {
-  if (propType == null || !propType.properties || visitedProps.has(propType)) {
+  if (propType == null || visitedProps.has(propType)) {
     return null;
   }
   visitedProps.add(propType);
   const spreadsToVisit = [];
+  if (propType.type === 'GenericTypeAnnotation') {
+    return getPropTypeProperty(
+      context,
+      typeAliasMap,
+      extractReadOnlyType(resolveTypeAlias(propType, typeAliasMap)),
+      propName,
+      visitedProps
+    );
+  }
+  if (propType.type !== 'ObjectTypeAnnotation') {
+    return null;
+  }
   for (const property of propType.properties) {
     if (property.type === 'ObjectTypeSpreadProperty') {
       spreadsToVisit.push(property);

@@ -445,6 +445,85 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealProps
+        |}>
+        type Props = $ReadOnly<{|
+          ...RelayProps,
+          id: 3
+        |}>
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RealPropsAlias = RealProps
+        type RealPropsAlias2 = RealPropsAlias
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealPropsAlias2
+        |}>
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RealPropsAlias = RealProps
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealPropsAlias
+        |}>
+        type RelayPropsAlias = $ReadOnly<RelayProps>
+        type Props = {|
+          ...RelayPropsAlias,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {|
           +user: ?MyComponent_user,
         |}
