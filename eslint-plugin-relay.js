@@ -14,7 +14,8 @@ module.exports = {
     'graphql-naming': require('./src/rule-graphql-naming'),
     'generated-flow-types': require('./src/rule-generated-flow-types'),
     'no-future-added-value': require('./src/rule-no-future-added-value'),
-    'unused-fields': require('./src/rule-unused-fields')
+    'unused-fields': require('./src/rule-unused-fields'),
+    'hook-required-argument': require('./src/rule-hook-required-argument')
   },
   configs: {
     recommended: {
@@ -24,7 +25,8 @@ module.exports = {
         'relay/graphql-naming': 'error',
         'relay/generated-flow-types': 'warn',
         'relay/no-future-added-value': 'warn',
-        'relay/unused-fields': 'warn'
+        'relay/unused-fields': 'warn',
+        'relay/hook-required-argument': 'warn'
       }
     },
     strict: {
@@ -34,7 +36,8 @@ module.exports = {
         'relay/graphql-naming': 'error',
         'relay/generated-flow-types': 'error',
         'relay/no-future-added-value': 'error',
-        'relay/unused-fields': 'error'
+        'relay/unused-fields': 'error',
+        'relay/hook-required-argument': 'error'
       }
     }
   }
