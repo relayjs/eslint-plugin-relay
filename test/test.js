@@ -277,7 +277,7 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
       `
     },
     {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
-    {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
+    {code: 'useLazyLoadQuery<Foo>(graphql`query Foo { id }`)'},
     {
       code: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
@@ -849,6 +849,59 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
       ],
       output: null
     },
+
+    {
+      code: `\nuseLazyLoadQuery(graphql\`query FooQuery { id }\`)`,
+      errors: [
+        {
+          message:
+            'The `useLazyLoadQuery` hook should be used with an explicit generated Flow type, e.g.: useLazyLoadQuery<FooQuery>(...)',
+          line: 2,
+          column: 1
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+useLazyLoadQuery<FooQuery>(graphql\`query FooQuery { id }\`)`
+    },
+    {
+      code: `
+        const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useLazyLoadQuery(query2);
+      `,
+      errors: [
+        {
+          message:
+            'The `useLazyLoadQuery` hook should be used with an explicit generated Flow type, e.g.: useLazyLoadQuery<FooQuery>(...)',
+          line: 4
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+        const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useLazyLoadQuery<FooQuery>(query2);
+      `
+    },
+    {
+      code: `
+        const query = 'graphql';
+        useLazyLoadQuery(query);
+      `,
+      options: DEFAULT_OPTIONS,
+      errors: [
+        {
+          message:
+            'The `useLazyLoadQuery` hook should be used with an explicit generated Flow type, e.g.: useLazyLoadQuery<ExampleQuery>(...)',
+          line: 3
+        }
+      ],
+      output: null
+    },
+
     {
       filename: 'MyComponent.jsx',
       code: `
