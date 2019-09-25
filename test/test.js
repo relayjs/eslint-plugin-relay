@@ -11,6 +11,12 @@ const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
 const HAS_ESLINT_BEEN_UPGRADED_YET = false;
+const DEFAULT_OPTIONS = [
+  {
+    fix: true,
+    haste: false
+  }
+];
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
@@ -393,6 +399,131 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
     {
       code: `
         import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RelayProps = {|
+          +user: MyComponent_user,
+        |}
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = {
+          +user: MyComponent_user,
+        }
+        type RelayProps = {|
+          ...RelayProps,
+          ...RealProps
+        |}
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealProps
+        |}>
+        type Props = $ReadOnly<{|
+          ...RelayProps,
+          id: 3
+        |}>
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RealPropsAlias = RealProps
+        type RealPropsAlias2 = RealPropsAlias
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealPropsAlias2
+        |}>
+        type Props = {|
+          ...RelayProps,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
+        type RealProps = $ReadOnly<{
+          +user: MyComponent_user,
+        }>
+        type RealPropsAlias = RealProps
+        type RelayProps = $ReadOnly<{|
+          ...RelayProps,
+          ...RealPropsAlias
+        |}>
+        type RelayPropsAlias = $ReadOnly<RelayProps>
+        type Props = {|
+          ...RelayPropsAlias,
+          id: 3
+        |}
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `
+    },
+    {
+      code: `
+        import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {|
           +user: ?MyComponent_user,
         |}
@@ -502,16 +633,22 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useRefetchableFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        useRefetchableFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
       `,
       errors: [
         {
           message:
-            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<RefetchableQuery, _>(...)',
+            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
-      ]
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
+        useRefetchableFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
+      `
     },
     {
       code: `
@@ -531,16 +668,22 @@ The prop passed to useRefetchableFragment() should be typed with the type 'TestF
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        usePaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        usePaginationFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
-            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<PaginationQuery, _>(...)',
+            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
-      ]
+      ],
+      output: `
+        import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
+import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
+        usePaginationFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
+      `
     },
     {
       code: `
@@ -596,12 +739,12 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestPa
     {
       code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
+        useBlockingPaginationFragment(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
       `,
       errors: [
         {
           message:
-            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<PaginationQuery, _>(...)',
+            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<TestFragmentQuery, _>(...)',
           line: 3,
           column: 9
         }
@@ -628,6 +771,7 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
         useLegacyPaginationFragment(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
@@ -635,7 +779,8 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
           line: 3,
           column: 9
         }
-      ]
+      ],
+      output: null
     },
     {
       code: `
@@ -654,28 +799,55 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
     },
 
     {
-      code: 'useQuery(graphql`query FooQuery { id }`)',
+      code: `\nuseQuery(graphql\`query FooQuery { id }\`)`,
       errors: [
         {
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
-          line: 1,
+          line: 2,
           column: 1
         }
-      ]
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+useQuery<FooQuery>(graphql\`query FooQuery { id }\`)`
     },
     {
       code: `
         const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useQuery(query2);
+      `,
+      errors: [
+        {
+          message:
+            'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<FooQuery>(...)',
+          line: 4
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooQuery} from './__generated__/FooQuery.graphql'
+        const query = graphql\`query FooQuery { id }\`;
+        const query2 = query;
+        useQuery<FooQuery>(query2);
+      `
+    },
+    {
+      code: `
+        const query = 'graphql';
         useQuery(query);
       `,
+      options: DEFAULT_OPTIONS,
       errors: [
         {
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<ExampleQuery>(...)',
           line: 3
         }
-      ]
+      ],
+      output: null
     },
     {
       filename: 'MyComponent.jsx',
@@ -690,8 +862,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -702,8 +874,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -757,8 +928,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user, somethingElse: number}> {
           render() {
@@ -769,8 +940,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -794,8 +964,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -806,8 +976,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -853,8 +1022,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         class MyComponent extends React.Component<{user: MyComponent_user}> {
           render() {
@@ -865,8 +1034,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -892,8 +1060,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -906,8 +1074,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -933,8 +1100,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user, somethingElse: number};
 
@@ -947,8 +1114,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -974,8 +1140,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -988,8 +1154,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -1015,8 +1180,8 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
+      options: DEFAULT_OPTIONS,
+      output: `
         import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
         type Props = {user: MyComponent_user};
 
@@ -1029,8 +1194,7 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
         createFragmentContainer(MyComponent, {
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
-      `
-        : null,
+      `,
       errors: [
         {
           message:
@@ -1552,6 +1716,38 @@ The prop passed to useLegacyPaginationFragment() should be typed with the type '
             '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
             'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 10,
+          column: 15
+        }
+      ]
+    },
+    {
+      filename: 'MyComponent.jsx',
+      code: `
+        type RelayProps = {
+          users: MyComponent_user
+        }
+
+        type Props = {
+          other: ?Object,
+          ...RelayProps
+        }
+
+        class MyComponent extends React.Component<Props> {
+          render() {
+            return <div />;
+          }
+        }
+
+        createFragmentContainer(MyComponent, {
+          user: graphql\`fragment MyComponent_user on User {id}\`,
+        });
+      `,
+      errors: [
+        {
+          message:
+            '`user` is not declared in the `props` of the React component or it is not marked with the generated flow type `MyComponent_user`. ' +
+            'See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+          line: 11,
           column: 15
         }
       ]

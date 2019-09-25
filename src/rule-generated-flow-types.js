@@ -78,6 +78,75 @@ function genImportFixer(fixer, importFixRange, type, haste, whitespace) {
   }
 }
 
+function getPropTypeProperty(
+  context,
+  typeAliasMap,
+  propType,
+  propName,
+  visitedProps = new Set()
+) {
+  if (propType == null || visitedProps.has(propType)) {
+    return null;
+  }
+  visitedProps.add(propType);
+  const spreadsToVisit = [];
+  if (propType.type === 'GenericTypeAnnotation') {
+    return getPropTypeProperty(
+      context,
+      typeAliasMap,
+      extractReadOnlyType(resolveTypeAlias(propType, typeAliasMap)),
+      propName,
+      visitedProps
+    );
+  }
+  if (propType.type !== 'ObjectTypeAnnotation') {
+    return null;
+  }
+  for (const property of propType.properties) {
+    if (property.type === 'ObjectTypeSpreadProperty') {
+      spreadsToVisit.push(property);
+    } else {
+      // HACK: Type annotations don't currently expose a 'key' property:
+      // https://github.com/babel/babel-eslint/issues/307
+
+      let tokenIndex = 0;
+      if (property.static) {
+        tokenIndex++;
+      }
+      if (property.variance) {
+        tokenIndex++;
+      }
+
+      if (
+        context.getSourceCode().getFirstToken(property, tokenIndex).value ===
+        propName
+      ) {
+        return property;
+      }
+    }
+  }
+  for (const property of spreadsToVisit) {
+    if (
+      property.argument &&
+      property.argument.id &&
+      property.argument.id.name
+    ) {
+      const nextPropType = typeAliasMap[property.argument.id.name];
+      const result = getPropTypeProperty(
+        context,
+        typeAliasMap,
+        nextPropType,
+        propName,
+        visitedProps
+      );
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
+
 function validateObjectTypeAnnotation(
   context,
   Component,
@@ -85,26 +154,17 @@ function validateObjectTypeAnnotation(
   propName,
   propType,
   importFixRange,
+  typeAliasMap,
   onlyVerify
 ) {
   const options = getOptions(context.options[0]);
-  const propTypeProperty = propType.properties.find(property => {
-    // HACK: Type annotations don't currently expose a 'key' property:
-    // https://github.com/babel/babel-eslint/issues/307
+  const propTypeProperty = getPropTypeProperty(
+    context,
+    typeAliasMap,
+    propType,
+    propName
+  );
 
-    let tokenIndex = 0;
-    if (property.static) {
-      tokenIndex++;
-    }
-    if (property.variance) {
-      tokenIndex++;
-    }
-
-    return (
-      context.getSourceCode().getFirstToken(property, tokenIndex).value ===
-      propName
-    );
-  });
   const atleastOnePropertyExists = !!propType.properties[0];
 
   if (!propTypeProperty) {
@@ -193,23 +253,6 @@ function validateObjectTypeAnnotation(
   return true;
 }
 
-/**
- * Tries to find a GraphQL definition node for a given argument.
- * Currently, only supports a graphql`...` literal inline, but could be
- * improved to follow a variable definition.
- */
-function getDefinitionName(arg) {
-  if (arg.type !== 'TaggedTemplateExpression') {
-    // TODO: maybe follow variables, see context.getScope()
-    return null;
-  }
-  const ast = getGraphQLAST(arg);
-  if (ast == null || ast.definitions.length === 0) {
-    return null;
-  }
-  return ast.definitions[0].name.value;
-}
-
 function extractReadOnlyType(genericType) {
   let currentType = genericType;
   while (
@@ -271,6 +314,63 @@ module.exports = {
     const typeAliasMap = {};
     const useFragmentInstances = [];
 
+    /**
+     * Tries to find a GraphQL definition node for a given argument.
+     * Supports a graphql`...` literal inline and follows variable definitions.
+     */
+    function getDefinition(arg) {
+      if (arg == null) {
+        return null;
+      }
+      if (arg.type === 'Identifier') {
+        const name = arg.name;
+        let scope = context.getScope();
+        while (scope && scope.type != 'global') {
+          for (const variable of scope.variables) {
+            if (variable.name === name) {
+              const definition = variable.defs.find(
+                def => def.node && def.node.type === 'VariableDeclarator'
+              );
+              return definition ? getDefinition(definition.node.init) : null;
+            }
+          }
+          scope = scope.upper;
+        }
+        return null;
+      }
+      if (arg.type !== 'TaggedTemplateExpression') {
+        return null;
+      }
+      return getGraphQLAST(arg);
+    }
+
+    function getDefinitionName(arg) {
+      const ast = getDefinition(arg);
+      if (ast == null || ast.definitions.length === 0) {
+        return null;
+      }
+      return ast.definitions[0].name.value;
+    }
+
+    function getRefetchableQueryName(arg) {
+      const ast = getDefinition(arg);
+      if (ast == null || ast.definitions.length === 0) {
+        return null;
+      }
+      const refetchable = ast.definitions[0].directives.find(
+        d => d.name.value === 'refetchable'
+      );
+      if (!refetchable) {
+        return null;
+      }
+      const nameArg = refetchable.arguments.find(
+        a => a.name.value === 'queryName'
+      );
+      return nameArg && nameArg.value && nameArg.value.value
+        ? nameArg.value.value
+        : null;
+    }
+
     function trackHookCall(node, hookName) {
       const firstArg = node.arguments[0];
       if (firstArg == null) {
@@ -284,6 +384,31 @@ module.exports = {
         fragmentName: fragmentName,
         node: node,
         hookName: hookName
+      });
+    }
+
+    function createHookTypeImportFixer(node, queryName, typeText) {
+      return fixer => {
+        const importFixRange = genImportFixRange(queryName, imports, requires);
+        return [
+          genImportFixer(fixer, importFixRange, queryName, options.haste, ''),
+          fixer.insertTextAfter(node.callee, `<${typeText}>`)
+        ];
+      };
+    }
+
+    function reportAndFixRefetchableType(node, hookName, defaultQueryName) {
+      const queryName = getRefetchableQueryName(node.arguments[0]);
+      context.report({
+        node: node,
+        message: `The \`${hookName}\` hook should be used with an explicit generated Flow type, e.g.: ${hookName}<{{queryName}}, _>(...)`,
+        data: {
+          queryName: queryName || defaultQueryName
+        },
+        fix:
+          queryName != null && options.fix
+            ? createHookTypeImportFixer(node, queryName, `${queryName}, _`)
+            : null
       });
     }
 
@@ -312,14 +437,18 @@ module.exports = {
         if (firstArg == null) {
           return;
         }
-        const queryName = getDefinitionName(firstArg) || 'ExampleQuery';
+        const queryName = getDefinitionName(firstArg);
         context.report({
           node: node,
           message:
             'The `useQuery` hook should be used with an explicit generated Flow type, e.g.: useQuery<{{queryName}}>(...)',
           data: {
-            queryName: queryName
-          }
+            queryName: queryName || 'ExampleQuery'
+          },
+          fix:
+            queryName != null && options.fix
+              ? createHookTypeImportFixer(node, queryName, queryName)
+              : null
         });
       },
 
@@ -329,15 +458,11 @@ module.exports = {
       'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `usePaginationFragment` hook should be used with an explicit generated Flow type, e.g.: usePaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'usePaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -346,15 +471,11 @@ module.exports = {
       'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useBlockingPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useBlockingPaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useBlockingPaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -363,15 +484,11 @@ module.exports = {
       'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'PaginationQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useLegacyPaginationFragment` hook should be used with an explicit generated Flow type, e.g.: useLegacyPaginationFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useLegacyPaginationFragment',
+          'PaginationQuery'
+        );
       },
 
       /**
@@ -380,15 +497,11 @@ module.exports = {
       'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
         node
       ) {
-        const queryName = 'RefetchableQuery';
-        context.report({
-          node: node,
-          message:
-            'The `useRefetchableFragment` hook should be used with an explicit generated Flow type, e.g.: useRefetchableFragment<{{queryName}}, _>(...)',
-          data: {
-            queryName: queryName
-          }
-        });
+        reportAndFixRefetchableType(
+          node,
+          'useRefetchableFragment',
+          'RefetchableQuery'
+        );
       },
 
       /**
@@ -591,7 +704,8 @@ module.exports = {
                   importedPropType,
                   propName,
                   propType,
-                  importFixRange
+                  importFixRange,
+                  typeAliasMap
                 );
                 break;
               }
@@ -612,7 +726,8 @@ module.exports = {
                       importedPropType,
                       propName,
                       aliasedObjectType,
-                      importFixRange
+                      importFixRange,
+                      typeAliasMap
                     );
                     break;
                   }
@@ -648,6 +763,7 @@ module.exports = {
                         propName,
                         objectType,
                         importFixRange,
+                        typeAliasMap,
                         true // Return false if invalid instead of reporting
                       );
                       if (isValid) {
@@ -661,7 +777,8 @@ module.exports = {
                       importedPropType,
                       propName,
                       objectTypes[0],
-                      importFixRange
+                      importFixRange,
+                      typeAliasMap
                     );
                     break;
                   }
