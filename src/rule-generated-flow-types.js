@@ -453,6 +453,31 @@ module.exports = {
       },
 
       /**
+       * Find useLazyLoadQuery() calls without type arguments.
+       */
+      'CallExpression[callee.name=useLazyLoadQuery]:not([typeArguments])'(
+        node
+      ) {
+        const firstArg = node.arguments[0];
+        if (firstArg == null) {
+          return;
+        }
+        const queryName = getDefinitionName(firstArg);
+        context.report({
+          node: node,
+          message:
+            'The `useLazyLoadQuery` hook should be used with an explicit generated Flow type, e.g.: useLazyLoadQuery<{{queryName}}>(...)',
+          data: {
+            queryName: queryName || 'ExampleQuery'
+          },
+          fix:
+            queryName != null && options.fix
+              ? createHookTypeImportFixer(node, queryName, queryName)
+              : null
+        });
+      },
+
+      /**
        * Find usePaginationFragment() calls without type arguments.
        */
       'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
