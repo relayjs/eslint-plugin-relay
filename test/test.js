@@ -901,7 +901,61 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
       ],
       output: null
     },
-
+    {
+      code: `\ncommitMutation(environemnt, {mutation: graphql\`mutation FooMutation { id }\`})`,
+      errors: [
+        {
+          message:
+            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+          line: 2,
+          column: 1
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooMutation} from './__generated__/FooMutation.graphql'
+commitMutation<FooMutation>(environemnt, {mutation: graphql\`mutation FooMutation { id }\`})`
+    },
+        {
+      code: `
+        const mutation = graphql\`mutation FooMutation { id }\`;
+        commitMutation(environment, {mutation});
+      `,
+      errors: [
+        {
+          message:
+            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+          line: 3
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooMutation} from './__generated__/FooMutation.graphql'
+        const mutation = graphql\`mutation FooMutation { id }\`;
+        commitMutation<FooMutation>(environment, {mutation});
+      `,
+    },
+    {
+      code: `
+        const mutation = graphql\`mutation FooMutation { id }\`;
+        const myMutation = mutation;
+        commitMutation(environment, {mutation: myMutation});
+      `,
+      errors: [
+        {
+          message:
+            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+          line: 4
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooMutation} from './__generated__/FooMutation.graphql'
+        const mutation = graphql\`mutation FooMutation { id }\`;
+        const myMutation = mutation;
+        commitMutation<FooMutation>(environment, {mutation: myMutation});
+      `,
+    },
     {
       filename: 'MyComponent.jsx',
       code: `

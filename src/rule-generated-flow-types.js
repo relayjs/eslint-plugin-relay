@@ -387,7 +387,7 @@ module.exports = {
       });
     }
 
-    function createHookTypeImportFixer(node, queryName, typeText) {
+    function createHookOrMutationTypeImportFixer(node, queryName, typeText) {
       return fixer => {
         const importFixRange = genImportFixRange(queryName, imports, requires);
         return [
@@ -407,7 +407,11 @@ module.exports = {
         },
         fix:
           queryName != null && options.fix
-            ? createHookTypeImportFixer(node, queryName, `${queryName}, _`)
+            ? createHookOrMutationTypeImportFixer(
+                node,
+                queryName,
+                `${queryName}, _`
+              )
             : null
       });
     }
@@ -447,7 +451,7 @@ module.exports = {
           },
           fix:
             queryName != null && options.fix
-              ? createHookTypeImportFixer(node, queryName, queryName)
+              ? createHookOrMutationTypeImportFixer(node, queryName, queryName)
               : null
         });
       },
@@ -472,7 +476,50 @@ module.exports = {
           },
           fix:
             queryName != null && options.fix
-              ? createHookTypeImportFixer(node, queryName, queryName)
+              ? createHookOrMutationTypeImportFixer(node, queryName, queryName)
+              : null
+        });
+      },
+
+      /**
+       * Find commitMutation() calls without type arguments.
+       */
+      'CallExpression[callee.name=commitMutation]:not([typeArguments])'(node) {
+        // Get mutation config. It should be second argument of the `commitMutation`
+        const mutationConfig = node.arguments && node.arguments[1];
+        if (
+          mutationConfig == null ||
+          mutationConfig.type !== 'ObjectExpression'
+        ) {
+          return;
+        }
+        // Find `mutation` property on the `mutationConfig`
+        const mutationNameProperty = mutationConfig.properties.find(prop => {
+          if (prop.key.name === 'mutation') {
+            return true;
+          }
+        });
+        if (
+          mutationNameProperty == null ||
+          mutationNameProperty.value == null
+        ) {
+          return;
+        }
+        const mutationName = getDefinitionName(mutationNameProperty.value);
+        context.report({
+          node: node,
+          message:
+            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<{{mutationName}}>(...)',
+          data: {
+            mutationName: mutationName || 'ExampleMutation'
+          },
+          fix:
+            mutationName != null && options.fix
+              ? createHookOrMutationTypeImportFixer(
+                  node,
+                  mutationName,
+                  mutationName
+                )
               : null
         });
       },
