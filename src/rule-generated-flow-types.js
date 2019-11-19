@@ -494,11 +494,9 @@ module.exports = {
           return;
         }
         // Find `mutation` property on the `mutationConfig`
-        const mutationNameProperty = mutationConfig.properties.find(prop => {
-          if (prop.key.name === 'mutation') {
-            return true;
-          }
-        });
+        const mutationNameProperty = mutationConfig.properties.find(
+          prop => prop.key.name === 'mutation'
+        );
         if (
           mutationNameProperty == null ||
           mutationNameProperty.value == null
@@ -509,7 +507,7 @@ module.exports = {
         context.report({
           node: node,
           message:
-            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<{{mutationName}}>(...)',
+            'The `commitMutation` must be used with an explicit generated Flow type, e.g.: commitMutation<{{mutationName}}>(...)',
           data: {
             mutationName: mutationName || 'ExampleMutation'
           },
@@ -519,6 +517,54 @@ module.exports = {
                   node,
                   mutationName,
                   mutationName
+                )
+              : null
+        });
+      },
+
+      /**
+       * Find requestSubscription() calls without type arguments.
+       */
+      'CallExpression[callee.name=requestSubscription]:not([typeArguments])'(
+        node
+      ) {
+        const subscriptionConfig = node.arguments && node.arguments[1];
+        if (
+          subscriptionConfig == null ||
+          subscriptionConfig.type !== 'ObjectExpression'
+        ) {
+          return;
+        }
+        const subscriptionNameProperty = subscriptionConfig.properties.find(
+          prop => {
+            if (prop.key.name === 'subscription') {
+              return true;
+            }
+          }
+        );
+
+        if (
+          subscriptionNameProperty == null ||
+          subscriptionNameProperty.value == null
+        ) {
+          return;
+        }
+        const subscriptionName = getDefinitionName(
+          subscriptionNameProperty.value
+        );
+        context.report({
+          node: node,
+          message:
+            'The `requestSubscription` must be used with an explicit generated Flow type, e.g.: requestSubscription<{{subscriptionName}}>(...)',
+          data: {
+            subscriptionName: subscriptionName || 'ExampleSubscription'
+          },
+          fix:
+            subscriptionName != null && options.fix
+              ? createHookOrMutationTypeImportFixer(
+                  node,
+                  subscriptionName,
+                  subscriptionName
                 )
               : null
         });

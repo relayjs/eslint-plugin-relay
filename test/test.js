@@ -906,7 +906,7 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
       errors: [
         {
           message:
-            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+            'The `commitMutation` must be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
           line: 2,
           column: 1
         }
@@ -924,7 +924,7 @@ commitMutation<FooMutation>(environemnt, {mutation: graphql\`mutation FooMutatio
       errors: [
         {
           message:
-            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+            'The `commitMutation` must be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
           line: 3
         }
       ],
@@ -944,7 +944,7 @@ import type {FooMutation} from './__generated__/FooMutation.graphql'
       errors: [
         {
           message:
-            'The `commitMutation` should be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
+            'The `commitMutation` must be used with an explicit generated Flow type, e.g.: commitMutation<FooMutation>(...)',
           line: 4
         }
       ],
