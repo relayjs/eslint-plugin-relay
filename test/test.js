@@ -957,6 +957,61 @@ import type {FooMutation} from './__generated__/FooMutation.graphql'
       `,
     },
     {
+      code: `\nrequestSubscription(environemnt, {subscription: graphql\`subscription FooSubscription { id }\`})`,
+      errors: [
+        {
+          message:
+            'The `requestSubscription` must be used with an explicit generated Flow type, e.g.: requestSubscription<FooSubscription>(...)',
+          line: 2,
+          column: 1
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooSubscription} from './__generated__/FooSubscription.graphql'
+requestSubscription<FooSubscription>(environemnt, {subscription: graphql\`subscription FooSubscription { id }\`})`
+    },
+        {
+      code: `
+        const subscription = graphql\`subscription FooSubscription { id }\`;
+        requestSubscription(environment, {subscription});
+      `,
+      errors: [
+        {
+          message:
+            'The `requestSubscription` must be used with an explicit generated Flow type, e.g.: requestSubscription<FooSubscription>(...)',
+          line: 3
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooSubscription} from './__generated__/FooSubscription.graphql'
+        const subscription = graphql\`subscription FooSubscription { id }\`;
+        requestSubscription<FooSubscription>(environment, {subscription});
+      `,
+    },
+    {
+      code: `
+        const subscription = graphql\`subscription FooSubscription { id }\`;
+        const mySubscription = subscription;
+        requestSubscription(environment, {subscription: mySubscription});
+      `,
+      errors: [
+        {
+          message:
+            'The `requestSubscription` must be used with an explicit generated Flow type, e.g.: requestSubscription<FooSubscription>(...)',
+          line: 4
+        }
+      ],
+      options: DEFAULT_OPTIONS,
+      output: `
+import type {FooSubscription} from './__generated__/FooSubscription.graphql'
+        const subscription = graphql\`subscription FooSubscription { id }\`;
+        const mySubscription = subscription;
+        requestSubscription<FooSubscription>(environment, {subscription: mySubscription});
+      `,
+    },
+    {
       filename: 'MyComponent.jsx',
       code: `
         class MyComponent extends React.Component<{}> {
