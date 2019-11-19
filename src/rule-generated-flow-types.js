@@ -387,11 +387,21 @@ module.exports = {
       });
     }
 
-    function createHookOrMutationTypeImportFixer(node, queryName, typeText) {
+    function createTypeImportFixer(node, operationName, typeText) {
       return fixer => {
-        const importFixRange = genImportFixRange(queryName, imports, requires);
+        const importFixRange = genImportFixRange(
+          operationName,
+          imports,
+          requires
+        );
         return [
-          genImportFixer(fixer, importFixRange, queryName, options.haste, ''),
+          genImportFixer(
+            fixer,
+            importFixRange,
+            operationName,
+            options.haste,
+            ''
+          ),
           fixer.insertTextAfter(node.callee, `<${typeText}>`)
         ];
       };
@@ -407,11 +417,7 @@ module.exports = {
         },
         fix:
           queryName != null && options.fix
-            ? createHookOrMutationTypeImportFixer(
-                node,
-                queryName,
-                `${queryName}, _`
-              )
+            ? createTypeImportFixer(node, queryName, `${queryName}, _`)
             : null
       });
     }
@@ -451,7 +457,7 @@ module.exports = {
           },
           fix:
             queryName != null && options.fix
-              ? createHookOrMutationTypeImportFixer(node, queryName, queryName)
+              ? createTypeImportFixer(node, queryName, queryName)
               : null
         });
       },
@@ -476,7 +482,7 @@ module.exports = {
           },
           fix:
             queryName != null && options.fix
-              ? createHookOrMutationTypeImportFixer(node, queryName, queryName)
+              ? createTypeImportFixer(node, queryName, queryName)
               : null
         });
       },
@@ -513,11 +519,7 @@ module.exports = {
           },
           fix:
             mutationName != null && options.fix
-              ? createHookOrMutationTypeImportFixer(
-                  node,
-                  mutationName,
-                  mutationName
-                )
+              ? createTypeImportFixer(node, mutationName, mutationName)
               : null
         });
       },
@@ -536,11 +538,7 @@ module.exports = {
           return;
         }
         const subscriptionNameProperty = subscriptionConfig.properties.find(
-          prop => {
-            if (prop.key.name === 'subscription') {
-              return true;
-            }
-          }
+          prop => prop.key.name === 'subscription'
         );
 
         if (
@@ -561,11 +559,7 @@ module.exports = {
           },
           fix:
             subscriptionName != null && options.fix
-              ? createHookOrMutationTypeImportFixer(
-                  node,
-                  subscriptionName,
-                  subscriptionName
-                )
+              ? createTypeImportFixer(node, subscriptionName, subscriptionName)
               : null
         });
       },
