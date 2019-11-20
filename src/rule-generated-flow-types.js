@@ -501,7 +501,7 @@ module.exports = {
         }
         // Find `mutation` property on the `mutationConfig`
         const mutationNameProperty = mutationConfig.properties.find(
-          prop => prop.key.name === 'mutation'
+          prop => prop.key != null && prop.key.name === 'mutation'
         );
         if (
           mutationNameProperty == null ||
@@ -538,7 +538,7 @@ module.exports = {
           return;
         }
         const subscriptionNameProperty = subscriptionConfig.properties.find(
-          prop => prop.key.name === 'subscription'
+          prop => prop.key != null && prop.key.name === 'subscription'
         );
 
         if (
