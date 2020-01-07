@@ -916,7 +916,7 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
 import type {FooMutation} from './__generated__/FooMutation.graphql'
 commitMutation<FooMutation>(environemnt, {mutation: graphql\`mutation FooMutation { id }\`})`
     },
-        {
+    {
       code: `
         const mutation = graphql\`mutation FooMutation { id }\`;
         commitMutation(environment, {mutation});
@@ -933,7 +933,7 @@ commitMutation<FooMutation>(environemnt, {mutation: graphql\`mutation FooMutatio
 import type {FooMutation} from './__generated__/FooMutation.graphql'
         const mutation = graphql\`mutation FooMutation { id }\`;
         commitMutation<FooMutation>(environment, {mutation});
-      `,
+      `
     },
     {
       code: `
@@ -954,7 +954,7 @@ import type {FooMutation} from './__generated__/FooMutation.graphql'
         const mutation = graphql\`mutation FooMutation { id }\`;
         const myMutation = mutation;
         commitMutation<FooMutation>(environment, {mutation: myMutation});
-      `,
+      `
     },
     {
       code: `\nrequestSubscription(environemnt, {subscription: graphql\`subscription FooSubscription { id }\`})`,
@@ -971,7 +971,7 @@ import type {FooMutation} from './__generated__/FooMutation.graphql'
 import type {FooSubscription} from './__generated__/FooSubscription.graphql'
 requestSubscription<FooSubscription>(environemnt, {subscription: graphql\`subscription FooSubscription { id }\`})`
     },
-        {
+    {
       code: `
         const subscription = graphql\`subscription FooSubscription { id }\`;
         requestSubscription(environment, {subscription});
@@ -988,7 +988,7 @@ requestSubscription<FooSubscription>(environemnt, {subscription: graphql\`subscr
 import type {FooSubscription} from './__generated__/FooSubscription.graphql'
         const subscription = graphql\`subscription FooSubscription { id }\`;
         requestSubscription<FooSubscription>(environment, {subscription});
-      `,
+      `
     },
     {
       code: `
@@ -1009,7 +1009,7 @@ import type {FooSubscription} from './__generated__/FooSubscription.graphql'
         const subscription = graphql\`subscription FooSubscription { id }\`;
         const mySubscription = subscription;
         requestSubscription<FooSubscription>(environment, {subscription: mySubscription});
-      `,
+      `
     },
     {
       filename: 'MyComponent.jsx',
