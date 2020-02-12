@@ -60,14 +60,20 @@ function getLocFromIndex(sourceCode, index) {
 
 // Copied directly from Relay
 function getModuleName(filePath) {
-  const filename = path.basename(filePath, path.extname(filePath));
+  // index.js -> index
+  // index.js.flow -> index.js
+  let filename = path.basename(filePath, path.extname(filePath));
+
+  // index.js -> index (when extension has multiple segments)
+  // index.react -> index (when extension has multiple segments)
+  filename = filename.replace(
+    /(?:\.js|\.react|\.react-test|\.example|\.jsx?|\.tsx?|\.flow|\.brands)+$/,
+    ''
+  );
+
   // /path/to/button/index.js -> button
   let moduleName =
     filename === 'index' ? path.basename(path.dirname(filePath)) : filename;
-
-  // Example.ios -> Example
-  // Example.product.android -> Example
-  moduleName = moduleName.replace(/(?:\.\w+)+/, '');
 
   // foo-bar -> fooBar
   // Relay compatibility mode splits on _, so we can't use that here.
