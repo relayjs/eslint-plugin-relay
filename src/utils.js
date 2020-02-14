@@ -66,10 +66,7 @@ function getModuleName(filePath) {
 
   // index.js -> index (when extension has multiple segments)
   // index.react -> index (when extension has multiple segments)
-  filename = filename.replace(
-    /(?:\.js|\.react|\.react-test|\.example|\.jsx?|\.tsx?|\.flow|\.brands)+$/,
-    ''
-  );
+  filename = filename.replace(/(\.(?!ios|android)[_a-zA-Z0-9\\-]+)+/g, '');
 
   // /path/to/button/index.js -> button
   let moduleName =
