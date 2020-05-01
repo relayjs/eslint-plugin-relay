@@ -4,11 +4,13 @@ cache: yarn
 
 matrix:
   include:
+    - node_js: '14'
+      env: TEST=1
     - node_js: '12'
       env: TEST=1
     - node_js: '10'
       env: TEST=1
-    - node_js: '12'
+    - node_js: '14'
       env: LINT=1
 
 script:
