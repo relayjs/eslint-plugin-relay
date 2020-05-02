@@ -28,7 +28,7 @@ function unusedFieldsWarning(fragment) {
 
 // TODO test unused fragments in queries
 
-ruleTester.run('unused-fragments', rules['unused-fragments'], {
+ruleTester.run('must-colocate-fragment-spreads', rules['must-colocate-fragment-spreads'], {
   valid: [
     `
       import { Component } from '../shared/component.js';
