@@ -14,13 +14,28 @@ function getGraphQLFragmentNames(graphQLAst) {
   const fragmentNames = {};
   visit(graphQLAst, {
     FragmentSpread(node, key, parent, path, ancestors) {
-      for (const item of ancestors) {
-        if (item.kind === 'OperationDefinition') {
+      for (const ancestorNode of ancestors) {
+        if (ancestorNode.kind === 'OperationDefinition') {
           if (
-            item.operation === 'mutation' ||
-            item.operation === 'subscription'
+            ancestorNode.operation === 'mutation' ||
+            ancestorNode.operation === 'subscription'
           ) {
             return;
+          }
+        }
+      }
+      for (const directiveNode of node.directives) {
+        if (directiveNode.name.value === 'module') {
+          return;
+        }
+        if (directiveNode.name.value === 'relay') {
+          for (const argumentNode of directiveNode.arguments) {
+            if (
+              argumentNode.name.value === 'mask' &&
+              argumentNode.value.value === false
+            ) {
+              return;
+            }
           }
         }
       }
