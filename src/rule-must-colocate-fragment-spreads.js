@@ -7,43 +7,27 @@
 
 'use strict';
 
+const {visit} = require('graphql');
 const utils = require('./utils');
-
-const getGraphQLAST = utils.getGraphQLAST;
 
 function getGraphQLFragmentNames(graphQLAst) {
   const fragmentNames = {};
-
-  function walkAST(node) {
-    if (node.kind === 'FragmentSpread') {
+  visit(graphQLAst, {
+    FragmentSpread(node, key, parent, path, ancestors) {
+      for (const item of ancestors) {
+        if (item.kind === 'OperationDefinition') {
+          if (
+            item.operation === 'mutation' ||
+            item.operation === 'subscription'
+          ) {
+            return;
+          }
+        }
+      }
       const nameNode = node.name;
       fragmentNames[nameNode.value] = nameNode;
     }
-    if (node.kind === 'OperationDefinition') {
-      if (node.operation === 'mutation' || node.operation === 'subscription') {
-        return;
-      }
-      node.selectionSet.selections.forEach(selection => {
-        walkAST(selection);
-      });
-      return;
-    }
-    for (const prop in node) {
-      const value = node[prop];
-      if (prop === 'loc') {
-        continue;
-      }
-      if (value && typeof value === 'object') {
-        walkAST(value);
-      } else if (Array.isArray(value)) {
-        value.forEach(child => {
-          walkAST(child);
-        });
-      }
-    }
-  }
-
-  walkAST(graphQLAst);
+  });
   return fragmentNames;
 }
 
@@ -78,7 +62,7 @@ function rule(context) {
     'Program:exit'(_node) {
       const fragmentsInTheSameModule = [];
       templateLiterals.forEach(templateLiteral => {
-        const graphQLAst = getGraphQLAST(templateLiteral);
+        const graphQLAst = utils.getGraphQLAST(templateLiteral);
         if (!graphQLAst) {
           // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
           return;
@@ -90,7 +74,7 @@ function rule(context) {
       });
 
       templateLiterals.forEach(templateLiteral => {
-        const graphQLAst = getGraphQLAST(templateLiteral);
+        const graphQLAst = utils.getGraphQLAST(templateLiteral);
         if (!graphQLAst) {
           // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
           return;
