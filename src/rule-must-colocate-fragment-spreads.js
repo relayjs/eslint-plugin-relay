@@ -47,14 +47,13 @@ function getGraphQLFragmentNames(graphQLAst) {
 }
 
 function getGraphQLFragmentDefinitionName(graphQLAst) {
-  const fragmentDefinition = graphQLAst.definitions.find(
-    definition => definition.kind === 'FragmentDefinition'
-  );
-  if (fragmentDefinition) {
-    return fragmentDefinition.name.value;
-  } else {
-    return null;
-  }
+  let name = null;
+  visit(graphQLAst, {
+    FragmentDefinition(node) {
+      name = node.name.value;
+    }
+  });
+  return name;
 }
 
 function isGraphQLTemplate(node) {
