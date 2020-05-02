@@ -84,10 +84,11 @@ function rule(context) {
               node,
               loc: utils.getLoc(context, node, queriedFragments[fragment]),
               message:
-                `This queries for the fragment \`${fragment}\` but this file does ` +
-                'not seem to use it directly. If a different file needs this ' +
-                'information that file should export a fragment and colocate ' +
-                'the query for the data with the usage.\n'
+                `This spreads the fragment \`${fragment}\` but ` +
+                'this module does not use it directly. If a different module ' +
+                'needs this information, that module should directly define a ' +
+                'fragment querying for that data, colocated next to where the ' +
+                'data is used.\n'
             });
           }
         }
