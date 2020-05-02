@@ -41,7 +41,7 @@ ruleTester.run(
       `
       import { Component } from './nested/componentModule.js';
       graphql\`fragment foo on Page {
-        ...componentModule_fragment @relay(mask: false)
+        ...componentModule_fragment
       }\`;
       `,
       `
@@ -69,7 +69,7 @@ ruleTester.run(
         page_unlike(data: $input) {
           ...component_fragment
           ...componentFragment
-          ...component @relay(mask: false)
+          ...component
         }
       }\`
       `,
@@ -121,6 +121,15 @@ ruleTester.run(
         graphql\`fragment foo on Page { ...unused1 @relay(mask: true) }\`;
         `,
         errors: [unusedFieldsWarning('unused1')]
+      },
+      {
+        code: `
+        import type { MyType } from '../shared/component.js';
+        graphql\`fragment foo on Page {
+          ...component_fragment
+        }\`;
+        `,
+        errors: [unusedFieldsWarning('component_fragment')]
       }
     ]
   }

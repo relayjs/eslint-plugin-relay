@@ -69,7 +69,6 @@ function rule(context) {
           fragmentsInTheSameModule.push(fragmentName);
         }
       });
-
       graphqlLiterals.forEach(({node, graphQLAst}) => {
         const queriedFragments = getGraphQLFragmentNames(graphQLAst);
         for (const fragment in queriedFragments) {
@@ -94,9 +93,13 @@ function rule(context) {
         }
       });
     },
+
     ImportDeclaration(node) {
-      foundImportedModules.push(utils.getModuleName(node.source.value));
+      if (node.importKind === 'value') {
+        foundImportedModules.push(utils.getModuleName(node.source.value));
+      }
     },
+
     TaggedTemplateExpression(node) {
       if (utils.isGraphQLTemplate(node)) {
         const graphQLAst = utils.getGraphQLAST(node);
