@@ -57,14 +57,10 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
 }
 
 function rule(context) {
-  let foundImportedModules = [];
-  let templateLiterals = [];
+  const foundImportedModules = [];
+  const templateLiterals = [];
 
   return {
-    Program(_node) {
-      foundImportedModules = [];
-      templateLiterals = [];
-    },
     'Program:exit'(_node) {
       const fragmentsInTheSameModule = [];
       templateLiterals.forEach(templateLiteral => {
