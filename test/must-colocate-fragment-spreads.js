@@ -45,6 +45,12 @@ ruleTester.run(
       }\`;
       `,
       `
+      const Component = import('../shared/component.js');
+      graphql\`fragment foo on Page {
+        ...component_fragment
+      }\`;
+      `,
+      `
       import { Component } from './nested/componentModule.js';
       graphql\`fragment foo on Page {
         ...componentModule_fragment
