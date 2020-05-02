@@ -58,30 +58,19 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
 
 function rule(context) {
   const foundImportedModules = [];
-  const templateLiterals = [];
+  const graphqlLiterals = [];
 
   return {
     'Program:exit'(_node) {
       const fragmentsInTheSameModule = [];
-      templateLiterals.forEach(templateLiteral => {
-        const graphQLAst = utils.getGraphQLAST(templateLiteral);
-        if (!graphQLAst) {
-          // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
-          return;
-        }
+      graphqlLiterals.forEach(({graphQLAst}) => {
         const fragmentName = getGraphQLFragmentDefinitionName(graphQLAst);
         if (fragmentName) {
           fragmentsInTheSameModule.push(fragmentName);
         }
       });
 
-      templateLiterals.forEach(templateLiteral => {
-        const graphQLAst = utils.getGraphQLAST(templateLiteral);
-        if (!graphQLAst) {
-          // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
-          return;
-        }
-
+      graphqlLiterals.forEach(({node, graphQLAst}) => {
         const queriedFragments = getGraphQLFragmentNames(graphQLAst);
         for (const fragment in queriedFragments) {
           const matchedModuleName = foundImportedModules.find(name =>
@@ -92,12 +81,8 @@ function rule(context) {
             !fragmentsInTheSameModule.includes(fragment)
           ) {
             context.report({
-              node: templateLiteral,
-              loc: utils.getLoc(
-                context,
-                templateLiteral,
-                queriedFragments[fragment]
-              ),
+              node,
+              loc: utils.getLoc(context, node, queriedFragments[fragment]),
               message:
                 `This queries for the fragment \`${fragment}\` but this file does ` +
                 'not seem to use it directly. If a different file needs this ' +
@@ -113,7 +98,12 @@ function rule(context) {
     },
     TaggedTemplateExpression(node) {
       if (utils.isGraphQLTemplate(node)) {
-        templateLiterals.push(node);
+        const graphQLAst = utils.getGraphQLAST(node);
+        if (!graphQLAst) {
+          // ignore nodes with syntax errors, they're handled by rule-graphql-syntax
+          return;
+        }
+        graphqlLiterals.push({node, graphQLAst});
       }
     }
   };
