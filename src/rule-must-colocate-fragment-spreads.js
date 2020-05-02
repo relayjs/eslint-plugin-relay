@@ -100,6 +100,15 @@ function rule(context) {
       }
     },
 
+    CallExpression(node) {
+      if (node.callee.name === 'require') {
+        const [source] = node.arguments;
+        if (source && source.type === 'Literal') {
+          foundImportedModules.push(utils.getModuleName(source.value));
+        }
+      }
+    },
+
     TaggedTemplateExpression(node) {
       if (utils.isGraphQLTemplate(node)) {
         const graphQLAst = utils.getGraphQLAST(node);
