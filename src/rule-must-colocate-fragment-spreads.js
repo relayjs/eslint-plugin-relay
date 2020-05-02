@@ -56,14 +56,6 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
   return name;
 }
 
-function isGraphQLTemplate(node) {
-  return (
-    node.tag.type === 'Identifier' &&
-    node.tag.name === 'graphql' &&
-    node.quasi.quasis.length === 1
-  );
-}
-
 function rule(context) {
   let foundImportedModules = [];
   let templateLiterals = [];
@@ -124,7 +116,7 @@ function rule(context) {
       foundImportedModules.push(utils.getModuleName(node.source.value));
     },
     TaggedTemplateExpression(node) {
-      if (isGraphQLTemplate(node)) {
+      if (utils.isGraphQLTemplate(node)) {
         templateLiterals.push(node);
       }
     }
