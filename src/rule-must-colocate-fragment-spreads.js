@@ -100,11 +100,12 @@ function rule(context) {
       }
     },
 
+    ImportExpression(node) {
+      foundImportedModules.push(utils.getModuleName(node.source.value));
+    },
+
     CallExpression(node) {
-      if (
-        node.callee.type === 'Import' ||
-        (node.callee.type === 'Identifier' && node.callee.name === 'require')
-      ) {
+      if (node.callee.name === 'require') {
         const [source] = node.arguments;
         if (source && source.type === 'Literal') {
           foundImportedModules.push(utils.getModuleName(source.value));
