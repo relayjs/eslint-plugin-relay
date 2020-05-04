@@ -10,8 +10,8 @@
 const {visit} = require('graphql');
 const utils = require('./utils');
 
-function getGraphQLFragmentNames(graphQLAst) {
-  const fragmentNames = {};
+function getGraphQLFragmentSpreads(graphQLAst) {
+  const fragmentSpreads = {};
   visit(graphQLAst, {
     FragmentSpread(node, key, parent, path, ancestors) {
       for (const ancestorNode of ancestors) {
@@ -39,11 +39,10 @@ function getGraphQLFragmentNames(graphQLAst) {
           }
         }
       }
-      const nameNode = node.name;
-      fragmentNames[nameNode.value] = nameNode;
+      fragmentSpreads[node.name.value] = node;
     }
   });
-  return fragmentNames;
+  return fragmentSpreads;
 }
 
 function getGraphQLFragmentDefinitionName(graphQLAst) {
@@ -70,7 +69,7 @@ function rule(context) {
         }
       });
       graphqlLiterals.forEach(({node, graphQLAst}) => {
-        const queriedFragments = getGraphQLFragmentNames(graphQLAst);
+        const queriedFragments = getGraphQLFragmentSpreads(graphQLAst);
         for (const fragment in queriedFragments) {
           const matchedModuleName = foundImportedModules.find(name =>
             fragment.startsWith(name)
@@ -105,11 +104,12 @@ function rule(context) {
     },
 
     CallExpression(node) {
-      if (node.callee.name === 'require') {
-        const [source] = node.arguments;
-        if (source && source.type === 'Literal') {
-          foundImportedModules.push(utils.getModuleName(source.value));
-        }
+      if (node.callee.name !== 'require') {
+        return;
+      }
+      const [source] = node.arguments;
+      if (source && source.type === 'Literal') {
+        foundImportedModules.push(utils.getModuleName(source.value));
       }
     },
 
