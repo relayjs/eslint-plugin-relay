@@ -52,8 +52,8 @@ function getLoc(context, templateNode, graphQLNode) {
 
 // TODO remove after we no longer have to support ESLint 3.5.0
 function getLocFromIndex(sourceCode, index) {
-  if (sourceCode.getSourceCode) {
-    return sourceCode.getSourceCode(index);
+  if (sourceCode.getLocFromIndex) {
+    return sourceCode.getLocFromIndex(index);
   }
   let pos = 0;
   for (let line = 0; line < sourceCode.lines.length; line++) {
@@ -93,7 +93,7 @@ function getModuleName(filePath) {
  * Returns a range object for auto fixers.
  */
 function getRange(context, templateNode, graphQLNode) {
-  const graphQLStart = templateNode.quasi.quasis[0].start;
+  const graphQLStart = templateNode.quasi.quasis[0].range[0] + 1;
   return [
     graphQLStart + graphQLNode.loc.start,
     graphQLStart + graphQLNode.loc.end
