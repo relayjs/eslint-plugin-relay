@@ -83,7 +83,13 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
           }
         }
       \`;
-    `
+    `,
+    {
+      code: `
+        graphql\`fragment Test on Page { id }\`;
+      `,
+      options: [{ignoreFields: ['id']}]
+    }
   ],
   invalid: [
     {
@@ -108,6 +114,13 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
         graphql\`fragment Test on Page { unused1, unused2 }\`;
       `,
       errors: [unusedFieldsWarning('unused1'), unusedFieldsWarning('unused2')]
+    },
+    {
+      code: `
+        graphql\`fragment Test on Page { unused1, unused2 }\`;
+      `,
+      options: [{ignoreFields: ['unused1']}],
+      errors: [unusedFieldsWarning('unused2')]
     },
     {
       code: `
