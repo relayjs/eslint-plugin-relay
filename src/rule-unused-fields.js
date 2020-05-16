@@ -12,23 +12,29 @@ const utils = require('./utils');
 const getGraphQLAST = utils.getGraphQLAST;
 
 const DEFAULT_OPTIONS = {
-  ignoreFields: []
+  ignoreFields: [],
+  leavesOnly: false
 };
 
 function getOptions(optionValue) {
   if (optionValue) {
     return {
-      ignoreFields: optionValue.ignoreFields || []
+      ignoreFields: optionValue.ignoreFields || DEFAULT_OPTIONS.ignoreFields,
+      leavesOnly: optionValue.leavesOnly || DEFAULT_OPTIONS.leavesOnly
     };
   }
   return DEFAULT_OPTIONS;
 }
 
-function getGraphQLFieldNames(graphQLAst) {
+function getGraphQLFieldNames(graphQLAst, leavesOnly) {
   const fieldNames = {};
 
   function walkAST(node, ignoreLevel) {
-    if (node.kind === 'Field' && !ignoreLevel) {
+    if (
+      node.kind === 'Field' &&
+      !ignoreLevel &&
+      (!leavesOnly || node.selectionSet == null)
+    ) {
       const nameNode = node.alias || node.name;
       fieldNames[nameNode.value] = nameNode;
     }
@@ -146,7 +152,10 @@ function rule(context) {
           return;
         }
 
-        const queriedFields = getGraphQLFieldNames(graphQLAst);
+        const queriedFields = getGraphQLFieldNames(
+          graphQLAst,
+          options.leavesOnly
+        );
         for (const field in queriedFields) {
           if (
             !foundMemberAccesses[field] &&
