@@ -18,7 +18,7 @@ const DEFAULT_OPTIONS = {
 function getOptions(optionValue) {
   if (optionValue) {
     return {
-      ignoreFields: optionValue.ignoreFields || []
+      ignoreFields: optionValue.ignoreFields || DEFAULT_OPTIONS.ignoreFields
     };
   }
   return DEFAULT_OPTIONS;
