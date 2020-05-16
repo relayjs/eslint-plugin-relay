@@ -11,6 +11,19 @@ const utils = require('./utils');
 
 const getGraphQLAST = utils.getGraphQLAST;
 
+const DEFAULT_OPTIONS = {
+  ignoreFields: []
+};
+
+function getOptions(optionValue) {
+  if (optionValue) {
+    return {
+      ignoreFields: optionValue.ignoreFields || []
+    };
+  }
+  return DEFAULT_OPTIONS;
+}
+
 function getGraphQLFieldNames(graphQLAst) {
   const fieldNames = {};
 
@@ -82,6 +95,8 @@ function isPageInfoField(field) {
 }
 
 function rule(context) {
+  const options = getOptions(context.options[0]);
+
   let currentMethod = [];
   let foundMemberAccesses = {};
   let templateLiterals = [];
@@ -138,7 +153,8 @@ function rule(context) {
             !isPageInfoField(field) &&
             // Do not warn for unused __typename which can be a workaround
             // when only interested in existence of an object.
-            field !== '__typename'
+            field !== '__typename' &&
+            !options.ignoreFields.includes(field)
           ) {
             context.report({
               node: templateLiteral,
