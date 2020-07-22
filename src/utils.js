@@ -12,6 +12,14 @@ const path = require('path');
 const graphql = require('graphql');
 const parse = graphql.parse;
 
+function isGraphQLTemplate(node) {
+  return (
+    node.tag.type === 'Identifier' &&
+    node.tag.name === 'graphql' &&
+    node.quasi.quasis.length === 1
+  );
+}
+
 function getGraphQLAST(taggedTemplateExpression) {
   if (!isGraphQLTag(taggedTemplateExpression.tag)) {
     return null;
@@ -105,6 +113,7 @@ function shouldLint(context) {
 }
 
 module.exports = {
+  isGraphQLTemplate: isGraphQLTemplate,
   getGraphQLAST: getGraphQLAST,
   getLoc: getLoc,
   getLocFromIndex: getLocFromIndex,

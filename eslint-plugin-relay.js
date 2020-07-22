@@ -15,6 +15,7 @@ module.exports = {
     'generated-flow-types': require('./src/rule-generated-flow-types'),
     'no-future-added-value': require('./src/rule-no-future-added-value'),
     'unused-fields': require('./src/rule-unused-fields'),
+    'must-colocate-fragment-spreads': require('./src/rule-must-colocate-fragment-spreads'),
     'hook-required-argument': require('./src/rule-hook-required-argument')
   },
   configs: {
@@ -26,6 +27,7 @@ module.exports = {
         'relay/generated-flow-types': 'warn',
         'relay/no-future-added-value': 'warn',
         'relay/unused-fields': 'warn',
+        'relay/must-colocate-fragment-spreads': 'warn',
         'relay/hook-required-argument': 'warn'
       }
     },
@@ -37,6 +39,7 @@ module.exports = {
         'relay/generated-flow-types': 'error',
         'relay/no-future-added-value': 'error',
         'relay/unused-fields': 'error',
+        'relay/must-colocate-fragment-spreads': 'error',
         'relay/hook-required-argument': 'error'
       }
     }
