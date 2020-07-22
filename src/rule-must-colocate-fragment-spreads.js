@@ -3,6 +3,56 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
+ *
+ * This rule lints for non-colocated fragment spreads within queries or
+ * fragments. In other words, situations where a fragment is spread in module A,
+ * but the module (B) that defines that fragment is not imported by module A.
+ * It does not lint subscriptions or mutations. This catches:
+ *
+ * - The anti-pattern of spreading a fragment in a parent module, then passing
+ * that data down to a child module, or jamming it all in context. This defeats
+ * the purpose of Relay. From the
+ * [Relay docs](https://relay.dev/docs/en/next/introduction-to-relay) – "[Relay]
+ * allows components to specify what data they need and the Relay framework
+ * provides the data. This makes the data needs of inner components opaque and
+ * allows composition of those needs."
+ * - Instances where fragment spreads are unused, which results in overfetching.
+ *
+ * ## When the fragment is unused
+ * The easiest way to tell if a fragment is unused is to remove the line
+ * containing the lint error, run Relay compiler, then Flow. If there are no
+ * type errors, then the fragment was possibly unused. You should still test
+ * your functionality to see that it's working as expected.
+ *
+ * ## When the fragment is being passed to a child component
+ * If you received Relay or Flow errors after attempting to remove the fragment,
+ * then it's very likely that you're passing that data down the tree. Our
+ * recommendation is to have components specify the data they need. In the below
+ * example, this is an anti-pattern because Component B's data requirements are
+ * no longer opaque. Component B should not be fetching data on Component C's
+ * behalf.
+ *
+ * function ComponentA(props) {
+ *   const data = useFragment(graphql`
+ *     fragment ComponentA_fragment on User {
+ *       foo
+ *       bar
+ *       some_field {
+ *         ...ComponentC_fragment
+ *       }
+ *     }
+ *   `);
+ *   return (
+ *     <div>
+ *       {data.foo} {data.baz}
+ *       <ComponentB text="Hello" data={data.some_field} />
+ *     </div>
+ *   );
+ * }
+ *
+ * To address this, refactor Component C to fetch the data it needs. You'll need
+ * to update the intermediate components by amending, or adding a fragment to
+ * each intermediate component between ComponentA and ComponentC.
  */
 
 'use strict';

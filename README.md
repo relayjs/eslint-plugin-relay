@@ -21,6 +21,7 @@ module.exports = {
     'relay/compat-uses-vars': 'warn',
     'relay/graphql-naming': 'error',
     'relay/generated-flow-types': 'warn',
+    'relay/must-colocate-fragment-spreads': 'warn',
     'relay/no-future-added-value': 'warn',
     'relay/unused-fields': 'warn'
   },
