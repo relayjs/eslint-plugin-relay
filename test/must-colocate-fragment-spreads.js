@@ -90,7 +90,17 @@ ruleTester.run(
       `,
       `
       graphql\`fragment foo on Page { ...Fragment @module(name: "ComponentName.react") }\`;
-      `
+      `,
+      '\
+      const getOperation = (reference) => {\
+        return import(`./src/__generated__/${reference}`);\
+      };\
+      ',
+      '\
+      const getOperation = (reference) => {\
+        return import(reference);\
+      };\
+      '
     ],
     invalid: [
       {
