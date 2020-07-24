@@ -150,7 +150,11 @@ function rule(context) {
     },
 
     ImportExpression(node) {
-      foundImportedModules.push(utils.getModuleName(node.source.value));
+      if (node.source.type === 'Literal') {
+        // Allow dynamic imports like import(`test/${fileName}`); and (path) => import(path);
+        // These would have node.source.value undefined
+        foundImportedModules.push(utils.getModuleName(node.source.value));
+      }
     },
 
     CallExpression(node) {
