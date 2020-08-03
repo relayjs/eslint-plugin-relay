@@ -677,7 +677,7 @@ module.exports = {
           }
         });
       },
-      'Program:exit': function(_node) {
+      'Program:exit': function (_node) {
         useFragmentInstances.forEach(useFragmentInstance => {
           const fragmentName = useFragmentInstance.fragmentName;
           const hookName = useFragmentInstance.hookName;
@@ -772,10 +772,7 @@ module.exports = {
         });
         expectedTypes.forEach(type => {
           const componentName = type.split('_')[0];
-          const propName = type
-            .split('_')
-            .slice(1)
-            .join('_');
+          const propName = type.split('_').slice(1).join('_');
           if (!componentName || !propName || !componentMap[componentName]) {
             // incorrect name, covered by graphql-naming/CallExpression
             return;
