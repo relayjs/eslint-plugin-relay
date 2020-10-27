@@ -108,6 +108,7 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
 function rule(context) {
   const foundImportedModules = [];
   const graphqlLiterals = [];
+  const contextFilename = context.getFilename();
 
   return {
     'Program:exit'(_node) {
@@ -145,7 +146,11 @@ function rule(context) {
 
     ImportDeclaration(node) {
       if (node.importKind === 'value') {
-        foundImportedModules.push(utils.getModuleName(node.source.value));
+        const moduleName = utils.getModuleName(
+          node.source.value,
+          contextFilename
+        );
+        foundImportedModules.push(moduleName);
       }
     },
 
@@ -153,7 +158,11 @@ function rule(context) {
       if (node.source.type === 'Literal') {
         // Allow dynamic imports like import(`test/${fileName}`); and (path) => import(path);
         // These would have node.source.value undefined
-        foundImportedModules.push(utils.getModuleName(node.source.value));
+        const moduleName = utils.getModuleName(
+          node.source.value,
+          contextFilename
+        );
+        foundImportedModules.push(moduleName);
       }
     },
 
@@ -163,7 +172,8 @@ function rule(context) {
       }
       const [source] = node.arguments;
       if (source && source.type === 'Literal') {
-        foundImportedModules.push(utils.getModuleName(source.value));
+        const moduleName = utils.getModuleName(source.value, contextFilename);
+        foundImportedModules.push(moduleName);
       }
     },
 

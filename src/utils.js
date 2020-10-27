@@ -67,7 +67,7 @@ function getLocFromIndex(sourceCode, index) {
 }
 
 // Copied directly from Relay
-function getModuleName(filePath) {
+function getModuleName(filePath, contextFilename) {
   // index.js -> index
   // index.js.flow -> index.js
   let filename = path.basename(filePath, path.extname(filePath));
@@ -79,6 +79,14 @@ function getModuleName(filePath) {
   // /path/to/button/index.js -> button
   let moduleName =
     filename === 'index' ? path.basename(path.dirname(filePath)) : filename;
+
+  // Special case to handle relative sibling index imports such as:
+  // import MyComponent from './'
+  if (moduleName === '.' && contextFilename) {
+    moduleName = path.basename(
+      path.dirname(path.join(moduleName, contextFilename))
+    );
+  }
 
   // foo-bar -> fooBar
   // Relay compatibility mode splits on _, so we can't use that here.
