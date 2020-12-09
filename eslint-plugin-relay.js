@@ -16,6 +16,7 @@ module.exports = {
     'no-future-added-value': require('./src/rule-no-future-added-value'),
     'unused-fields': require('./src/rule-unused-fields'),
     'must-colocate-fragment-spreads': require('./src/rule-must-colocate-fragment-spreads'),
+    'function-required-argument': require('./src/rule-function-required-argument'),
     'hook-required-argument': require('./src/rule-hook-required-argument')
   },
   configs: {
@@ -28,6 +29,7 @@ module.exports = {
         'relay/no-future-added-value': 'warn',
         'relay/unused-fields': 'warn',
         'relay/must-colocate-fragment-spreads': 'warn',
+        'relay/function-required-argument': 'warn',
         'relay/hook-required-argument': 'warn'
       }
     },
@@ -40,6 +42,7 @@ module.exports = {
         'relay/no-future-added-value': 'error',
         'relay/unused-fields': 'error',
         'relay/must-colocate-fragment-spreads': 'error',
+        'relay/function-required-argument': 'error',
         'relay/hook-required-argument': 'error'
       }
     }

@@ -23,7 +23,9 @@ module.exports = {
     'relay/generated-flow-types': 'warn',
     'relay/must-colocate-fragment-spreads': 'warn',
     'relay/no-future-added-value': 'warn',
-    'relay/unused-fields': 'warn'
+    'relay/unused-fields': 'warn',
+    'relay/function-required-argument': 'warn',
+    'relay/hook-required-argument': 'warn'
   },
   plugins: ['relay']
 };
