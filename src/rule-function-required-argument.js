@@ -7,8 +7,7 @@
 
 'use strict';
 
-const utils = require('./utils');
-const shouldLint = utils.shouldLint;
+const {shouldLint} = require('./utils');
 
 function reportMissingKeyArgument(node, context) {
   context.report({
