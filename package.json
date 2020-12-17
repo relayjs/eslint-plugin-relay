@@ -9,7 +9,8 @@
     "lint": "eslint eslint-plugin-relay.js src",
     "test": "mocha",
     "test-watch": "mocha --watch",
-    "prettier": "prettier --write '**/*.js'"
+    "prettier": "prettier --write '**/*.js'",
+    "prettier-check": "prettier --check '**/*.js'"
   },
   "files": [
     "eslint-plugin-relay.js",
