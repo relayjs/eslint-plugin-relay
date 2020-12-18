@@ -11,11 +11,30 @@ const utils = require('./utils');
 
 const getGraphQLAST = utils.getGraphQLAST;
 
-function getGraphQLFieldNames(graphQLAst) {
+const DEFAULT_OPTIONS = {
+  ignoreFields: [],
+  leavesOnly: false
+};
+
+function getOptions(optionValue) {
+  if (optionValue) {
+    return {
+      ignoreFields: optionValue.ignoreFields || DEFAULT_OPTIONS.ignoreFields,
+      leavesOnly: optionValue.leavesOnly || DEFAULT_OPTIONS.leavesOnly
+    };
+  }
+  return DEFAULT_OPTIONS;
+}
+
+function getGraphQLFieldNames(graphQLAst, leavesOnly) {
   const fieldNames = {};
 
   function walkAST(node, ignoreLevel) {
-    if (node.kind === 'Field' && !ignoreLevel) {
+    if (
+      node.kind === 'Field' &&
+      !ignoreLevel &&
+      (!leavesOnly || node.selectionSet == null)
+    ) {
       const nameNode = node.alias || node.name;
       fieldNames[nameNode.value] = nameNode;
     }
@@ -82,6 +101,8 @@ function isPageInfoField(field) {
 }
 
 function rule(context) {
+  const options = getOptions(context.options[0]);
+
   let currentMethod = [];
   let foundMemberAccesses = {};
   let templateLiterals = [];
@@ -131,14 +152,18 @@ function rule(context) {
           return;
         }
 
-        const queriedFields = getGraphQLFieldNames(graphQLAst);
+        const queriedFields = getGraphQLFieldNames(
+          graphQLAst,
+          options.leavesOnly
+        );
         for (const field in queriedFields) {
           if (
             !foundMemberAccesses[field] &&
             !isPageInfoField(field) &&
             // Do not warn for unused __typename which can be a workaround
             // when only interested in existence of an object.
-            field !== '__typename'
+            field !== '__typename' &&
+            !options.ignoreFields.includes(field)
           ) {
             context.report({
               node: templateLiteral,
