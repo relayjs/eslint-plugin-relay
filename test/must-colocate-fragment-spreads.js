@@ -100,7 +100,16 @@ ruleTester.run(
       const getOperation = (reference) => {\
         return import(reference);\
       };\
-      '
+      ',
+      {
+        filename: '/Container/MyComponent/AnotherComponent.js',
+        code: `
+        import MyComponent from './';
+        graphql\`fragment foo on Page {
+          ...MyComponent_foo
+        }\`;
+      `
+      }
     ],
     invalid: [
       {
@@ -152,6 +161,16 @@ ruleTester.run(
         }\`;
         `,
         errors: [unusedFieldsWarning('component_fragment')]
+      },
+      {
+        filename: '/Container/NotMyComponent/AnotherComponent.js',
+        code: `
+        import MyComponent from './';
+        graphql\`fragment foo on Page {
+          ...MyComponent_foo
+        }\`;
+      `,
+        errors: [unusedFieldsWarning('MyComponent_foo')]
       }
     ]
   }
