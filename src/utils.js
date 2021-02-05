@@ -112,6 +112,11 @@ function shouldLint(context) {
   return /graphql|relay/i.test(context.getSourceCode().text);
 }
 
+function hasPrecedingEslintDisableComment(node, commentText) {
+  const prevNode = node.loc.startToken.prev;
+  return prevNode.kind === 'Comment' && prevNode.value.startsWith(commentText);
+}
+
 module.exports = {
   isGraphQLTemplate: isGraphQLTemplate,
   getGraphQLAST: getGraphQLAST,
@@ -119,6 +124,7 @@ module.exports = {
   getLocFromIndex: getLocFromIndex,
   getModuleName: getModuleName,
   getRange: getRange,
+  hasPrecedingEslintDisableComment: hasPrecedingEslintDisableComment,
   isGraphQLTag: isGraphQLTag,
   isGraphQLDeprecatedTag: isGraphQLDeprecatedTag,
   shouldLint: shouldLint
