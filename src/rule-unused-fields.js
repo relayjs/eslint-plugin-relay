@@ -7,20 +7,31 @@
 
 'use strict';
 
-const utils = require('./utils');
+const {
+  getGraphQLAST,
+  getLoc,
+  hasPrecedingEslintDisableComment
+} = require('./utils');
 
-const getGraphQLAST = utils.getGraphQLAST;
+const ESLINT_DISABLE_COMMENT = ' eslint-disable-next-line relay/unused-fields';
 
 function getGraphQLFieldNames(graphQLAst) {
   const fieldNames = {};
 
   function walkAST(node, ignoreLevel) {
     if (node.kind === 'Field' && !ignoreLevel) {
+      if (hasPrecedingEslintDisableComment(node, ESLINT_DISABLE_COMMENT)) {
+        return;
+      }
       const nameNode = node.alias || node.name;
       fieldNames[nameNode.value] = nameNode;
     }
     if (node.kind === 'OperationDefinition') {
-      if (node.operation === 'mutation' || node.operation === 'subscription') {
+      if (
+        node.operation === 'mutation' ||
+        node.operation === 'subscription' ||
+        hasPrecedingEslintDisableComment(node, ESLINT_DISABLE_COMMENT)
+      ) {
         return;
       }
       // Ignore fields that are direct children of query as used in mutation
@@ -142,7 +153,7 @@ function rule(context) {
           ) {
             context.report({
               node: templateLiteral,
-              loc: utils.getLoc(context, templateLiteral, queriedFields[field]),
+              loc: getLoc(context, templateLiteral, queriedFields[field]),
               message:
                 `This queries for the field \`${field}\` but this file does ` +
                 'not seem to use it directly. If a different file needs this ' +
