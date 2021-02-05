@@ -100,7 +100,13 @@ ruleTester.run(
       const getOperation = (reference) => {\
         return import(reference);\
       };\
-      '
+      ',
+      `
+      graphql\`fragment foo on Page {
+        # eslint-disable-next-line relay/must-colocate-fragment-spreads
+        ...unused1
+      }\`;
+      `
     ],
     invalid: [
       {
