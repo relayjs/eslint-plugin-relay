@@ -60,6 +60,9 @@
 const {visit} = require('graphql');
 const utils = require('./utils');
 
+const ESLINT_DISABLE_COMMENT =
+  ' eslint-disable-next-line relay/must-colocate-fragment-spreads';
+
 function getGraphQLFragmentSpreads(graphQLAst) {
   const fragmentSpreads = {};
   visit(graphQLAst, {
@@ -88,6 +91,11 @@ function getGraphQLFragmentSpreads(graphQLAst) {
             }
           }
         }
+      }
+      if (
+        utils.hasPrecedingEslintDisableComment(node, ESLINT_DISABLE_COMMENT)
+      ) {
+        return;
       }
       fragmentSpreads[node.name.value] = node;
     }

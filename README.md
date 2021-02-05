@@ -42,6 +42,24 @@ Add `plugin:relay/recommended` or `plugin:relay/strict` in `extends`:
 }
 ```
 
+### Suppressing rules within graphql tags
+
+The following rules support suppression within graphql tags:
+
+- relay/unused-fields
+- relay/must-colocate-fragment-spreads
+
+Supported rules can be suppressed by adding `# eslint-disable-next-line relay/name-of-rule` to the preceding line:
+
+```js
+graphql`fragment foo on Page {
+  # eslint-disable-next-line relay/must-colocate-fragment-spreads
+  ...unused1
+}`
+```
+
+Note that only the `eslint-disable-next-line` form of suppression works. `eslint-disable-line` doesn't currently work until graphql-js provides support for [parsing Comment nodes](https://github.com/graphql/graphql-js/issues/2241) in their AST.
+
 ## Contribute
 
 We actively welcome pull requests, learn how to [contribute](./CONTRIBUTING.md).
