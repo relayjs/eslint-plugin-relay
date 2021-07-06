@@ -442,7 +442,9 @@ module.exports = {
       /**
        * Find useQuery() calls without type arguments.
        */
-      'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
+      'CallExpression[callee.name=useQuery]:not(:has([typeParameters], [typeArguments]))'(
+        node
+      ) {
         const firstArg = node.arguments[0];
         if (firstArg == null) {
           return;
@@ -465,7 +467,7 @@ module.exports = {
       /**
        * Find useLazyLoadQuery() calls without type arguments.
        */
-      'CallExpression[callee.name=useLazyLoadQuery]:not([typeArguments])'(
+      'CallExpression[callee.name=useLazyLoadQuery]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         const firstArg = node.arguments[0];
@@ -490,7 +492,9 @@ module.exports = {
       /**
        * Find commitMutation() calls without type arguments.
        */
-      'CallExpression[callee.name=commitMutation]:not([typeArguments])'(node) {
+      'CallExpression[callee.name=commitMutation]:not(:has([typeParameters], [typeArguments]))'(
+        node
+      ) {
         // Get mutation config. It should be second argument of the `commitMutation`
         const mutationConfig = node.arguments && node.arguments[1];
         if (
@@ -527,7 +531,7 @@ module.exports = {
       /**
        * Find requestSubscription() calls without type arguments.
        */
-      'CallExpression[callee.name=requestSubscription]:not([typeArguments])'(
+      'CallExpression[callee.name=requestSubscription]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         const subscriptionConfig = node.arguments && node.arguments[1];
@@ -585,7 +589,7 @@ module.exports = {
       /**
        * Find usePaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
+      'CallExpression[callee.name=usePaginationFragment]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -598,7 +602,7 @@ module.exports = {
       /**
        * Find useBlockingPaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
+      'CallExpression[callee.name=useBlockingPaginationFragment]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -611,7 +615,7 @@ module.exports = {
       /**
        * Find useLegacyPaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
+      'CallExpression[callee.name=useLegacyPaginationFragment]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -624,7 +628,7 @@ module.exports = {
       /**
        * Find useRefetchableFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
+      'CallExpression[callee.name=useRefetchableFragment]:not(:has([typeParameters], [typeArguments]))'(
         node
       ) {
         reportAndFixRefetchableType(
