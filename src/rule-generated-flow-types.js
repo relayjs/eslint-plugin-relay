@@ -565,6 +565,24 @@ module.exports = {
       },
 
       /**
+       * Find useMutation() calls without type arguments.
+       */
+      'CallExpression[callee.name=useMutation]:not([typeArguments])'(node) {
+        const queryName = getDefinitionName(node.arguments[0]);
+        context.report({
+          node,
+          message: `The \`useMutation\` hook should be used with an explicit generated Flow type, e.g.: useMutation<{{queryName}}>(...)`,
+          data: {
+            queryName: queryName
+          },
+          fix:
+            queryName != null && options.fix
+              ? createTypeImportFixer(node, queryName, queryName)
+              : null
+        });
+      },
+
+      /**
        * Find usePaginationFragment() calls without type arguments.
        */
       'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(

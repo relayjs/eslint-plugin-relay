@@ -902,6 +902,21 @@ import type {FooQuery} from './__generated__/FooQuery.graphql'
       output: null
     },
     {
+      code: `\nconst mutation = graphql\`mutation FooMutation { id }\`;\nconst [commit] = useMutation(mutation);`,
+      options: DEFAULT_OPTIONS,
+      errors: [
+        {
+          message:
+            'The `useMutation` hook should be used with an explicit generated Flow type, e.g.: useMutation<FooMutation>(...)',
+          line: 3
+        }
+      ],
+      output: `
+import type {FooMutation} from './__generated__/FooMutation.graphql'
+const mutation = graphql\`mutation FooMutation { id }\`;
+const [commit] = useMutation<FooMutation>(mutation);`
+    },
+    {
       code: `\ncommitMutation(environemnt, {mutation: graphql\`mutation FooMutation { id }\`})`,
       errors: [
         {
