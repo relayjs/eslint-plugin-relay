@@ -571,7 +571,9 @@ module.exports = {
       /**
        * Find useMutation() calls without type arguments.
        */
-      'CallExpression[callee.name=useMutation]:not([typeArguments])'(node) {
+      'CallExpression[callee.name=useMutation]:not(:has([typeParameters], [typeArguments]))'(
+        node
+      ) {
         const queryName = getDefinitionName(node.arguments[0]);
         context.report({
           node,

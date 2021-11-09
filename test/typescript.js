@@ -221,6 +221,20 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
             line: 4
           }
         ]
+      },
+      {
+        code: `
+          function MyComponent() {
+            const mutation = graphql\`mutation FooMutation { id }\`;
+            const [commit] = useMutation(mutation);
+          }`,
+        errors: [
+          {
+            message:
+              'The `useMutation` hook should be used with an explicit generated Flow type, e.g.: useMutation<FooMutation>(...)',
+            line: 4
+          }
+        ]
       }
     ]
   }
