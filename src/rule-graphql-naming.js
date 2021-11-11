@@ -13,7 +13,6 @@ const getLoc = utils.getLoc;
 const getModuleName = utils.getModuleName;
 const getRange = utils.getRange;
 const isGraphQLTag = utils.isGraphQLTag;
-const isGraphQLDeprecatedTag = utils.isGraphQLDeprecatedTag;
 const shouldLint = utils.shouldLint;
 
 const CREATE_CONTAINER_FUNCTIONS = new Set([
@@ -148,10 +147,7 @@ module.exports = {
               property.computed === false &&
               property.value.type === 'TaggedTemplateExpression'
             ) {
-              if (
-                !isGraphQLTag(property.value.tag) &&
-                !isGraphQLDeprecatedTag(property.value.tag)
-              ) {
+              if (!isGraphQLTag(property.value.tag)) {
                 context.report({
                   node: property.value.tag,
                   message:
