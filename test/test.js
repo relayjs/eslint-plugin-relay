@@ -101,8 +101,7 @@ ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
       ]
     },
     {
-      code:
-        'graphql`fragment Test on User { id } fragment Test2 on User { id }`;',
+      code: 'graphql`fragment Test on User { id } fragment Test2 on User { id }`;',
       errors: [
         {
           message:
