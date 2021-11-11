@@ -20,6 +20,7 @@ module.exports = context => {
     "Literal[value='%future added value']": validateValue,
 
     // StringLiteralTypeAnnotations that are not children of a default case
-    ":not(SwitchCase[test=null] StringLiteralTypeAnnotation)StringLiteralTypeAnnotation[value='%future added value']": validateValue
+    ":not(SwitchCase[test=null] StringLiteralTypeAnnotation)StringLiteralTypeAnnotation[value='%future added value']":
+      validateValue
   };
 };
