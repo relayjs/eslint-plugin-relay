@@ -54,9 +54,8 @@ module.exports = {
         variables = scope.childScopes[0].variables.concat(variables);
         // Temporary fix for babel-eslint
         if (scope.childScopes[0].childScopes.length) {
-          variables = scope.childScopes[0].childScopes[0].variables.concat(
-            variables
-          );
+          variables =
+            scope.childScopes[0].childScopes[0].variables.concat(variables);
         }
       }
 
