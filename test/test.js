@@ -47,12 +47,6 @@ const valid = [
     code: `createFragmentContainer(Component, {
       user: graphql\`fragment MyComponent_user on User {id}\`,
     });`
-  },
-  {
-    filename: 'path/to/MyDeprecatedComponent.jsx',
-    code: `createFragmentContainer(Component, {
-      user: graphql_DEPRECATED\`fragment MyComponent_user on User {id}\`,
-    });`
   }
 ];
 
