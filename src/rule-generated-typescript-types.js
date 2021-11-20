@@ -7,7 +7,7 @@
 
 'use strict';
 
-const utils = require('eslint-plugin-relay/src/utils');
+const utils = require('./utils');
 const shouldLint = utils.shouldLint;
 const getGraphQLAST = utils.getGraphQLAST;
 
@@ -90,7 +90,7 @@ function getPropTypeProperty(
   }
   visitedProps.add(propType);
   const spreadsToVisit = [];
-  if (propType.type === 'GenericTypeAnnotation') {
+  if (propType.type === 'TSTypeReference') {
     return getPropTypeProperty(
       context,
       typeAliasMap,
@@ -99,28 +99,14 @@ function getPropTypeProperty(
       visitedProps
     );
   }
-  if (propType.type !== 'ObjectTypeAnnotation') {
+  if (propType.type !== 'TSTypeLiteral') {
     return null;
   }
-  for (const property of propType.properties) {
+  for (const property of propType.members) {
     if (property.type === 'ObjectTypeSpreadProperty') {
       spreadsToVisit.push(property);
     } else {
-      // HACK: Type annotations don't currently expose a 'key' property:
-      // https://github.com/babel/babel-eslint/issues/307
-
-      let tokenIndex = 0;
-      if (property.static) {
-        tokenIndex++;
-      }
-      if (property.variance) {
-        tokenIndex++;
-      }
-
-      if (
-        context.getSourceCode().getFirstToken(property, tokenIndex).value ===
-        propName
-      ) {
+      if (property.key.name === propName) {
         return property;
       }
     }
@@ -165,7 +151,7 @@ function validateObjectTypeAnnotation(
     propName
   );
 
-  const atleastOnePropertyExists = !!propType.properties[0];
+  const atleastOnePropertyExists = !!propType.members[0];
 
   if (!propTypeProperty) {
     if (onlyVerify) {
@@ -195,7 +181,7 @@ function validateObjectTypeAnnotation(
             if (atleastOnePropertyExists) {
               fixes.push(
                 fixer.insertTextBefore(
-                  propType.properties[0],
+                  propType.members[0],
                   `${propName}: ${type}, `
                 )
               );
@@ -210,14 +196,54 @@ function validateObjectTypeAnnotation(
     return false;
   }
   if (
-    propTypeProperty.value.type === 'NullableTypeAnnotation' &&
-    propTypeProperty.value.typeAnnotation.type === 'GenericTypeAnnotation' &&
-    propTypeProperty.value.typeAnnotation.id.name === type
+    propTypeProperty.type === 'TSPropertySignature' &&
+    propTypeProperty.typeAnnotation.type === 'TSTypeAnnotation'
   ) {
-    return true;
+    // If we have a TSTypeAnnotation here, it must be a TSTypeReference to the generated type, otherwise we have an invalid reference here
+    if (
+      propTypeProperty.typeAnnotation.typeAnnotation.type ===
+        'TSTypeReference' &&
+      propTypeProperty.typeAnnotation.typeAnnotation.typeName.name === type
+    ) {
+      return true;
+    }
+
+    if (onlyVerify) {
+      return false;
+    }
+
+    context.report({
+      message:
+        'Component property `{{prop}}` expects to use the generated ' +
+        '`{{type}}` typescript type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+      data: {
+        prop: propName,
+        type
+      },
+      fix: options.fix
+        ? fixer => {
+            const whitespace = ' '.repeat(Component.parent.loc.start.column);
+            return [
+              genImportFixer(
+                fixer,
+                importFixRange,
+                type,
+                options.haste,
+                whitespace
+              ),
+              fixer.replaceText(
+                propTypeProperty.typeAnnotation.typeAnnotation,
+                type
+              )
+            ];
+          }
+        : null,
+      loc: Component.loc
+    });
+    return false;
   }
   if (
-    propTypeProperty.value.type !== 'GenericTypeAnnotation' ||
+    propTypeProperty.type !== 'TSTypeReference' ||
     propTypeProperty.value.id.name !== type
   ) {
     if (onlyVerify) {
@@ -226,7 +252,7 @@ function validateObjectTypeAnnotation(
     context.report({
       message:
         'Component property `{{prop}}` expects to use the generated ' +
-        '`{{type}}` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+        '`{{type}}` typescript type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
       data: {
         prop: propName,
         type
@@ -257,7 +283,7 @@ function extractReadOnlyType(genericType) {
   let currentType = genericType;
   while (
     currentType != null &&
-    currentType.type === 'GenericTypeAnnotation' &&
+    currentType.type === 'TSTypeReference' &&
     currentType.id.name === '$ReadOnly' &&
     currentType.typeParameters &&
     currentType.typeParameters.type === 'TypeParameterInstantiation' &&
@@ -273,10 +299,10 @@ function resolveTypeAlias(genericType, typeAliasMap) {
   let currentType = genericType;
   while (
     currentType != null &&
-    currentType.type === 'GenericTypeAnnotation' &&
-    typeAliasMap[currentType.id.name] != null
+    currentType.type === 'TSTypeReference' &&
+    typeAliasMap[currentType.typeName.name] != null
   ) {
-    currentType = typeAliasMap[currentType.id.name];
+    currentType = typeAliasMap[currentType.typeName.name];
   }
   return currentType;
 }
@@ -325,7 +351,7 @@ module.exports = {
       if (arg.type === 'Identifier') {
         const name = arg.name;
         let scope = context.getScope();
-        while (scope && scope.type != 'global') {
+        while (scope != null) {
           for (const variable of scope.variables) {
             if (variable.name === name) {
               const definition = variable.defs.find(
@@ -435,8 +461,8 @@ module.exports = {
           requires.push(node);
         }
       },
-      TypeAlias(node) {
-        typeAliasMap[node.id.name] = node.right;
+      TSTypeAliasDeclaration(node) {
+        typeAliasMap[node.id.name] = node.typeAnnotation;
       },
 
       /**
@@ -564,6 +590,23 @@ module.exports = {
         });
       },
 
+      /**
+       * Find useMutation() calls without type arguments.
+       */
+      'CallExpression[callee.name=useMutation]:not([typeParameters])'(node) {
+        const queryName = getDefinitionName(node.arguments[0]);
+        context.report({
+          node,
+          message: `The \`useMutation\` hook should be used with an explicit generated Typescript type, e.g.: useMutation<{{queryName}}>(...)`,
+          data: {
+            queryName: queryName
+          },
+          fix:
+            queryName != null && options.fix
+              ? createTypeImportFixer(node, queryName, queryName)
+              : null
+        });
+      },
       /**
        * Find usePaginationFragment() calls without type arguments.
        */
@@ -794,7 +837,7 @@ module.exports = {
             // There exists a prop typeAnnotation. Let's look at how it's
             // structured
             switch (propType.type) {
-              case 'ObjectTypeAnnotation': {
+              case 'TSTypeLiteral': {
                 validateObjectTypeAnnotation(
                   context,
                   Component,
@@ -806,7 +849,7 @@ module.exports = {
                 );
                 break;
               }
-              case 'GenericTypeAnnotation': {
+              case 'TSTypeReference': {
                 const aliasedObjectType = extractReadOnlyType(
                   resolveTypeAlias(propType, typeAliasMap)
                 );
@@ -816,7 +859,7 @@ module.exports = {
                   break;
                 }
                 switch (aliasedObjectType.type) {
-                  case 'ObjectTypeAnnotation': {
+                  case 'TSTypeLiteral': {
                     validateObjectTypeAnnotation(
                       context,
                       Component,
@@ -828,23 +871,23 @@ module.exports = {
                     );
                     break;
                   }
-                  case 'IntersectionTypeAnnotation': {
+                  case 'TSIntersectionType': {
                     const objectTypes = aliasedObjectType.types
                       .map(intersectedType => {
-                        if (intersectedType.type === 'GenericTypeAnnotation') {
+                        if (intersectedType.type === 'TSTypeReference') {
                           return extractReadOnlyType(
                             resolveTypeAlias(intersectedType, typeAliasMap)
                           );
                         }
-                        if (intersectedType.type === 'ObjectTypeAnnotation') {
+                        if (intersectedType.type === 'TSTypeLiteral') {
                           return intersectedType;
                         }
                       })
                       .filter(maybeObjectType => {
-                        // GenericTypeAnnotation may not map to an object type
+                        // TSTypeReference may not map to an object type
                         return (
                           maybeObjectType &&
-                          maybeObjectType.type === 'ObjectTypeAnnotation'
+                          maybeObjectType.type === 'TSTypeLiteral'
                         );
                       });
                     if (!objectTypes.length) {
@@ -887,7 +930,7 @@ module.exports = {
             context.report({
               message:
                 'Component property `{{prop}}` expects to use the ' +
-                'generated `{{type}}` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
+                'generated `{{type}}` typescript type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
               data: {
                 prop: propName,
                 type: importedPropType

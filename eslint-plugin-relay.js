@@ -58,7 +58,7 @@ module.exports = {
         'relay/must-colocate-fragment-spreads': 'error',
         'relay/function-required-argument': 'error',
         'relay/hook-required-argument': 'error'
-      },
+      }
     },
     'ts-strict': {
       rules: {
@@ -71,7 +71,7 @@ module.exports = {
         'relay/must-colocate-fragment-spreads': 'error',
         'relay/function-required-argument': 'error',
         'relay/hook-required-argument': 'error'
-      },
-    },
+      }
+    }
   }
 };
