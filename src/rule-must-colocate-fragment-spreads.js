@@ -12,7 +12,7 @@
  * - The anti-pattern of spreading a fragment in a parent module, then passing
  * that data down to a child module, or jamming it all in context. This defeats
  * the purpose of Relay. From the
- * [Relay docs](https://relay.dev/docs/en/next/introduction-to-relay) – "[Relay]
+ * [Relay docs](https://relay.dev/docs/next) – "[Relay]
  * allows components to specify what data they need and the Relay framework
  * provides the data. This makes the data needs of inner components opaque and
  * allows composition of those needs."
