@@ -57,7 +57,7 @@ ruleTester.run(
       {
         code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        usePaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `
       },
       {
@@ -73,19 +73,19 @@ ruleTester.run(
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 
         const {data: ref} = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
-        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+        usePaginationFragment<PaginationQuery>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
       `
       },
       {
         code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        useBlockingPaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `
       },
       {
         code: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
-        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        useLegacyPaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `
       },
       {code: 'useQuery<Foo>(graphql`query Foo { id }`)'},
@@ -272,7 +272,7 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         errors: [
           {
             message:
-              'The `useRefetchableFragment` hook should be used with an explicit generated Typescript type, e.g.: useRefetchableFragment<TestFragmentQuery, _>(...)',
+              'The `useRefetchableFragment` hook should be used with an explicit generated Typescript type, e.g.: useRefetchableFragment<TestFragmentQuery>(...)',
             line: 3,
             column: 9
           }
@@ -281,12 +281,12 @@ The prop passed to useFragment() should be typed with the type 'TestFragment_foo
         output: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
-        useRefetchableFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
+        useRefetchableFragment<TestFragmentQuery>(graphql\`fragment TestFragment_foo on User @refetchable(queryName:"TestFragmentQuery") { id }\`)
       `
       },
       {
         code: `
-        useRefetchableFragment<RefetchQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        useRefetchableFragment<RefetchQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
         errors: [
           {
@@ -308,7 +308,7 @@ The prop passed to useRefetchableFragment() should be typed with the type 'TestF
         errors: [
           {
             message:
-              'The `usePaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: usePaginationFragment<TestFragmentQuery, _>(...)',
+              'The `usePaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: usePaginationFragment<TestFragmentQuery>(...)',
             line: 3,
             column: 9
           }
@@ -316,12 +316,12 @@ The prop passed to useRefetchableFragment() should be typed with the type 'TestF
         output: `
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 import type {TestFragmentQuery} from './__generated__/TestFragmentQuery.graphql'
-        usePaginationFragment<TestFragmentQuery, _>(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
+        usePaginationFragment<TestFragmentQuery>(graphql\`fragment TestFragment_foo on User @refetchable(queryName: "TestFragmentQuery") { id }\`)
       `
       },
       {
         code: `
-        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        usePaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
         errors: [
           {
@@ -339,7 +339,7 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestFr
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 
         const refUnused = useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
-        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+        usePaginationFragment<PaginationQuery>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
       `,
         errors: [
           {
@@ -357,7 +357,7 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestPa
         import type {TestFragment_foo$key} from 'TestFragment_foo.graphql';
 
         const {data: refUnused }= useFragment(graphql\`fragment TestFragment_foo on User { id }\`, props.user);
-        usePaginationFragment<PaginationQuery, _>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
+        usePaginationFragment<PaginationQuery>(graphql\`fragment TestPaginationFragment_foo on User { id }\`, ref);
       `,
         errors: [
           {
@@ -378,7 +378,7 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestPa
         errors: [
           {
             message:
-              'The `useBlockingPaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: useBlockingPaginationFragment<TestFragmentQuery, _>(...)',
+              'The `useBlockingPaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: useBlockingPaginationFragment<TestFragmentQuery>(...)',
             line: 3,
             column: 9
           }
@@ -386,7 +386,7 @@ The prop passed to usePaginationFragment() should be typed with the type 'TestPa
       },
       {
         code: `
-        useBlockingPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        useBlockingPaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
         errors: [
           {
@@ -409,7 +409,7 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
         errors: [
           {
             message:
-              'The `useLegacyPaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: useLegacyPaginationFragment<PaginationQuery, _>(...)',
+              'The `useLegacyPaginationFragment` hook should be used with an explicit generated Typescript type, e.g.: useLegacyPaginationFragment<PaginationQuery>(...)',
             line: 3,
             column: 9
           }
@@ -418,7 +418,7 @@ The prop passed to useBlockingPaginationFragment() should be typed with the type
       },
       {
         code: `
-        useLegacyPaginationFragment<PaginationQuery, _>(graphql\`fragment TestFragment_foo on User { id }\`)
+        useLegacyPaginationFragment<PaginationQuery>(graphql\`fragment TestFragment_foo on User { id }\`)
       `,
         errors: [
           {

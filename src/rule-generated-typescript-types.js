@@ -437,13 +437,13 @@ module.exports = {
       const queryName = getRefetchableQueryName(node.arguments[0]);
       context.report({
         node: node,
-        message: `The \`${hookName}\` hook should be used with an explicit generated Typescript type, e.g.: ${hookName}<{{queryName}}, _>(...)`,
+        message: `The \`${hookName}\` hook should be used with an explicit generated Typescript type, e.g.: ${hookName}<{{queryName}}>(...)`,
         data: {
           queryName: queryName || defaultQueryName
         },
         fix:
           queryName != null && options.fix
-            ? createTypeImportFixer(node, queryName, `${queryName}, _`)
+            ? createTypeImportFixer(node, queryName, `${queryName}`)
             : null
       });
     }
