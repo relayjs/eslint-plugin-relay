@@ -39,6 +39,12 @@ ruleTester.run(
       }\`;
       `,
       `
+      import { Component } from '../shared';
+      graphql\`fragment foo on Page {
+        ...component_fragment
+      }\`;
+      `,
+      `
       const Component = require('../shared/component.js');
       graphql\`fragment foo on Page {
         ...component_fragment
@@ -117,6 +123,20 @@ ruleTester.run(
           {
             message: unusedFieldsWarning('unused1'),
             line: 2
+          }
+        ]
+      },
+      {
+        code: `
+        import { ComponentAnother } from '../shared';
+        graphql\`fragment foo on Page {
+          ...component_fragment
+        }\`;
+        `,
+        errors: [
+          {
+            message: unusedFieldsWarning('component_fragment'),
+            line: 4
           }
         ]
       },
