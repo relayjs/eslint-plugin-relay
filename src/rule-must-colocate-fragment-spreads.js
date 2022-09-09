@@ -103,6 +103,10 @@ function getGraphQLFragmentSpreads(graphQLAst) {
   return fragmentSpreads;
 }
 
+function isFirstLetterUppercase(word) {
+  return /^\p{Lu}/u.test(word);
+}
+
 function getGraphQLFragmentDefinitionName(graphQLAst) {
   let name = null;
   visit(graphQLAst, {
@@ -113,7 +117,7 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
   return name;
 }
 
-function rule(context) {
+function checkColocation(context) {
   const foundImportedModules = [];
   const graphqlLiterals = [];
 
@@ -129,9 +133,16 @@ function rule(context) {
       graphqlLiterals.forEach(({node, graphQLAst}) => {
         const queriedFragments = getGraphQLFragmentSpreads(graphQLAst);
         for (const fragment in queriedFragments) {
-          const matchedModuleName = foundImportedModules.find(name =>
-            fragment.startsWith(name)
-          );
+          const matchedModuleName = foundImportedModules.find(module => {
+            if (typeof module === 'string') {
+              return fragment.startsWith(module);
+            } else if (module.type === 'component') {
+              return (
+                fragment.split('_').shift().toLowerCase() ===
+                module.value.toLowerCase()
+              );
+            }
+          });
           if (
             !matchedModuleName &&
             !fragmentsInTheSameModule.includes(fragment)
@@ -153,6 +164,14 @@ function rule(context) {
 
     ImportDeclaration(node) {
       if (node.importKind === 'value') {
+        node.specifiers.forEach(specifier => {
+          if (isFirstLetterUppercase(specifier.imported.name)) {
+            foundImportedModules.push({
+              type: 'component',
+              value: specifier.imported.name
+            });
+          }
+        });
         foundImportedModules.push(utils.getModuleName(node.source.value));
       }
     },
@@ -188,4 +207,11 @@ function rule(context) {
   };
 }
 
-module.exports = rule;
+module.exports = {
+  meta: {
+    docs: {
+      description: 'Checks whether fragment that is spread is used directly'
+    }
+  },
+  create: checkColocation
+};
