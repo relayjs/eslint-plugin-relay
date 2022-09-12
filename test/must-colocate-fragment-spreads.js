@@ -38,12 +38,15 @@ ruleTester.run(
         ...component_fragment
       }\`;
       `,
-      `
-      import { Component } from '../shared';
-      graphql\`fragment foo on Page {
-        ...component_fragment
-      }\`;
-      `,
+      {
+        code: `
+        import { Component } from '../shared';
+        graphql\`fragment foo on Page {
+          ...component_fragment
+        }\`;
+        `,
+        options: [{allowNamedImports: true}]
+      },
       `
       const Component = require('../shared/component.js');
       graphql\`fragment foo on Page {
@@ -133,6 +136,22 @@ ruleTester.run(
           ...component_fragment
         }\`;
         `,
+        options: [{allowNamedImports: true}],
+        errors: [
+          {
+            message: unusedFieldsWarning('component_fragment'),
+            line: 4
+          }
+        ]
+      },
+      {
+        code: `
+        import { Component } from '../shared';
+        graphql\`fragment foo on Page {
+          ...component_fragment
+        }\`;
+        `,
+        options: [{allowNamedImports: false}],
         errors: [
           {
             message: unusedFieldsWarning('component_fragment'),
