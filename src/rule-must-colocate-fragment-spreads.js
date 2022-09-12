@@ -118,8 +118,11 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
 }
 
 function checkColocation(context) {
+  // [{ type: 'importPath' | 'namedImport', value: string }, ...]
   const foundImportedModules = [];
   const graphqlLiterals = [];
+  const config = context.options[0] || {};
+  const allowNamedImports = config.allowNamedImports || false;
 
   return {
     'Program:exit'(_node) {
@@ -134,9 +137,9 @@ function checkColocation(context) {
         const queriedFragments = getGraphQLFragmentSpreads(graphQLAst);
         for (const fragment in queriedFragments) {
           const matchedModuleName = foundImportedModules.find(module => {
-            if (typeof module === 'string') {
-              return fragment.startsWith(module);
-            } else if (module.type === 'component') {
+            if (module.type === 'importPath') {
+              return fragment.startsWith(module.value);
+            } else if (module.type === 'namedImport') {
               return (
                 fragment.split('_').shift().toLowerCase() ===
                 module.value.toLowerCase()
@@ -165,14 +168,20 @@ function checkColocation(context) {
     ImportDeclaration(node) {
       if (node.importKind === 'value') {
         node.specifiers.forEach(specifier => {
-          if (isFirstLetterUppercase(specifier.imported.name)) {
+          if (
+            allowNamedImports &&
+            isFirstLetterUppercase(specifier.imported.name)
+          ) {
             foundImportedModules.push({
-              type: 'component',
+              type: 'namedImport',
               value: specifier.imported.name
             });
           }
         });
-        foundImportedModules.push(utils.getModuleName(node.source.value));
+        foundImportedModules.push({
+          type: 'importPath',
+          value: utils.getModuleName(node.source.value)
+        });
       }
     },
 
@@ -180,7 +189,10 @@ function checkColocation(context) {
       if (node.source.type === 'Literal') {
         // Allow dynamic imports like import(`test/${fileName}`); and (path) => import(path);
         // These would have node.source.value undefined
-        foundImportedModules.push(utils.getModuleName(node.source.value));
+        foundImportedModules.push({
+          type: 'importPath',
+          value: utils.getModuleName(node.source.value)
+        });
       }
     },
 
@@ -190,7 +202,10 @@ function checkColocation(context) {
       }
       const [source] = node.arguments;
       if (source && source.type === 'Literal') {
-        foundImportedModules.push(utils.getModuleName(source.value));
+        foundImportedModules.push({
+          type: 'importPath',
+          value: utils.getModuleName(source.value)
+        });
       }
     },
 
@@ -211,7 +226,18 @@ module.exports = {
   meta: {
     docs: {
       description: 'Checks whether fragment that is spread is used directly'
-    }
+    },
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allowNamedImports: {
+            type: 'boolean'
+          }
+        },
+        additionalProperties: false
+      }
+    ]
   },
   create: checkColocation
 };
