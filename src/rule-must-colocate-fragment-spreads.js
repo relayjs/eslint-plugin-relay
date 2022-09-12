@@ -170,6 +170,7 @@ function checkColocation(context) {
         node.specifiers.forEach(specifier => {
           if (
             allowNamedImports &&
+            specifier.imported &&
             isFirstLetterUppercase(specifier.imported.name)
           ) {
             foundImportedModules.push({
