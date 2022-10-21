@@ -22,28 +22,28 @@ module.exports = {
   configs: {
     recommended: {
       rules: {
-        'relay/graphql-syntax': 'error',
-        'relay/compat-uses-vars': 'warn',
-        'relay/graphql-naming': 'error',
-        'relay/generated-flow-types': 'warn',
-        'relay/no-future-added-value': 'warn',
-        'relay/unused-fields': 'warn',
-        'relay/must-colocate-fragment-spreads': 'warn',
-        'relay/function-required-argument': 'warn',
-        'relay/hook-required-argument': 'warn'
+        '@kbjz/relay/graphql-syntax': 'error',
+        '@kbjz/relay/compat-uses-vars': 'warn',
+        '@kbjz/relay/graphql-naming': 'error',
+        '@kbjz/relay/generated-flow-types': 'warn',
+        '@kbjz/relay/no-future-added-value': 'warn',
+        '@kbjz/relay/unused-fields': 'warn',
+        '@kbjz/relay/must-colocate-fragment-spreads': 'warn',
+        '@kbjz/relay/function-required-argument': 'warn',
+        '@kbjz/relay/hook-required-argument': 'warn'
       }
     },
     strict: {
       rules: {
-        'relay/graphql-syntax': 'error',
-        'relay/compat-uses-vars': 'error',
-        'relay/graphql-naming': 'error',
-        'relay/generated-flow-types': 'error',
-        'relay/no-future-added-value': 'error',
-        'relay/unused-fields': 'error',
-        'relay/must-colocate-fragment-spreads': 'error',
-        'relay/function-required-argument': 'error',
-        'relay/hook-required-argument': 'error'
+        '@kbjz/relay/graphql-syntax': 'error',
+        '@kbjz/relay/compat-uses-vars': 'error',
+        '@kbjz/relay/graphql-naming': 'error',
+        '@kbjz/relay/generated-flow-types': 'error',
+        '@kbjz/relay/no-future-added-value': 'error',
+        '@kbjz/relay/unused-fields': 'error',
+        '@kbjz/relay/must-colocate-fragment-spreads': 'error',
+        '@kbjz/relay/function-required-argument': 'error',
+        '@kbjz/relay/hook-required-argument': 'error'
       }
     }
   }
