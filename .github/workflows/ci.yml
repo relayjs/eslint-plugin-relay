@@ -55,15 +55,16 @@ jobs:
       - name: Build latest (main) version
         if: github.ref == 'refs/heads/main'
         run: yarn version --no-git-tag-version --new-version 0.0.0-main-${GITHUB_SHA}
-      - name: Build release version
+      - name: Check release version matches tag
         if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-        run: yarn version --no-git-tag-version --new-version ${GITHUB_REF_NAME:1}
+        run: |
+          if [ $(cat package.json | jq -r '.version') != "${GITHUB_REF_NAME:1}" ]; then
+            echo "Version in package.json does not match tag. Did you forget to commit the package.json version bump?"
+            exit 1
+          fi
       - name: Publish to npm
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-        run: |
-          for pkg in dist/*; do
-            npm publish "$pkg" ${TAG}
-          done
+        run: npm publish ${TAG}
         env:
           TAG: ${{ github.ref == 'refs/heads/main' && '--tag=main' || ((contains(github.ref_name, '-rc.') && '--tag=dev') || '' )}}
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
