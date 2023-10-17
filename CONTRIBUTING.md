@@ -20,6 +20,16 @@ _Before_ submitting a pull request, please make sure the following is done…
 4. Auto-format the code by running `yarn run prettier` or `npm run prettier`.
 5. If you haven't already, complete the CLA.
 
+### Package Publishing
+
+- Every change that gets pushed to the `main` branch will be published as `0.0.0-main-SHA`.
+- For stable releases, the release author is expected to update the version in `package.json`, commit that, and create an accompanying tag. Once this is pushed a package will be published following that version. The workflow would look something like this:
+
+  ```bash
+  $ yarn version --minor
+  $ git push --follow-tags
+  ```
+
 ### Contributor License Agreement (CLA)
 
 In order to accept your pull request, we need you to submit a CLA. You only need to do this once, so if you've done this for another Facebook open source project, you're good to go. If you are submitting a pull request for the first time, just let us know that you have completed the CLA and we can cross-check with your GitHub username.
