@@ -64,7 +64,7 @@ jobs:
           fi
       - name: Publish to npm
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-        run: npm publish ${TAG}
+        run: npm publish --verbose ${TAG}
         env:
           TAG: ${{ github.ref == 'refs/heads/main' && '--tag=main' || ((contains(github.ref_name, '-rc.') && '--tag=dev') || '' )}}
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
