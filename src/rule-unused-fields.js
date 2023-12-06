@@ -92,7 +92,17 @@ function isPageInfoField(field) {
   }
 }
 
+function getOptions(context) {
+  return (context.options || [])[0] || {};
+}
+
+function isIgnoredField(field, {ignoredFields = []}) {
+  return ignoredFields.includes(field);
+}
+
 function rule(context) {
+  const options = getOptions(context);
+
   let currentMethod = [];
   let foundMemberAccesses = {};
   let templateLiterals = [];
@@ -147,6 +157,7 @@ function rule(context) {
           if (
             !foundMemberAccesses[field] &&
             !isPageInfoField(field) &&
+            !isIgnoredField(field, options) &&
             // Do not warn for unused __typename which can be a workaround
             // when only interested in existence of an object.
             field !== '__typename'
@@ -205,4 +216,20 @@ function rule(context) {
   };
 }
 
-module.exports = rule;
+module.exports = module.exports = {
+  meta: {
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          ignoredFields: {
+            type: 'array',
+            items: {type: 'string'}
+          }
+        },
+        additionalProperties: false
+      }
+    ]
+  },
+  create: rule
+};
