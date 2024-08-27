@@ -285,12 +285,12 @@ function extractReadOnlyType(genericType) {
     currentType != null &&
     currentType.type === 'TSTypeReference' &&
     currentType.id.name === '$ReadOnly' &&
-    currentType.typeParameters &&
-    currentType.typeParameters.type === 'TypeParameterInstantiation' &&
-    Array.isArray(currentType.typeParameters.params) &&
-    currentType.typeParameters.params.length === 1
+    currentType.typeArguments &&
+    currentType.typeArguments.type === 'TSTypeParameterInstantiation' &&
+    Array.isArray(currentType.typeArguments.params) &&
+    currentType.typeArguments.params.length === 1
   ) {
-    currentType = currentType.typeParameters.params[0];
+    currentType = currentType.typeArguments.params[0];
   }
   return currentType;
 }
@@ -468,7 +468,7 @@ module.exports = {
       /**
        * Find useQuery() calls without type arguments.
        */
-      'CallExpression[callee.name=useQuery]:not([typeParameters])'(node) {
+      'CallExpression[callee.name=useQuery]:not([typeArguments])'(node) {
         const firstArg = node.arguments[0];
         if (firstArg == null) {
           return;
@@ -491,7 +491,7 @@ module.exports = {
       /**
        * Find useLazyLoadQuery() calls without type arguments.
        */
-      'CallExpression[callee.name=useLazyLoadQuery]:not([typeParameters])'(
+      'CallExpression[callee.name=useLazyLoadQuery]:not([typeArguments])'(
         node
       ) {
         const firstArg = node.arguments[0];
@@ -516,7 +516,7 @@ module.exports = {
       /**
        * Find commitMutation() calls without type arguments.
        */
-      'CallExpression[callee.name=commitMutation]:not([typeParameters])'(node) {
+      'CallExpression[callee.name=commitMutation]:not([typeArguments])'(node) {
         // Get mutation config. It should be second argument of the `commitMutation`
         const mutationConfig = node.arguments && node.arguments[1];
         if (
@@ -553,7 +553,7 @@ module.exports = {
       /**
        * Find requestSubscription() calls without type arguments.
        */
-      'CallExpression[callee.name=requestSubscription]:not([typeParameters])'(
+      'CallExpression[callee.name=requestSubscription]:not([typeArguments])'(
         node
       ) {
         const subscriptionConfig = node.arguments && node.arguments[1];
@@ -593,7 +593,7 @@ module.exports = {
       /**
        * Find useMutation() calls without type arguments.
        */
-      'CallExpression[callee.name=useMutation]:not([typeParameters])'(node) {
+      'CallExpression[callee.name=useMutation]:not([typeArguments])'(node) {
         const queryName = getDefinitionName(node.arguments[0]);
         context.report({
           node,
@@ -610,7 +610,7 @@ module.exports = {
       /**
        * Find usePaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=usePaginationFragment]:not([typeParameters])'(
+      'CallExpression[callee.name=usePaginationFragment]:not([typeArguments])'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -623,7 +623,7 @@ module.exports = {
       /**
        * Find useBlockingPaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeParameters])'(
+      'CallExpression[callee.name=useBlockingPaginationFragment]:not([typeArguments])'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -636,7 +636,7 @@ module.exports = {
       /**
        * Find useLegacyPaginationFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeParameters])'(
+      'CallExpression[callee.name=useLegacyPaginationFragment]:not([typeArguments])'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -649,7 +649,7 @@ module.exports = {
       /**
        * Find useRefetchableFragment() calls without type arguments.
        */
-      'CallExpression[callee.name=useRefetchableFragment]:not([typeParameters])'(
+      'CallExpression[callee.name=useRefetchableFragment]:not([typeArguments])'(
         node
       ) {
         reportAndFixRefetchableType(
@@ -700,9 +700,9 @@ module.exports = {
           Component: node.id
         };
         // new style React.Component accepts 'props' as the first parameter
-        if (node.superTypeParameters && node.superTypeParameters.params[0]) {
+        if (node.superTypeArguments && node.superTypeArguments.params[0]) {
           componentMap[componentName].propType =
-            node.superTypeParameters.params[0];
+            node.superTypeArguments.params[0];
         }
       },
       TaggedTemplateExpression(node) {
