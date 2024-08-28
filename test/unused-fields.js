@@ -89,7 +89,16 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
         # eslint-disable-next-line relay/unused-fields
         name
       }\`;
-    `
+    `,
+    {
+      code: `
+        graphql\`fragment foo on Page {
+          edges { node { name } }
+        }\`;
+        getCollectionNodes(foo)[0]?.name;
+      `,
+      options: [{ignoredFields: ['node', 'edges']}]
+    }
   ],
   invalid: [
     {
@@ -163,6 +172,15 @@ ruleTester.run('unused-fields', rules['unused-fields'], {
           line: 4
         }
       ]
+    },
+    {
+      code: `
+        graphql\`fragment foo on Page {
+          edges { node { name } }
+        }\`;
+        getCollectionNodes(foo)[0]?.name;
+      `,
+      errors: [unusedFieldsWarning('edges'), unusedFieldsWarning('node')]
     }
   ]
 });

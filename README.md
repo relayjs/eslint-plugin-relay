@@ -52,13 +52,41 @@ The following rules support suppression within graphql tags:
 Supported rules can be suppressed by adding `# eslint-disable-next-line relay/name-of-rule` to the preceding line:
 
 ```js
-graphql`fragment foo on Page {
-  # eslint-disable-next-line relay/must-colocate-fragment-spreads
-  ...unused1
-}`
+graphql`
+  fragment foo on Page {
+    # eslint-disable-next-line relay/must-colocate-fragment-spreads
+    ...unused1
+  }
+`;
 ```
 
 Note that only the `eslint-disable-next-line` form of suppression works. `eslint-disable-line` doesn't currently work until graphql-js provides support for [parsing Comment nodes](https://github.com/graphql/graphql-js/issues/2241) in their AST.
+
+## Ignoring fields with `unused-fields`
+
+Sometimes you might have fields that are accessed by library code (outside the current file), for example:
+
+```js
+import getNodes from 'some/lib';
+
+graphql`
+  fragment foo on Page {
+    edges { # not directly accessed by this file
+      node { # not directly accessed by this file
+        name
+      }
+    }
+  }
+`;
+
+getNodes(foo).map(node => node.name);
+```
+
+You can ignore the `unused-fields` rule for these fields by providing the `ignoredFields` option.
+
+```js
+  'relay/unused-fields': ['warn', {ignoredFields: ['edges', 'node']}],
+```
 
 ## Contribute
 
