@@ -243,6 +243,18 @@ ruleTester.run(
       },
       {
         code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
+      },
+      {
+        code: `
         import type {TestMutation} from 'TestMutation.graphql';
         const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
       `
@@ -250,6 +262,18 @@ ruleTester.run(
       {
         code: `
         import type {TestMutation} from 'TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
         const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
       `
       }
