@@ -329,6 +329,7 @@ module.exports = {
     ]
   },
   create(context) {
+    const sourceCode = context.sourceCode ?? context.getSourceCode();
     if (!shouldLint(context)) {
       return {};
     }
@@ -350,7 +351,7 @@ module.exports = {
       }
       if (arg.type === 'Identifier') {
         const name = arg.name;
-        let scope = context.getScope();
+        let scope = sourceCode.getScope ? sourceCode.getScope(context) : context.getScope();
         while (scope != null) {
           for (const variable of scope.variables) {
             if (variable.name === name) {

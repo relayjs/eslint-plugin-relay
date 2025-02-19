@@ -35,15 +35,18 @@ module.exports = {
     }
   },
   create(context) {
+    const sourceCode = context.sourceCode ?? context.getSourceCode();
     if (!shouldLint(context)) {
       return {};
     }
-    if (!/react-relay\/compat|RelayCompat/.test(context.getSourceCode().text)) {
+    if (!/react-relay\/compat|RelayCompat/.test(sourceCode.text)) {
       // Only run in for compat mode files
       return {};
     }
     function isInScope(name) {
-      var scope = context.getScope();
+      var scope = sourceCode.getScope
+        ? sourceCode.getScope(context)
+        : context.getScope();
       var variables = scope.variables;
 
       while (scope.type !== 'global') {
@@ -90,8 +93,13 @@ module.exports = {
             );
             if (isInScope(componentName)) {
               // if this variable is defined, mark it as used
-              context.markVariableAsUsed(componentName);
-            } else if (componentName === getModuleName(context.getFilename())) {
+              sourceCode.markVariableAsUsed
+                ? sourceCode.markVariableAsUsed(componentName, spreadNode)
+                : context.markVariableAsUsed(componentName);
+            } else if (
+              componentName ===
+              getModuleName(context.filename ?? context.getFilename())
+            ) {
               if (!validateInlineDirective(spreadNode)) {
                 context.report({
                   message:
@@ -120,7 +128,9 @@ module.exports = {
                   loc: loc
                 });
               }
-              context.markVariableAsUsed(propName);
+              sourceCode.markVariableAsUsed
+                ? sourceCode.markVariableAsUsed(propName, spreadNode)
+                : context.markVariableAsUsed(propName);
             } else {
               // otherwise, yell about this needed to be defined
               context.report({
