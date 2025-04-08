@@ -31,7 +31,7 @@ function getGraphQLAST(taggedTemplateExpression) {
   const quasi = taggedTemplateExpression.quasi.quasis[0];
   try {
     return parse(quasi.value.cooked);
-  } catch (error) {
+  } catch (_error) {
     // Invalid syntax, covered by graphql-syntax rule
     return null;
   }
