@@ -43,7 +43,9 @@ module.exports = {
           return;
         }
         try {
-          const filename = path.basename(context.getFilename());
+          const filename = path.basename(
+            context.filename ?? context.getFilename()
+          );
           const ast = parse(new Source(quasi.value.cooked, filename));
           if (ast.definitions.length !== 1) {
             context.report({

@@ -11,8 +11,7 @@ const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
-  parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
+  languageOptions: {ecmaVersion: 6, parser: require('@typescript-eslint/parser')}
 });
 
 ruleTester.run(

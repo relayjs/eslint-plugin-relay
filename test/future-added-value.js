@@ -13,8 +13,12 @@ const rules = require('..').rules;
 const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
-  parserOptions: {ecmaVersion: 6, sourceType: 'module'}
+  languageOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module',
+    parser: require('@babel/eslint-parser'),
+    parserOptions: { requireConfigFile: false, babelOptions: { "presets": ["@babel/preset-flow"] } }
+  },
 });
 
 const FUTURE_ADDED_VALUE_MESSAGE =

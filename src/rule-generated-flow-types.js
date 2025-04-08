@@ -85,6 +85,7 @@ function getPropTypeProperty(
   propName,
   visitedProps = new Set()
 ) {
+  const sourceCode = context.sourceCode ?? context.getSourceCode();
   if (propType == null || visitedProps.has(propType)) {
     return null;
   }
@@ -117,10 +118,7 @@ function getPropTypeProperty(
         tokenIndex++;
       }
 
-      if (
-        context.getSourceCode().getFirstToken(property, tokenIndex).value ===
-        propName
-      ) {
+      if (sourceCode.getFirstToken(property, tokenIndex).value === propName) {
         return property;
       }
     }
@@ -303,6 +301,7 @@ module.exports = {
     ]
   },
   create(context) {
+    const sourceCode = context.sourceCode ?? context.getSourceCode();
     if (!shouldLint(context)) {
       return {};
     }
@@ -324,8 +323,10 @@ module.exports = {
       }
       if (arg.type === 'Identifier') {
         const name = arg.name;
-        let scope = context.getScope();
-        while (scope && scope.type != 'global') {
+        let scope = sourceCode.getScope
+          ? sourceCode.getScope(arg)
+          : context.getScope();
+        while (scope != null && scope.type != 'global') {
           for (const variable of scope.variables) {
             if (variable.name === name) {
               const definition = variable.defs.find(

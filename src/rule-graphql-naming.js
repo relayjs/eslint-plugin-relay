@@ -56,7 +56,7 @@ function validateTemplate(context, taggedTemplateExpression, keyName) {
   if (!ast) {
     return;
   }
-  const moduleName = getModuleName(context.getFilename());
+  const moduleName = getModuleName(context.filename ?? context.getFilename());
   ast.definitions.forEach(def => {
     if (!def.name) {
       // no name, covered by graphql-naming/TaggedTemplateExpression
@@ -109,7 +109,9 @@ module.exports = {
         ast.definitions.forEach(definition => {
           switch (definition.kind) {
             case 'OperationDefinition': {
-              const moduleName = getModuleName(context.getFilename());
+              const moduleName = getModuleName(
+                context.filename ?? context.getFilename()
+              );
               const name = definition.name;
               if (!name) {
                 return;
