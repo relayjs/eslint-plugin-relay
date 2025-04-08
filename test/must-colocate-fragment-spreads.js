@@ -13,8 +13,7 @@ const rules = require('..').rules;
 const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
-  parserOptions: {ecmaVersion: 6, sourceType: 'module'}
+  languageOptions: {ecmaVersion: 6, parser: require('@typescript-eslint/parser')}
 });
 
 function unusedFieldsWarning(fragment) {

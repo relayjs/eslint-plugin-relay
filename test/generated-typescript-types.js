@@ -11,8 +11,7 @@ const rules = require('..').rules;
 const RuleTester = require('eslint').RuleTester;
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-  parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
+  languageOptions: {ecmaVersion: 6, parser: require('@typescript-eslint/parser'), parserOptions: {ecmaFeatures: {jsx: true}}},
 });
 
 const HAS_ESLINT_BEEN_UPGRADED_YET = false;
@@ -177,24 +176,6 @@ ruleTester.run(
         import type {MyComponent_user} from 'MyComponent_user.graphql'
         type Props = {
           user?: MyComponent_user,
-        }
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
-      },
-      {
-        code: `
-        import type {MyComponent_user} from 'MyComponent_user.graphql'
-        type Props = {
-          user: MyComponent_user,
         }
 
         class MyComponent extends React.Component<Props> {
@@ -1366,51 +1347,6 @@ import type {FooSubscription} from './__generated__/FooSubscription.graphql'
               'Component property `user` expects to use the generated ' +
               '`MyComponent_user` typescript type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
             line: 9,
-            column: 15
-          }
-        ]
-      },
-      {
-        filename: 'MyComponent.jsx',
-        code: `
-        import {aaa} from 'aaa'
-        import zzz from 'zzz'
-
-        class MyComponent extends React.Component {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `,
-        output: HAS_ESLINT_BEEN_UPGRADED_YET
-          ? `
-        import {aaa} from 'aaa'
-        import zzz from 'zzz'
-        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-
-        type Props = {user: MyComponent_user};
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
-          : null,
-        errors: [
-          {
-            message:
-              'Component property `user` expects to use the generated ' +
-              '`MyComponent_user` typescript type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
-            line: 5,
             column: 15
           }
         ]

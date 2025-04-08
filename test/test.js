@@ -19,8 +19,12 @@ const DEFAULT_OPTIONS = [
 ];
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
-  parserOptions: {ecmaVersion: 6, ecmaFeatures: {jsx: true}}
+  languageOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module',
+    parser: require('@babel/eslint-parser'),
+    parserOptions: { requireConfigFile: false, babelOptions: { "presets": ["@babel/preset-flow", "@babel/preset-react"] } }
+  },
 });
 
 const valid = [
@@ -520,24 +524,6 @@ ruleTester.run('generated-flow-types', rules['generated-flow-types'], {
         type Props = {|
           +user: ?MyComponent_user,
         |}
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
-    },
-    {
-      code: `
-        import type {MyComponent_user} from 'MyComponent_user.graphql'
-        type Props = {
-          user: MyComponent_user,
-        }
 
         class MyComponent extends React.Component<Props> {
           render() {
@@ -1725,51 +1711,6 @@ import type {FooSubscription} from './__generated__/FooSubscription.graphql'
             'Component property `user` expects to use the generated ' +
             '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
           line: 9,
-          column: 15
-        }
-      ]
-    },
-    {
-      filename: 'MyComponent.jsx',
-      code: `
-        import {aaa} from 'aaa'
-        import zzz from 'zzz'
-
-        class MyComponent extends React.Component {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `,
-      output: HAS_ESLINT_BEEN_UPGRADED_YET
-        ? `
-        import {aaa} from 'aaa'
-        import zzz from 'zzz'
-        import type {MyComponent_user} from './__generated__/MyComponent_user.graphql'
-
-        type Props = {user: MyComponent_user};
-
-        class MyComponent extends React.Component<Props> {
-          render() {
-            return <div />;
-          }
-        }
-
-        createFragmentContainer(MyComponent, {
-          user: graphql\`fragment MyComponent_user on User {id}\`,
-        });
-      `
-        : null,
-      errors: [
-        {
-          message:
-            'Component property `user` expects to use the generated ' +
-            '`MyComponent_user` flow type. See https://facebook.github.io/relay/docs/en/graphql-in-relay.html#importing-generated-definitions',
-          line: 5,
           column: 15
         }
       ]

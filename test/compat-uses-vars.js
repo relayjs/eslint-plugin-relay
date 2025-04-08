@@ -7,20 +7,22 @@
 
 'use strict';
 
-const ruleNoUnusedVars = require('eslint/lib/rules/no-unused-vars');
-const ruleNoUndef = require('eslint/lib/rules/no-undef');
+const { builtinRules } = require('eslint/use-at-your-own-risk');
 const RuleTester = require('eslint').RuleTester;
 const rules = require('..').rules;
 
 const ruleTester = new RuleTester({
-  parserOptions: {ecmaVersion: 6, sourceType: 'module'}
+  languageOptions: {ecmaVersion: 6, sourceType: 'module'},
+  plugins: {
+    relay: {
+      rules: {
+        'compat-uses-vars': rules['compat-uses-vars'],
+      }
+    }
+  }
 });
 
-const esLintVersion = require('eslint/package.json').version;
-
-ruleTester.defineRule('relay/compat-uses-vars', rules['compat-uses-vars']);
-
-ruleTester.run('no-unused-vars', ruleNoUnusedVars, {
+ruleTester.run('no-unused-vars', builtinRules.get('no-unused-vars'), {
   valid: [
     {
       code: `
@@ -108,9 +110,10 @@ module.exports = {
         \`
       `,
       errors: [
-        esLintVersion === '3.5.0'
-          ? "'OtherComponent' is defined but never used."
-          : "'OtherComponent' is assigned a value but never used."
+        {
+          message: `'OtherComponent' is assigned a value but never used.`,
+          suggestions: 1
+        }
       ]
     }
   ]

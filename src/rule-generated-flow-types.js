@@ -324,9 +324,9 @@ module.exports = {
       if (arg.type === 'Identifier') {
         const name = arg.name;
         let scope = sourceCode.getScope
-          ? sourceCode.getScope(context)
+          ? sourceCode.getScope(arg)
           : context.getScope();
-        while (scope && scope.type != 'global') {
+        while (scope != null && scope.type != 'global') {
           for (const variable of scope.variables) {
             if (variable.name === name) {
               const definition = variable.defs.find(

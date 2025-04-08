@@ -351,7 +351,7 @@ module.exports = {
       }
       if (arg.type === 'Identifier') {
         const name = arg.name;
-        let scope = sourceCode.getScope ? sourceCode.getScope(context) : context.getScope();
+        let scope = sourceCode.getScope ? sourceCode.getScope(arg) : context.getScope(arg);
         while (scope != null) {
           for (const variable of scope.variables) {
             if (variable.name === name) {
