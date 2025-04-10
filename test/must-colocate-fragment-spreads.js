@@ -13,7 +13,10 @@ const rules = require('..').rules;
 const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
-  languageOptions: {ecmaVersion: 6, parser: require('@typescript-eslint/parser')}
+  languageOptions: {
+    ecmaVersion: 6,
+    parser: require('@typescript-eslint/parser')
+  }
 });
 
 function unusedFieldsWarning(fragment) {

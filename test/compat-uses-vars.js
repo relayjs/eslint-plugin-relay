@@ -7,7 +7,7 @@
 
 'use strict';
 
-const { builtinRules } = require('eslint/use-at-your-own-risk');
+const {builtinRules} = require('eslint/use-at-your-own-risk');
 const RuleTester = require('eslint').RuleTester;
 const rules = require('..').rules;
 
@@ -16,7 +16,7 @@ const ruleTester = new RuleTester({
   plugins: {
     relay: {
       rules: {
-        'compat-uses-vars': rules['compat-uses-vars'],
+        'compat-uses-vars': rules['compat-uses-vars']
       }
     }
   }

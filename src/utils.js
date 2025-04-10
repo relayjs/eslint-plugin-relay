@@ -45,7 +45,10 @@ function getLoc(context, templateNode, graphQLNode) {
   const start = startAndEnd[0];
   const end = startAndEnd[1];
   return {
-    start: getLocFromIndex(context.sourceCode ?? context.getSourceCode(), start),
+    start: getLocFromIndex(
+      context.sourceCode ?? context.getSourceCode(),
+      start
+    ),
     end: getLocFromIndex(context.sourceCode ?? context.getSourceCode(), end)
   };
 }
@@ -105,7 +108,9 @@ function isGraphQLTag(tag) {
 }
 
 function shouldLint(context) {
-  return /graphql|relay/i.test((context.sourceCode ?? context.getSourceCode()).text);
+  return /graphql|relay/i.test(
+    (context.sourceCode ?? context.getSourceCode()).text
+  );
 }
 
 function hasPrecedingEslintDisableComment(node, commentText) {
