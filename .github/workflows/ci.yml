@@ -15,8 +15,8 @@ jobs:
       matrix:
         node-version: [18.x, 20.x, 22.x]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
@@ -29,8 +29,8 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22.x
           cache: 'yarn'
@@ -47,8 +47,8 @@ jobs:
     if: github.event_name == 'push' && github.repository == 'relayjs/eslint-plugin-relay'
     needs: [build, lint]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22.x
           registry-url: https://registry.npmjs.org/
