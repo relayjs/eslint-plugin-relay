@@ -17,8 +17,11 @@ const ruleTester = new RuleTester({
     ecmaVersion: 6,
     sourceType: 'module',
     parser: require('@babel/eslint-parser'),
-    parserOptions: { requireConfigFile: false, babelOptions: { "presets": ["@babel/preset-flow"] } }
-  },
+    parserOptions: {
+      requireConfigFile: false,
+      babelOptions: {presets: ['@babel/preset-flow']}
+    }
+  }
 });
 
 const FUTURE_ADDED_VALUE_MESSAGE =
