@@ -45,7 +45,7 @@ module.exports = {
     strict: {
       rules: {
         'relay/graphql-syntax': 'error',
-        'relay/compat-uses-vars': 'error',
+        'relay/graphql-naming': 'error',
         'relay/no-future-added-value': 'error',
         'relay/unused-fields': 'error',
         'relay/must-colocate-fragment-spreads': 'error',
