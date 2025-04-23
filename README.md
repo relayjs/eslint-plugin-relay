@@ -18,9 +18,7 @@ module.exports = {
   // Other eslint properties here
   rules: {
     'relay/graphql-syntax': 'error',
-    'relay/compat-uses-vars': 'warn',
     'relay/graphql-naming': 'error',
-    'relay/generated-flow-types': 'warn',
     'relay/must-colocate-fragment-spreads': 'warn',
     'relay/no-future-added-value': 'warn',
     'relay/unused-fields': 'warn',
@@ -41,6 +39,22 @@ Add `plugin:relay/recommended` or `plugin:relay/strict` in `extends`:
   ]
 }
 ```
+
+### Rule Descriptions
+
+Brief descriptions for each rule:
+
+- `relay/graphql-syntax`: Ensures each `graphql\`\`` tagged template literal contains syntactically valid GraphQL. This is also validated by the Relay Compiler, but the ESLint plugin can often provide faster feedback.
+- `relay/graphql-naming`: Ensures GraphQL fragments and quries follow Relay's naming conventions. This is also validated by the Relay Compiler, but the ESLint plugin can often provide faster feedback.
+- `relay/must-colocate-fragment-spreads`: Ensures that when a fragment spread is added within a module, that module directly imports the module which defines that fragment. This prevents the anit-pattern when one component fetches a fragment that is not used by a direct child component. **Note**: This rule leans heavily on Meta's globally unique module names. It likely won't work well in other environments.
+- `relay/no-future-added-value`: Ensures code does not try to explicly handle the `"%future added value"` typename which Relay inserts as a placeholder for types that might be added to the schema while your app is deployed.
+- `relay/unused-fields`: Ensures that every GraphQL field that is fetched is used within the module that includes it. This helps enable Relay's [optimal data fetching](https://relay.dev/blog/2023/10/24/how-relay-enables-optimal-data-fetching/)
+- `relay/function-required-argument`: Ensures that `readInlineData` is always passed an explict argument even though that argument is allowed to be `undefined` at runtime.
+- `relay/hook-required-argument`: Ensures that Relay hooks are always passed an explict argument even though that argument is allowed to be `undefined` at runtime.
+
+Haste?
+
+- `relay/must-colocate-fragment-spreads`: Ensures that for every fragment spread, the module that defines that fragment is imported.
 
 ### Suppressing rules within graphql tags
 
