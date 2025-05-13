@@ -213,6 +213,54 @@ ruleTester.run(
           user: graphql\`fragment MyComponent_user on User {id}\`,
         });
       `
+      },
+      {
+        code: `
+        import type {TestMutation} from 'TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from 'TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from 'TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from 'TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`)
+      `
+      },
+      {
+        code: `
+        import type {TestMutation} from './__generated__/TestMutation.graphql';
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`)
+      `
       }
     ],
     invalid: [
@@ -1501,6 +1549,66 @@ import type {FooSubscription} from './__generated__/FooSubscription.graphql'
             column: 15
           }
         ]
+      },
+      {
+        code: `
+        const mutation = useMutation(graphql\`mutation TestMutation { testMutation { test } }\`);`,
+        options: DEFAULT_OPTIONS,
+        errors: [
+          {
+            message:
+              'The `useMutation` hook should be used with an explicit generated Typescript type, e.g.: useMutation<TestMutation>(...)',
+            line: 2
+          }
+        ],
+        output: `
+import type {TestMutation} from './__generated__/TestMutation.graphql'
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`);`
+      },
+      {
+        code: `
+        const mutation = useMutation(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`);`,
+        options: DEFAULT_OPTIONS,
+        errors: [
+          {
+            message:
+              'The `useMutation` hook should be used with an explicit generated Typescript type, e.g.: useMutation<TestMutation>(...)',
+            line: 2
+          }
+        ],
+        output: `
+import type {TestMutation} from './__generated__/TestMutation.graphql'
+        const mutation = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`);`
+      },
+      {
+        code: `
+        const [commit, inFlight] = useMutation(graphql\`mutation TestMutation { testMutation { test } }\`);`,
+        options: DEFAULT_OPTIONS,
+        errors: [
+          {
+            message:
+              'The `useMutation` hook should be used with an explicit generated Typescript type, e.g.: useMutation<TestMutation>(...)',
+            line: 2
+          }
+        ],
+        output: `
+import type {TestMutation} from './__generated__/TestMutation.graphql'
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation { testMutation { test } }\`);`
+      },
+      {
+        code: `
+        const [commit, inFlight] = useMutation(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`);`,
+        options: DEFAULT_OPTIONS,
+        errors: [
+          {
+            message:
+              'The `useMutation` hook should be used with an explicit generated Typescript type, e.g.: useMutation<TestMutation>(...)',
+            line: 2
+          }
+        ],
+        output: `
+import type {TestMutation} from './__generated__/TestMutation.graphql'
+        const [commit, inFlight] = useMutation<TestMutation>(graphql\`mutation TestMutation($foo: String!) { testMutation(foo: $foo) { test } }\`);`
       }
     ]
   }
