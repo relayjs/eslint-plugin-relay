@@ -386,13 +386,13 @@ module.exports = {
       if (ast == null || ast.definitions.length === 0) {
         return null;
       }
-      const refetchable = ast.definitions[0].directives.find(
+      const refetchable = (ast.definitions[0].directives ?? []).find(
         d => d.name.value === 'refetchable'
       );
       if (!refetchable) {
         return null;
       }
-      const nameArg = refetchable.arguments.find(
+      const nameArg = (refetchable.arguments ?? []).find(
         a => a.name.value === 'queryName'
       );
       return nameArg && nameArg.value && nameArg.value.value
