@@ -5,6 +5,9 @@
   "main": "eslint-plugin-relay",
   "repository": "relayjs/eslint-plugin-relay",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "lint": "eslint eslint-plugin-relay.js src",
     "test": "mocha",
