@@ -77,12 +77,12 @@ function getGraphQLFragmentSpreads(graphQLAst) {
           }
         }
       }
-      for (const directiveNode of node.directives) {
+      for (const directiveNode of node.directives ?? []) {
         if (directiveNode.name.value === 'module') {
           return;
         }
         if (directiveNode.name.value === 'relay') {
-          for (const argumentNode of directiveNode.arguments) {
+          for (const argumentNode of directiveNode.arguments ?? []) {
             if (
               argumentNode.name.value === 'mask' &&
               argumentNode.value.value === false

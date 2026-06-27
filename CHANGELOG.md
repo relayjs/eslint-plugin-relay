@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Add support for GraphQL 17
+- Enable parsing of fragment arguments/variables (`fragment F($x: Int)` and `...spread(arg: $x)`) in the `graphql-syntax` rule and shared parser
+
 ## 2.0.0
 
 - Remove `relay/compat-uses-vars` and `relay/generated-flow-types` rules [493346f](https://github.com/relayjs/eslint-plugin-relay/commit/493346f), [5c313c6](https://github.com/relayjs/eslint-plugin-relay/commit/5c313c6)

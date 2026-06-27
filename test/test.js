@@ -58,7 +58,21 @@ const valid = [
 ];
 
 ruleTester.run('graphql-syntax', rules['graphql-syntax'], {
-  valid: valid,
+  valid: valid.concat([
+    // fragment spread with arguments
+    {
+      filename: 'path/to/MyComponent.react.js',
+      code:
+        'graphql`fragment variableProfilePic on User {\n' +
+        '  ...dynamicProfilePic(size: $size)\n' +
+        '}`;'
+    },
+    // fragment with variable/argument definitions
+    {
+      filename: 'path/to/MyComponent.react.js',
+      code: 'graphql`fragment F($var: Int) on Type {\n   node\n}`;'
+    }
+  ]),
   invalid: [
     // missing name on query
     {

@@ -1,10 +1,13 @@
 {
   "name": "eslint-plugin-relay",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "ESLint plugin for Relay.",
   "main": "eslint-plugin-relay",
   "repository": "relayjs/eslint-plugin-relay",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "lint": "eslint eslint-plugin-relay.js src",
     "test": "mocha",
@@ -18,7 +21,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0"
+    "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
