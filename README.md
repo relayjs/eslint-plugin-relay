@@ -8,10 +8,33 @@
 
 ## How To Use
 
-1.  Add `"relay"` to your eslint `plugins` section.
-2.  Add the relay rules such as `"relay/graphql-syntax": "error"` to your eslint `rules` section, see the example for all rules.
+eslint-plugin-relay comes with shared recommended and strict configs.
 
-Example .eslintrc.js:
+Example `eslint.config.js` (or `eslint.config.ts`):
+```js
+import relay from 'eslint-plugin-relay';
+
+export default defineConfig(
+  // Other eslint properties here
+  {
+    files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
+    plugins: {relay},
+    ...relay.configs.recommended
+  }
+);
+```
+
+Example .eslintrc.js (for legacy versions of ESLint):
+
+```js
+{
+  "extends": [
+    "plugin:relay/recommended"
+  ]
+}
+```
+
+Instead of using a shared config, you can enable just the rules you want:
 
 ```js
 module.exports = {
@@ -29,16 +52,7 @@ module.exports = {
 };
 ```
 
-You can also enable all the recommended or strict rules at once.
-Add `plugin:relay/recommended` or `plugin:relay/strict` in `extends`:
 
-```js
-{
-  "extends": [
-    "plugin:relay/recommended"
-  ]
-}
-```
 
 ### Rule Descriptions
 
