@@ -3,6 +3,7 @@
   "version": "2.1.0",
   "description": "ESLint plugin for Relay.",
   "main": "eslint-plugin-relay",
+  "types": "eslint-plugin-relay.d.ts",
   "repository": "relayjs/eslint-plugin-relay",
   "license": "MIT",
   "engines": {
@@ -17,6 +18,7 @@
   },
   "files": [
     "eslint-plugin-relay.js",
+    "eslint-plugin-relay.d.ts",
     "src/",
     "LICENSE"
   ],
