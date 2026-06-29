@@ -67,6 +67,8 @@ jobs:
             echo "Version in package.json does not match tag. Did you forget to commit the package.json version bump?"
             exit 1
           fi
+      - name: Ensure npm 11.5.1 or later for trusted publishing
+        run: npm install -g npm@11.7.0
       - name: Publish to npm
         if: github.ref == 'refs/heads/main' || github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
         run: npm publish --verbose ${TAG}
