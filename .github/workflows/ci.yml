@@ -46,6 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'relayjs/eslint-plugin-relay'
     needs: [build, lint]
+    environment: npm-publish
+    permissions:
+      contents: read   # Required for actions/checkout
+      id-token: write  # Required for trusted publishing to NPM
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -68,4 +72,3 @@ jobs:
         run: npm publish --verbose ${TAG}
         env:
           TAG: ${{ github.ref == 'refs/heads/main' && '--tag=main' || ((contains(github.ref_name, '-rc.') && '--tag=dev') || '' )}}
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
