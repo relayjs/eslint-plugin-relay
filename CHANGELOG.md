@@ -2,6 +2,8 @@
 
 - Add support for GraphQL 17
 - Enable parsing of fragment arguments/variables (`fragment F($x: Int)` and `...spread(arg: $x)`) in the `graphql-syntax` rule and shared parser
+- Add TypeScript declarations for the plugin's rules and configs
+- Require Node.js 22 or newer
 
 ## 2.0.0
 
