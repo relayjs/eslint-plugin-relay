@@ -108,6 +108,14 @@ ruleTester.run(
         # eslint-disable-next-line relay/must-colocate-fragment-spreads
         ...unused1
       }\`;
+      `,
+      `
+      import { foo } from '../';
+      import { Component } from '../shared/component.js';
+      console.log(foo);
+      graphql\`fragment foo on Page {
+        ...component_fragment
+      }\`;
       `
     ],
     invalid: [

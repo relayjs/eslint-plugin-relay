@@ -134,8 +134,8 @@ module.exports = {
         graphqlLiterals.forEach(({node, graphQLAst}) => {
           const queriedFragments = getGraphQLFragmentSpreads(graphQLAst);
           for (const fragment in queriedFragments) {
-            const matchedModuleName = foundImportedModules.find(name =>
-              fragment.startsWith(name)
+            const matchedModuleName = foundImportedModules.find(
+              name => name && fragment.startsWith(name)
             );
             if (
               !matchedModuleName &&
