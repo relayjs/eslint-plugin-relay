@@ -14,8 +14,19 @@ const RuleTester = eslint.RuleTester;
 
 const ruleTester = new RuleTester({
   languageOptions: {
-    ecmaVersion: 6,
+    ecmaVersion: 2022,
     parser: require('@typescript-eslint/parser')
+  }
+});
+
+const flowRuleTester = new RuleTester({
+  languageOptions: {
+    ecmaVersion: 2022,
+    parser: require('@babel/eslint-parser'),
+    parserOptions: {
+      requireConfigFile: false,
+      babelOptions: {presets: ['@babel/preset-flow']}
+    }
   }
 });
 
@@ -70,6 +81,51 @@ ruleTester.run(
         ...componentModuleFragment
       }\`;
       `,
+      {
+        code: `
+        import { StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      },
+      {
+        code: `
+        import { useStory } from 'example-ui';
+        graphql\`fragment foo on Page {
+          ...useStory_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      },
+      {
+        code: `
+        import { StoryCard as Card } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      },
+      {
+        code: `
+        import { "StoryCard" as Card } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      },
+      {
+        code: `
+        import { StoryCard, type StoryCard$key } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      },
       `
       graphql\`fragment foo1 on Page {
         name
@@ -160,6 +216,145 @@ ruleTester.run(
         }\`;
         `,
         errors: [unusedFieldsWarning('component_fragment')]
+      },
+      {
+        code: `
+        import { StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: false}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { StoryCard } from '@example/ui/story-card';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { StoryCard } from './index.js';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { Other as StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import StoryCard from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import * as StoryCard from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import type { StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { type StoryCard, Other } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { Card } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      }
+    ]
+  }
+);
+
+flowRuleTester.run(
+  'must-colocate-fragment-spreads with Flow imports',
+  rules['must-colocate-fragment-spreads'],
+  {
+    valid: [
+      {
+        code: `
+        import { StoryCard, type StoryCard$key } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}]
+      }
+    ],
+    invalid: [
+      {
+        code: `
+        import typeof { StoryCard } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
+      },
+      {
+        code: `
+        import { typeof StoryCard, Other } from '@example/ui';
+        graphql\`fragment foo on Page {
+          ...StoryCard_fragment
+        }\`;
+        `,
+        options: [{allowNamedImportsFromPackageRoot: true}],
+        errors: [unusedFieldsWarning('StoryCard_fragment')]
       }
     ]
   }

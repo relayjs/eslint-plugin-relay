@@ -113,12 +113,38 @@ function getGraphQLFragmentDefinitionName(graphQLAst) {
   return name;
 }
 
+function isPackageRootImport(source) {
+  return /^(@[^/:#]+\/[^/:#]+|[a-zA-Z0-9][^/:#]*)$/.test(source);
+}
+
+function getImportedName(specifier) {
+  if (specifier.imported.type === 'Identifier') {
+    return specifier.imported.name;
+  }
+  if (typeof specifier.imported.value === 'string') {
+    return specifier.imported.value;
+  }
+  return null;
+}
+
 module.exports = {
   meta: {
     docs: {},
-    schema: []
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allowNamedImportsFromPackageRoot: {
+            type: 'boolean'
+          }
+        },
+        additionalProperties: false
+      }
+    ]
   },
   create(context) {
+    const allowNamedImportsFromPackageRoot =
+      context.options[0]?.allowNamedImportsFromPackageRoot === true;
     const foundImportedModules = [];
     const graphqlLiterals = [];
 
@@ -159,6 +185,24 @@ module.exports = {
       ImportDeclaration(node) {
         if (node.importKind === 'value') {
           foundImportedModules.push(utils.getModuleName(node.source.value));
+          if (
+            allowNamedImportsFromPackageRoot &&
+            isPackageRootImport(node.source.value)
+          ) {
+            node.specifiers.forEach(specifier => {
+              if (
+                specifier.type !== 'ImportSpecifier' ||
+                specifier.importKind === 'type' ||
+                specifier.importKind === 'typeof'
+              ) {
+                return;
+              }
+              const importedName = getImportedName(specifier);
+              if (importedName) {
+                foundImportedModules.push(importedName);
+              }
+            });
+          }
         }
       },
 
