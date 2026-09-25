@@ -64,7 +64,14 @@ Brief descriptions for each rule:
 - `relay/unused-fields`: Ensures that every GraphQL field referenced is used within the module that includes it. This helps enable Relay's [optimal data fetching](https://relay.dev/blog/2023/10/24/how-relay-enables-optimal-data-fetching/)
 - `relay/function-required-argument`: Ensures that `readInlineData` is always passed an explicit argument even though that argument is allowed to be `undefined` at runtime.
 - `relay/hook-required-argument`: Ensures that Relay hooks are always passed an explicit argument even though that argument is allowed to be `undefined` at runtime.
-- `relay/must-colocate-fragment-spreads`: Ensures that when a fragment spread is added within a module, that module directly imports the module which defines that fragment. This prevents the anti-pattern when one component fetches a fragment that is not used by a direct child component. **Note**: This rule leans heavily on Meta's globally unique module names. It likely won't work well in other environments.
+- `relay/must-colocate-fragment-spreads`: Ensures that when a fragment spread is added within a module, that module directly imports the module which defines that fragment. This prevents the anti-pattern when one component fetches a fragment that is not used by a direct child component. **Note**: This rule leans heavily on Meta's globally unique module names. It likely won't work well in other environments. The optional `allowNamedImportsFromPackageRoot` setting also treats the original exported names of runtime named imports from package roots, such as `StoryCard` from `@example/ui`, as module-name candidates. This is only a naming convention, not module or export resolution, and does not prove that the imported symbol uses the fragment. Package-internal and relative imports are unaffected. If the exported name differs from the fragment owner prefix, the rule cannot infer the relationship and can still report the spread.
+
+  ```js
+  'relay/must-colocate-fragment-spreads': [
+    'warn',
+    {allowNamedImportsFromPackageRoot: true},
+  ],
+  ```
 
 ### Suppressing rules within graphql tags
 
