@@ -164,3 +164,20 @@ ruleTester.run(
     ]
   }
 );
+
+new RuleTester().run(
+  'must-colocate-fragment-spreads (default parser)',
+  rules['must-colocate-fragment-spreads'],
+  {
+    valid: [],
+    invalid: [
+      {
+        code: `
+          import Card from './Card';
+          graphql\`fragment Page_profile on Page { ...Card_profile ...Other_profile }\`;
+        `,
+        errors: [unusedFieldsWarning('Other_profile')]
+      }
+    ]
+  }
+);

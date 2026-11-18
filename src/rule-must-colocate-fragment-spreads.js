@@ -157,7 +157,7 @@ module.exports = {
       },
 
       ImportDeclaration(node) {
-        if (node.importKind === 'value') {
+        if (node.importKind == null || node.importKind === 'value') {
           foundImportedModules.push(utils.getModuleName(node.source.value));
         }
       },
